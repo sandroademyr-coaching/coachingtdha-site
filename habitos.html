@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel TDHA — Hábitos, Agenda y Prioridades | Sandro Ademyr</title>
+<meta name="description" content="El sistema de productividad personal completo: hábitos con rachas y heatmap, agenda diaria, matriz de Eisenhower, journal y recordatorios. Pago único, tuyo para siempre.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0a0a0a;
+    --bg-raised: #131313;
+    --gold: #c9a227;
+    --gold-dim: #8a701c;
+    --ink: #ede9df;
+    --ink-muted: #8f8b7f;
+    --line: #262620;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg); color:var(--ink); font-family:'IBM Plex Sans', sans-serif;
+    line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  .display{font-family:'Bebas Neue', sans-serif; letter-spacing:0.02em;}
+  a{color:inherit; text-decoration:none;}
+  .wrap{max-width:1080px; margin:0 auto; padding:0 24px;}
+  .eyebrow{display:inline-block; font-size:12px; letter-spacing:0.18em; text-transform:uppercase; color:var(--gold); font-weight:600; margin-bottom:16px;}
+
+  nav{position:sticky; top:0; z-index:50; background:rgba(10,10,10,0.88); backdrop-filter:blur(8px); border-bottom:1px solid var(--line);}
+  nav .wrap{display:flex; align-items:center; justify-content:space-between; height:72px;}
+  .brand{font-family:'Bebas Neue', sans-serif; font-size:22px; letter-spacing:0.06em;}
+  .brand span{color:var(--gold);}
+  .nav-cta{border:1px solid var(--gold); color:var(--gold); padding:9px 18px; font-size:13px; border-radius:2px;}
+  .nav-cta:hover{background:var(--gold); color:#0a0a0a;}
+
+  header.hero{padding:88px 0 56px; border-bottom:1px solid var(--line); text-align:center;}
+  h1.display{font-size:clamp(40px,6vw,64px); line-height:0.98; margin-bottom:20px;}
+  h1.display .accent{color:var(--gold);}
+  .hero p.lead{font-size:18px; color:var(--ink-muted); max-width:56ch; margin:0 auto 32px;}
+  .btn-primary{background:var(--gold); color:#0a0a0a; padding:15px 28px; font-weight:600; font-size:14px; border-radius:2px; border:1px solid var(--gold); display:inline-block; cursor:pointer;}
+  .btn-primary:hover{background:#e0b82e;}
+
+  section{padding:80px 0; border-bottom:1px solid var(--line);}
+  h2.display{font-size:clamp(30px,4vw,40px); margin-bottom:16px;}
+  .section-lead{color:var(--ink-muted); max-width:60ch; margin-bottom:40px; font-size:16px;}
+
+  /* LIVE PREVIEW */
+  .preview-frame{border:1px solid var(--line); border-radius:6px; overflow:hidden; background:#0d0d0d;}
+  .preview-frame iframe{width:100%; height:640px; border:none; display:block;}
+  .preview-note{font-size:12px; color:var(--ink-muted); margin-top:14px; text-align:center;}
+
+  /* FEATURES */
+  .feat-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line);}
+  @media (max-width:800px){ .feat-grid{grid-template-columns:1fr 1fr;} }
+  .feat-card{background:var(--bg); padding:28px 22px;}
+  .feat-card .icon{font-size:22px; margin-bottom:14px;}
+  .feat-card h3{font-size:15.5px; font-weight:600; margin-bottom:8px;}
+  .feat-card p{font-size:13.5px; color:var(--ink-muted);}
+
+  /* OFFER */
+  .offer-card{background:var(--bg-raised); border:1px solid var(--line); border-radius:4px; padding:48px; text-align:center; max-width:520px; margin:0 auto;}
+  .offer-price{font-family:'Bebas Neue', sans-serif; font-size:64px; color:var(--gold);}
+  .offer-price span{font-family:'IBM Plex Sans'; font-size:15px; color:var(--ink-muted); display:block; margin-top:4px;}
+  ul.offer-list{list-style:none; margin:24px 0; text-align:left;}
+  ul.offer-list li{font-size:14px; color:var(--ink-muted); padding:9px 0; border-top:1px solid var(--line);}
+  ul.offer-list li:first-child{border-top:none;}
+  ul.offer-list li strong{color:var(--ink); font-weight:500;}
+
+  footer{padding:48px 0; text-align:center;}
+  footer p{font-size:13px; color:var(--ink-muted);}
+  footer a.ig{color:var(--gold);}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a class="brand" href="productos.html">SANDRO ADEMYR <span>·</span> COACH TDHA</a>
+    <a class="nav-cta" href="#comprar">Comprar ahora</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="eyebrow">Producto digital · Pago único</span>
+    <h1 class="display">Un solo panel para tus <span class="accent">hábitos</span>, tu <span class="accent">agenda</span> y tus <span class="accent">prioridades</span></h1>
+    <p class="lead">El mismo sistema que uso todos los días para sostener mi propia disciplina, ahora disponible para ti. Sin suscripción, sin cuenta, sin depender de nadie: es un archivo, es tuyo, corre en tu navegador.</p>
+    <a class="btn-primary" href="#comprar">Ver precio y comprar</a>
+  </div>
+</header>
+
+<section id="demo">
+  <div class="wrap">
+    <span class="eyebrow">Pruébalo primero</span>
+    <h2 class="display">Así se ve por dentro</h2>
+    <p class="section-lead">Esta es la herramienta real funcionando, no una maqueta. Interactúa con ella antes de decidir.</p>
+    <div class="preview-frame">
+      <iframe src="panel-tdha.html" title="Vista previa en vivo del Panel TDHA"></iframe>
+    </div>
+    <p class="preview-note">Lo que hagas aquí se guarda solo en este navegador de demostración — tu copia comprada empieza en blanco y es 100% tuya.</p>
+  </div>
+</section>
+
+<section id="que-incluye">
+  <div class="wrap">
+    <span class="eyebrow">Qué incluye</span>
+    <h2 class="display">Cinco módulos, un solo lugar</h2>
+    <p class="section-lead">Nada de saltar entre cinco apps distintas para organizar tu vida.</p>
+  </div>
+  <div class="feat-grid">
+    <div class="feat-card"><div class="icon">🔥</div><h3>Hábitos con rachas</h3><p>Marca tus hábitos diarios, ve tu racha activa y tu progreso semanal en puntos visuales.</p></div>
+    <div class="feat-card"><div class="icon">🗓️</div><h3>Heatmap de constancia</h3><p>Un mapa de calor tipo GitHub que muestra tu consistencia real a lo largo del tiempo, no solo el día de hoy.</p></div>
+    <div class="feat-card"><div class="icon">📋</div><h3>Agenda diaria por estados</h3><p>Cada tarea puede quedar Completada, Incompleta, Cancelada o Reprogramada — tu día real, no una lista ideal.</p></div>
+    <div class="feat-card"><div class="icon">🎯</div><h3>Matriz de Eisenhower</h3><p>Ordena lo urgente vs. lo importante para saber en qué de verdad vale la pena poner tu energía.</p></div>
+    <div class="feat-card"><div class="icon">📔</div><h3>Journal con estado de ánimo</h3><p>Registra cómo te sientes cada día y qué agradeces, con historial navegable hacia atrás.</p></div>
+    <div class="feat-card"><div class="icon">🔔</div><h3>Recordatorios inteligentes</h3><p>Avisos en pantalla, sonido de alerta, y exportación directa a Google Calendar o archivo .ics.</p></div>
+  </div>
+</section>
+
+<section id="comprar" style="border-bottom:none;">
+  <div class="wrap">
+    <span class="eyebrow">Precio</span>
+    <h2 class="display" style="text-align:center;">Un pago. Tuyo para siempre.</h2>
+    <p class="section-lead" style="text-align:center; margin-left:auto; margin-right:auto;">Sin mensualidad, sin renovación, sin límite de tiempo de uso.</p>
+    <div class="offer-card">
+      <div class="offer-price">S/ 99<span>Pago único</span></div>
+      <ul class="offer-list">
+        <li><strong>Acceso inmediato</strong> — descarga apenas se confirma el pago</li>
+        <li><strong>Tuyo para siempre</strong> — sin suscripción ni vencimiento</li>
+        <li><strong>Corre en tu navegador</strong> — tus datos quedan solo en tu dispositivo</li>
+        <li><strong>Actualizaciones</strong> — mejoras futuras del panel, sin costo extra</li>
+      </ul>
+      <a id="btn-pagar-panel" class="btn-primary" style="width:100%; display:block; text-align:center;" href="https://wa.me/51957312122?text=Hola%20Sandro!%20Quiero%20comprar%20el%20Panel%20TDHA%20(S%2F99).%20Ya%20hice%20mi%20Yape%2FPlin%2C%20te%20mando%20el%20comprobante." target="_blank" rel="noopener">Comprar ahora — S/ 99</a>
+      <p style="font-size:11px; color:var(--ink-muted); margin-top:12px;">Yapea o Plinea a <strong style="color:var(--ink);">957 312 122</strong> (Sandro Ademyr) y confirma con el botón de arriba.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>Lima, Perú · <a class="ig" href="https://instagram.com/sandroade.coach" target="_blank" rel="noopener">@sandroade.coach</a></p>
+</footer>
+
+<!--
+  BLOQUE DE CULQI — DESACTIVADO TEMPORALMENTE (ver index.html para instrucciones de reactivación)
+  El botón "Comprar ahora" arriba ahora enlaza directo a WhatsApp para pago manual por Yape/Plin.
+
+<script src="https://js.culqi.com/checkout-js"></script>
+<script>
+(function () {
+  const CULQI_PUBLIC_KEY = "PON_AQUI_TU_LLAVE_PUBLICA_CULQI";
+  const WORKER_URL = "https://PON-AQUI-TU-WORKER.tu-subdominio.workers.dev/cargo";
+
+  const PAGINA_GRACIAS = "gracias-panel.html";
+
+  const appearance = {
+    theme: "default",
+    menuType: "sidebar",
+    buttonCardPayText: "Pagar ahora",
+    variables: {
+      fontFamily: "IBM Plex Sans, sans-serif",
+      borderRadius: "2px",
+      colorBackground: "#0a0a0a",
+      colorPrimary: "#c9a227",
+      colorPrimaryText: "#0a0a0a",
+      colorText: "#ede9df",
+      colorTextSecondary: "#8f8b7f",
+      colorTextPlaceholder: "#8f8b7f"
+    }
+  };
+
+  const paymentMethods = { tarjeta: true, yape: true, billetera: false, bancaMovil: false, agente: false, cuotealo: false };
+  const options = { lang: "es", installments: false, modal: true, paymentMethods: paymentMethods, paymentMethodsSort: Object.keys(paymentMethods) };
+
+  const settings = { title: "Panel TDHA · Hábitos, Agenda y Prioridades", currency: "PEN", amount: 9900 };
+  const config = { settings: settings, options: options, appearance: appearance };
+  const checkoutPanel = new CulqiCheckout(CULQI_PUBLIC_KEY, config);
+
+  checkoutPanel.culqi = async function () {
+    const statusEl = document.getElementById("status-pago-panel");
+    if (checkoutPanel.token) {
+      const tokenId = checkoutPanel.token.id;
+      checkoutPanel.close();
+      statusEl.textContent = "Procesando tu pago...";
+      statusEl.style.color = "var(--ink-muted)";
+      try {
+        const resp = await fetch(WORKER_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            token: tokenId,
+            amount: 9900,
+            description: "Panel TDHA · Hábitos, Agenda y Prioridades",
+            email: (checkoutPanel.token.email || "")
+          })
+        });
+        const data = await resp.json();
+        if (data && data.success) {
+          statusEl.textContent = "¡Pago confirmado! Redirigiéndote a tu descarga...";
+          statusEl.style.color = "#c9a227";
+          setTimeout(function () { window.location.href = PAGINA_GRACIAS; }, 1200);
+        } else {
+          statusEl.textContent = "El pago no pudo procesarse. Intenta de nuevo o escríbeme.";
+          statusEl.style.color = "#d16a6a";
+        }
+      } catch (err) {
+        statusEl.textContent = "Hubo un error de conexión. Intenta de nuevo.";
+        statusEl.style.color = "#d16a6a";
+      }
+    } else if (checkoutPanel.error) {
+      checkoutPanel.close();
+      statusEl.textContent = "No se pudo generar el pago. Verifica los datos e intenta de nuevo.";
+      statusEl.style.color = "#d16a6a";
+    }
+  };
+
+  document.getElementById("btn-pagar-panel").addEventListener("click", function (e) {
+    e.preventDefault();
+    checkoutPanel.open();
+  });
+})();
+</script>
+-->
+
+</body>
+</html>

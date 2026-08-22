@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Productos | Sandro Ademyr</title>
+<meta name="description" content="Herramientas digitales creadas por Sandro Ademyr: sistema de productividad personal y CRM para pequeños negocios.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0a0a0a; --bg-raised: #131313; --gold: #c9a227; --gold-dim: #8a701c;
+    --ink: #ede9df; --ink-muted: #8f8b7f; --line: #262620;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:var(--bg); color:var(--ink); font-family:'IBM Plex Sans', sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased;}
+  .display{font-family:'Bebas Neue', sans-serif; letter-spacing:0.02em;}
+  a{color:inherit; text-decoration:none;}
+  .wrap{max-width:1080px; margin:0 auto; padding:0 24px;}
+  .eyebrow{display:inline-block; font-size:12px; letter-spacing:0.18em; text-transform:uppercase; color:var(--gold); font-weight:600; margin-bottom:16px;}
+
+  nav{position:sticky; top:0; z-index:50; background:rgba(10,10,10,0.88); backdrop-filter:blur(8px); border-bottom:1px solid var(--line);}
+  nav .wrap{display:flex; align-items:center; justify-content:space-between; height:72px;}
+  .brand{font-family:'Bebas Neue', sans-serif; font-size:22px; letter-spacing:0.06em;}
+  .brand span{color:var(--gold);}
+  .nav-cta{border:1px solid var(--gold); color:var(--gold); padding:9px 18px; font-size:13px; border-radius:2px;}
+  .nav-cta:hover{background:var(--gold); color:#0a0a0a;}
+
+  header.hero{padding:80px 0 56px; border-bottom:1px solid var(--line);}
+  h1.display{font-size:clamp(40px,6vw,64px); line-height:0.98; margin-bottom:20px;}
+  h1.display .accent{color:var(--gold);}
+  .hero p.lead{font-size:18px; color:var(--ink-muted); max-width:56ch;}
+
+  section{padding:64px 0;}
+  .product-grid{display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--line); border:1px solid var(--line);}
+  @media (max-width:800px){ .product-grid{grid-template-columns:1fr;} }
+
+  .product-card{background:var(--bg); padding:40px 36px; display:flex; flex-direction:column;}
+  .product-card .tag{font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--gold); font-weight:600; margin-bottom:14px;}
+  .product-card .tag.soon{color:var(--ink-muted);}
+  .product-card h2{font-family:'Bebas Neue',sans-serif; font-size:32px; margin-bottom:10px; letter-spacing:0.01em;}
+  .product-card p.desc{font-size:14px; color:var(--ink-muted); margin-bottom:20px; flex:1;}
+  ul.mini-list{list-style:none; margin-bottom:24px;}
+  ul.mini-list li{font-size:13px; color:var(--ink-muted); padding:5px 0;}
+  ul.mini-list li::before{content:"— "; color:var(--gold-dim);}
+  .product-foot{display:flex; align-items:center; justify-content:space-between; gap:16px; border-top:1px solid var(--line); padding-top:20px;}
+  .price{font-family:'Bebas Neue',sans-serif; font-size:26px; color:var(--gold);}
+  .price span{font-family:'IBM Plex Sans'; font-size:11px; color:var(--ink-muted); display:block; text-transform:uppercase; letter-spacing:0.06em;}
+  .btn-primary{background:var(--gold); color:#0a0a0a; padding:12px 22px; font-weight:600; font-size:13px; border-radius:2px; border:1px solid var(--gold); display:inline-block;}
+  .btn-primary:hover{background:#e0b82e;}
+  .btn-disabled{background:transparent; color:var(--ink-muted); padding:12px 22px; font-weight:600; font-size:13px; border-radius:2px; border:1px solid var(--line); display:inline-block; cursor:default;}
+
+  footer{padding:48px 0; text-align:center; border-top:1px solid var(--line);}
+  footer p{font-size:13px; color:var(--ink-muted);}
+  footer a.ig{color:var(--gold);}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a class="brand" href="index.html">SANDRO ADEMYR <span>·</span> COACH TDHA</a>
+    <a class="nav-cta" href="index.html#agenda">Agenda tu diagnóstico</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="eyebrow">Productos digitales</span>
+    <h1 class="display">Herramientas, no solo <span class="accent">consejos</span></h1>
+    <p class="lead">Todo lo que uso yo mismo para sostener disciplina y orden, empaquetado para que lo uses tú — o tu negocio.</p>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <div class="product-grid">
+
+      <div class="product-card">
+        <span class="tag">Disponible ahora</span>
+        <h2>Panel TDHA</h2>
+        <p class="desc">Hábitos, agenda diaria, matriz de Eisenhower, journal y recordatorios — todo en un solo panel que corre en tu navegador. Pago único, tuyo para siempre.</p>
+        <ul class="mini-list">
+          <li>Rachas de hábitos + heatmap de constancia</li>
+          <li>Agenda con 4 estados por tarea</li>
+          <li>Journal con seguimiento de ánimo</li>
+        </ul>
+        <div class="product-foot">
+          <div class="price">S/ 99<span>Pago único</span></div>
+          <a class="btn-primary" href="habitos.html">Ver producto</a>
+        </div>
+      </div>
+
+      <div class="product-card">
+        <span class="tag soon">Próximamente</span>
+        <h2>CRM para pymes</h2>
+        <p class="desc">El mismo sistema de seguimiento de datos y números que construí para gestionar equipos de distribución, ahora disponible para pequeños negocios que necesitan orden en su pipeline de ventas.</p>
+        <ul class="mini-list">
+          <li>Kanban de clientes y oportunidades</li>
+          <li>Multi-usuario, tus datos aislados y seguros</li>
+          <li>Pensado para equipos pequeños, sin curva de aprendizaje</li>
+        </ul>
+        <div class="product-foot">
+          <div class="price">S/ ___<span>Membresía mensual</span></div>
+          <span class="btn-disabled">Muy pronto</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>Lima, Perú · <a class="ig" href="https://instagram.com/sandroade.coach" target="_blank" rel="noopener">@sandroade.coach</a></p>
+</footer>
+
+</body>
+</html>
