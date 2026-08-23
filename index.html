@@ -127,9 +127,8 @@
 
   /* CALENDLY EMBED SLOT */
   .calendly-frame{
-    border:1px solid var(--line); border-radius:4px; overflow:hidden;
+    border:1px solid var(--line); border-radius:4px; overflow:hidden; min-height:600px;
   }
-  .calendly-frame iframe{width:100%; height:700px; border:none; display:block;}
 
   /* FOOTER */
   footer{padding:48px 0; text-align:center;}
@@ -288,6 +287,13 @@
         </div>
       </div>
     </div>
+
+    <div style="margin-top:56px;">
+      <p style="font-size:13px; color:var(--ink-muted); margin-bottom:16px;">O agenda directo tu sesión de coaching aquí — confírmame tu pago por Yape/Plin antes o después de reservar el horario.</p>
+      <div class="calendly-frame">
+        <div id="inline-container-paid"></div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -297,10 +303,26 @@
     <h2 class="display">Reserva tu diagnóstico de 30 min</h2>
     <p class="section-lead">Sin costo, sin compromiso. Si el fit es correcto, ahí mismo coordinamos el paquete completo.</p>
     <div class="calendly-frame">
-      <iframe src="https://coachingtdha.zohobookings.com/4941140000000037045" title="Agenda tu diagnóstico gratuito"></iframe>
+      <div id="inline-container-free"></div>
     </div>
   </div>
 </section>
+
+<script src="https://bookings.nimbuspop.com/assets/embed.js"></script>
+<script>
+  window.addEventListener("load", function () {
+    Bookings.inlineEmbed({
+      url: "https://coachingtdha.zohobookings.com/portal-embed#/4941140000000037045",
+      parent: "#inline-container-free",
+      height: "600px"
+    });
+    Bookings.inlineEmbed({
+      url: "https://coachingtdha.zohobookings.com/portal-embed#/4941140000000037122",
+      parent: "#inline-container-paid",
+      height: "600px"
+    });
+  });
+</script>
 
 <footer>
   <div class="brand">SANDRO ADEMYR <span style="color:var(--gold)">·</span> COACH TDHA</div>
