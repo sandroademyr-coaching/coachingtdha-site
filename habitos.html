@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Panel TDHA — Hábitos, Agenda y Prioridades | Sandro Ademyr</title>
 <meta name="description" content="El sistema de productividad personal completo: hábitos con rachas y heatmap, agenda diaria, matriz de Eisenhower, journal y recordatorios. Pago único, tuyo para siempre.">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32">
+<link rel="icon" href="/favicon-16x16.png" type="image/png" sizes="16x16">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -47,10 +51,17 @@
   h2.display{font-size:clamp(30px,4vw,40px); margin-bottom:16px;}
   .section-lead{color:var(--ink-muted); max-width:60ch; margin-bottom:40px; font-size:16px;}
 
-  /* LIVE PREVIEW */
-  .preview-frame{border:1px solid var(--line); border-radius:6px; overflow:hidden; background:#0d0d0d;}
-  .preview-frame iframe{width:100%; height:640px; border:none; display:block;}
-  .preview-note{font-size:12px; color:var(--ink-muted); margin-top:14px; text-align:center;}
+  /* SCREENSHOTS CAROUSEL (reemplaza la demo en vivo) */
+  .shot-tabs{display:flex; gap:8px; margin-bottom:20px;}
+  .shot-tab{
+    background:transparent; border:1px solid var(--line); color:var(--ink-muted);
+    padding:9px 18px; font-size:13px; border-radius:2px; cursor:pointer;
+  }
+  .shot-tab.active{border-color:var(--gold); color:var(--gold);}
+  .shot-frame{border:1px solid var(--line); border-radius:6px; overflow:hidden; background:#0d0d0d;}
+  .shot-frame img{width:100%; display:block;}
+  .shot-frame img{display:none;}
+  .shot-frame img.active{display:block;}
 
   /* FEATURES */
   .feat-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line);}
@@ -94,15 +105,33 @@
 
 <section id="demo">
   <div class="wrap">
-    <span class="eyebrow">Pruébalo primero</span>
-    <h2 class="display">Así se ve por dentro</h2>
-    <p class="section-lead">Esta es la herramienta real funcionando, no una maqueta. Interactúa con ella antes de decidir.</p>
-    <div class="preview-frame">
-      <iframe src="panel-tdha.html" title="Vista previa en vivo del Panel TDHA"></iframe>
+    <span class="eyebrow">Así se ve por dentro</span>
+    <h2 class="display">Capturas reales de la herramienta</h2>
+    <p class="section-lead">Estas son pantallas reales del panel en uso — hábitos con rachas, tu día ordenado por prioridad, y tu journal diario.</p>
+
+    <div class="shot-tabs">
+      <button class="shot-tab active" data-target="shot-habitos">Hábitos</button>
+      <button class="shot-tab" data-target="shot-agenda">Agenda & Prioridades</button>
+      <button class="shot-tab" data-target="shot-journal">Journal</button>
     </div>
-    <p class="preview-note">Lo que hagas aquí se guarda solo en este navegador de demostración — tu copia comprada empieza en blanco y es 100% tuya.</p>
+    <div class="shot-frame">
+      <img id="shot-habitos" class="active" src="img/screenshot-habitos.png" alt="Pantalla de hábitos del Panel TDHA, mostrando rachas y mapa de constancia">
+      <img id="shot-agenda" src="img/screenshot-agenda.png" alt="Pantalla de agenda y matriz de Eisenhower del Panel TDHA">
+      <img id="shot-journal" src="img/screenshot-journal.png" alt="Pantalla de journal diario del Panel TDHA">
+    </div>
   </div>
 </section>
+
+<script>
+  document.querySelectorAll(".shot-tab").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      document.querySelectorAll(".shot-tab").forEach(function (b) { b.classList.remove("active"); });
+      document.querySelectorAll(".shot-frame img").forEach(function (img) { img.classList.remove("active"); });
+      btn.classList.add("active");
+      document.getElementById(btn.dataset.target).classList.add("active");
+    });
+  });
+</script>
 
 <section id="que-incluye">
   <div class="wrap">
