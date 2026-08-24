@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32">
+<link rel="icon" href="/favicon-16x16.png" type="image/png" sizes="16x16">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<title>Cierre CRM — Pipeline de ventas para pymes | Sandro Ademyr</title>
+<meta name="description" content="El CRM con precio fijo, sin cobro por asesor. Pipeline visual, dashboard de ventas y seguimiento de comisiones, pensado para cómo vende tu equipo en el día a día.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0a0a0a; --bg-raised: #131313; --gold: #c9a227; --gold-dim: #8a701c;
+    --ink: #ede9df; --ink-muted: #8f8b7f; --line: #262620;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--bg); color:var(--ink); font-family:'IBM Plex Sans', sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased;}
+  .display{font-family:'Bebas Neue', sans-serif; letter-spacing:0.02em;}
+  a{color:inherit; text-decoration:none;}
+  .wrap{max-width:1080px; margin:0 auto; padding:0 24px;}
+  .eyebrow{display:inline-block; font-size:12px; letter-spacing:0.18em; text-transform:uppercase; color:var(--gold); font-weight:600; margin-bottom:16px;}
+
+  nav{position:sticky; top:0; z-index:50; background:rgba(10,10,10,0.88); backdrop-filter:blur(8px); border-bottom:1px solid var(--line);}
+  nav .wrap{display:flex; align-items:center; justify-content:space-between; height:72px;}
+  .brand{font-family:'Bebas Neue', sans-serif; font-size:22px; letter-spacing:0.06em;}
+  .brand span{color:var(--gold);}
+  .nav-cta{border:1px solid var(--gold); color:var(--gold); padding:9px 18px; font-size:13px; border-radius:2px;}
+  .nav-cta:hover{background:var(--gold); color:#0a0a0a;}
+
+  header.hero{padding:88px 0 56px; border-bottom:1px solid var(--line);}
+  h1.display{font-size:clamp(38px,5.5vw,58px); line-height:1.02; margin-bottom:20px; max-width:16ch;}
+  h1.display .accent{color:var(--gold);}
+  .hero p.lead{font-size:18px; color:var(--ink-muted); max-width:56ch; margin-bottom:32px;}
+  .btn-primary{background:var(--gold); color:#0a0a0a; padding:15px 28px; font-weight:600; font-size:14px; border-radius:2px; border:1px solid var(--gold); display:inline-block;}
+  .btn-primary:hover{background:#e0b82e;}
+  .btn-ghost{border:1px solid var(--line); color:var(--ink); padding:15px 28px; font-size:14px; border-radius:2px; display:inline-block;}
+  .btn-ghost:hover{border-color:var(--ink-muted);}
+  .cta-row{display:flex; gap:16px; flex-wrap:wrap;}
+
+  section{padding:72px 0; border-bottom:1px solid var(--line);}
+  h2.display{font-size:clamp(30px,4vw,40px); margin-bottom:16px;}
+  .section-lead{color:var(--ink-muted); max-width:62ch; margin-bottom:44px; font-size:16px;}
+
+  /* FEATURES */
+  .feat-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line);}
+  @media (max-width:800px){ .feat-grid{grid-template-columns:1fr 1fr;} }
+  .feat-card{background:var(--bg); padding:28px 22px;}
+  .feat-card .icon{font-size:22px; margin-bottom:14px;}
+  .feat-card h3{font-size:15.5px; font-weight:600; margin-bottom:8px;}
+  .feat-card p{font-size:13.5px; color:var(--ink-muted);}
+
+  /* COMPARISON TABLE */
+  .compare-table{width:100%; border-collapse:collapse; font-size:14px;}
+  .compare-table th, .compare-table td{padding:14px 16px; text-align:left; border-bottom:1px solid var(--line);}
+  .compare-table th{font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:var(--ink-muted); font-weight:600;}
+  .compare-table td{color:var(--ink-muted);}
+  .compare-table tr.us td{color:var(--ink);}
+  .compare-table tr.us{background:var(--bg-raised);}
+  .compare-table td:first-child, .compare-table th:first-child{font-weight:600; color:var(--ink);}
+  .compare-table tr.us td:first-child{color:var(--gold);}
+  .compare-note{font-size:12px; color:var(--ink-muted); margin-top:14px;}
+
+  /* OFFER */
+  .offer-card{background:var(--bg-raised); border:1px solid var(--line); border-radius:4px; padding:48px; text-align:center; max-width:520px; margin:0 auto;}
+  .offer-price{font-family:'Bebas Neue', sans-serif; font-size:60px; color:var(--gold);}
+  .offer-price span{font-family:'IBM Plex Sans'; font-size:15px; color:var(--ink-muted); display:block; margin-top:4px;}
+  ul.offer-list{list-style:none; margin:24px 0; text-align:left;}
+  ul.offer-list li{font-size:14px; color:var(--ink-muted); padding:9px 0; border-top:1px solid var(--line);}
+  ul.offer-list li:first-child{border-top:none;}
+  ul.offer-list li strong{color:var(--ink); font-weight:500;}
+
+  footer{padding:48px 0; text-align:center;}
+  footer p{font-size:13px; color:var(--ink-muted);}
+  footer a.ig{color:var(--gold);}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a class="brand" href="productos.html">SANDRO ADEMYR <span>·</span> COACH TDHA</a>
+    <a class="nav-cta" href="#precio">Ver precio</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="eyebrow">CRM para pymes</span>
+    <h1 class="display">Un precio fijo. <span class="accent">Sin cobro por asesor.</span></h1>
+    <p class="lead">Los CRM grandes cobran por usuario — y eso se dispara apenas creces. Cierre CRM tiene un precio fijo mensual, así tu equipo crezca de 2 a 15 personas. Pipeline visual, dashboard de ventas y seguimiento de comisiones, listo desde el primer día.</p>
+    <div class="cta-row">
+      <a class="btn-primary" href="#precio">Ver precio</a>
+      <a class="btn-ghost" href="#comparativa">Ver comparativa</a>
+    </div>
+  </div>
+</header>
+
+<section id="que-incluye">
+  <div class="wrap">
+    <span class="eyebrow">Qué incluye</span>
+    <h2 class="display">Todo lo que tu equipo de ventas ya usa, en un solo lugar</h2>
+    <p class="section-lead">Nada de armar procesos desde cero — el pipeline y el dashboard ya vienen configurados para cómo se vende puerta a puerta, por citas o por campañas.</p>
+  </div>
+  <div class="feat-grid">
+    <div class="feat-card"><div class="icon">📋</div><h3>Pipeline visual (Kanban)</h3><p>Arrastra cada lead por sus etapas: Nuevo, Contactado, Cita agendada, Cierre, Post-venta. Configurable a tu propio proceso.</p></div>
+    <div class="feat-card"><div class="icon">📊</div><h3>Dashboard de ventas</h3><p>Ranking de asesores, productos más vendidos, ticket promedio, origen de leads — todo en gráficos, sin armar reportes a mano.</p></div>
+    <div class="feat-card"><div class="icon">💰</div><h3>Comisiones por tipo de venta</h3><p>Define tasas distintas para contado, crédito estándar o alto riesgo — el sistema calcula solo.</p></div>
+    <div class="feat-card"><div class="icon">👥</div><h3>Usuarios ilimitados</h3><p>Todo tu equipo de ventas adentro, sin pagar de más por cada persona que sumas.</p></div>
+    <div class="feat-card"><div class="icon">🔒</div><h3>Tus datos, aislados y seguros</h3><p>Cada empresa tiene su propio espacio privado — nadie más ve tu información, ni siquiera otras cuentas del sistema.</p></div>
+    <div class="feat-card"><div class="icon">📅</div><h3>Integración con Google Calendar</h3><p>Agenda cada cita de venta directo desde el lead, sin cambiar de pantalla.</p></div>
+  </div>
+</section>
+
+<section id="comparativa">
+  <div class="wrap">
+    <span class="eyebrow">Comparativa</span>
+    <h2 class="display">Cómo se compara con los CRM grandes</h2>
+    <p class="section-lead">Precios de referencia investigados en 2026, planes de entrada de cada proveedor.</p>
+    <table class="compare-table">
+      <thead>
+        <tr><th>CRM</th><th>Precio</th><th>Modelo</th><th>Para un equipo de 5</th></tr>
+      </thead>
+      <tbody>
+        <tr class="us"><td>Cierre CRM</td><td>S/ 149/mes</td><td>Fijo, usuarios ilimitados</td><td><strong>S/ 149/mes</strong></td></tr>
+        <tr><td>Zoho CRM (Standard)</td><td>US$ 14/usuario/mes</td><td>Por asesor</td><td>~S/ 260/mes</td></tr>
+        <tr><td>Pipedrive (Lite)</td><td>US$ 14–24/usuario/mes</td><td>Por asesor</td><td>~S/ 260–450/mes</td></tr>
+        <tr><td>HubSpot (Starter)</td><td>US$ 15/asiento/mes</td><td>Por asesor</td><td>~S/ 280/mes</td></tr>
+      </tbody>
+    </table>
+    <p class="compare-note">Conversión referencial a S/ 3,75 por dólar. Precios de planes de entrada de cada proveedor, sujetos a cambio — verifica las tarifas vigentes antes de decidir.</p>
+  </div>
+</section>
+
+<section id="precio" style="border-bottom:none;">
+  <div class="wrap">
+    <span class="eyebrow">Precio</span>
+    <h2 class="display" style="text-align:center;">Membresía mensual</h2>
+    <p class="section-lead" style="text-align:center; margin-left:auto; margin-right:auto;">Cancela cuando quieras. Sin contrato forzoso, sin costos ocultos por usuario.</p>
+    <div class="offer-card">
+      <div class="offer-price">S/ 149<span>Por mes, por empresa</span></div>
+      <ul class="offer-list">
+        <li><strong>Usuarios ilimitados</strong> — todo tu equipo de ventas</li>
+        <li><strong>Pipeline + dashboard</strong> — configurados desde el día uno</li>
+        <li><strong>Datos aislados</strong> — tu información, solo tuya</li>
+        <li><strong>Soporte directo</strong> — conmigo, no un ticket sin respuesta</li>
+      </ul>
+      <a class="btn-primary" style="width:100%; text-align:center; display:block;" href="https://wa.me/51957312122?text=Hola%20Sandro!%20Quiero%20info%20de%20Cierre%20CRM%20para%20mi%20negocio.">Solicitar acceso</a>
+      <p style="font-size:11px; color:var(--ink-muted); margin-top:14px;">La activación es asistida — te configuro la cuenta y las etapas de tu pipeline en la primera llamada.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>Lima, Perú · <a class="ig" href="https://instagram.com/sandroade.coach" target="_blank" rel="noopener">@sandroade.coach</a></p>
+</footer>
+
+</body>
+</html>
