@@ -115,6 +115,11 @@
   .origin-step.active{border-left-color:var(--gold);}
   .origin-step .tag{font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--gold); font-weight:600;}
   .origin-step p{font-size:14px; color:var(--ink-muted); margin-top:8px;}
+  .historia-intro{display:grid; grid-template-columns:auto 1fr; gap:32px; align-items:center; margin-bottom:48px;}
+  @media (max-width:700px){ .historia-intro{grid-template-columns:1fr; text-align:center; justify-items:center;} }
+  .historia-photo{width:120px; height:120px; border-radius:50%; object-fit:cover; border:3px solid var(--gold); flex-shrink:0;}
+  .historia-intro p{font-size:15px; color:var(--ink-muted); max-width:62ch;}
+  .historia-intro p strong{color:var(--ink); font-weight:600;}
 
   /* OFFER */
   .offer-card{
@@ -245,22 +250,28 @@
     <span class="eyebrow">Historia de origen</span>
     <h2 class="display">Dolor → Giro → Decisión → Resultado</h2>
     <p class="section-lead">El mismo formato que uso en cada sesión, aplicado primero a mi propia historia.</p>
+
+    <div class="historia-intro">
+      <img class="historia-photo" src="img/sandro.jpg" alt="Sandro Ademyr">
+      <p>Antes de ser coach fui <strong>trader</strong>. Ahí aprendí que ninguna estrategia alcanza si por dentro no hay estructura — cada pérdida me hundía días enteros. Cuando una relación importante terminó de la peor forma, sentí que todo lo que conocía se venía abajo. De ese quiebre nació el método que hoy uso con mis clientes.</p>
+    </div>
+
     <div class="origin-grid">
       <div class="origin-step active">
         <div class="tag">Dolor</div>
-        <p>El punto donde la estrategia dejó de alcanzar y el problema se volvió personal.</p>
+        <p>Años como trader me enseñaron que mis resultados dependían más de mi estado emocional que de mi análisis — y una ruptura personal terminó de derrumbar lo que creía tener resuelto.</p>
       </div>
       <div class="origin-step">
         <div class="tag">Giro</div>
-        <p>El momento en que entendí que el obstáculo no era técnico, sino de estructura interna.</p>
+        <p>Una sesión de coaching pagada por la empresa donde trabajaba me reveló creencias que ni sabía que tenía. Meses después, sin saber qué más hacer con el dolor, elegí correr — todos los días, sin faltar uno.</p>
       </div>
       <div class="origin-step">
         <div class="tag">Decisión</div>
-        <p>La certificación en coaching ontológico y el compromiso con un método, no con una técnica suelta.</p>
+        <p>Ese hábito diario se volvió disciplina. Corrí 120 días seguidos, bajé mi marca de 5K a 21 minutos, y decidí certificarme como coach — no para dejar de sentir el dolor, sino para aprender a convertirlo en dirección.</p>
       </div>
       <div class="origin-step">
         <div class="tag">Resultado</div>
-        <p>El Pipeline del Propósito: la misma estructura, ahora al servicio de otros.</p>
+        <p>Hoy sé que mi propósito es ser el punto de quiebre que otros necesitan, como lo fue esa sesión para mí. El Pipeline del Propósito es esa misma estructura que me salvó, ahora al servicio de quien la necesite.</p>
       </div>
     </div>
   </div>
