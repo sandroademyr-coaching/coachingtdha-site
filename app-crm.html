@@ -355,8 +355,11 @@ main{max-width:1600px; margin:0 auto; padding:20px;}
 
         <div class="config-section">
           <h3>Apariencia</h3>
-          <div class="hint">El color de acento se usa en botones, pestaña activa y detalles en toda la app.</div>
-          <input type="color" id="themeColorInput" style="width:100%;height:38px;border:1px solid var(--border);border-radius:8px;background:var(--card);cursor:pointer;">
+          <div class="hint">El color de acento se usa en botones, pestaña activa y detalles. El color de fondo cambia toda la base de la app.</div>
+          <div class="row2">
+            <div class="field"><label>Color de acento</label><input type="color" id="themeColorInput" style="width:100%;height:38px;border:1px solid var(--border);border-radius:8px;background:var(--card);cursor:pointer;"></div>
+            <div class="field"><label>Color de fondo</label><input type="color" id="bgColorInput" style="width:100%;height:38px;border:1px solid var(--border);border-radius:8px;background:var(--card);cursor:pointer;"></div>
+          </div>
         </div>
 
         <div class="config-section">
@@ -364,6 +367,24 @@ main{max-width:1600px; margin:0 auto; padding:20px;}
           <div class="hint">Agrega tus propios campos a cada lead (ej. "DNI", "Referido por", "Talla"). Aparecen en la ficha de cada lead.</div>
           <div id="customFieldEditor"></div>
           <div class="add-inline"><input type="text" id="customFieldInput" placeholder="Nombre del campo, ej. DNI"><button class="btn btn-sm" id="addCustomFieldBtn">Agregar</button></div>
+        </div>
+
+        <div class="config-section">
+          <h3>Métricas personalizadas</h3>
+          <div class="hint">Crea tus propias tarjetas de KPI para el dashboard — puedes usar cualquier campo, incluyendo los personalizados de arriba.</div>
+          <div id="customMetricEditor"></div>
+          <div class="row3" style="margin-top:10px;">
+            <div class="field"><label>Nombre de la métrica</label><input type="text" id="metricLabelInput" placeholder="Ej. Clientes VIP"></div>
+            <div class="field"><label>Campo</label><select id="metricFieldInput"></select></div>
+            <div class="field"><label>Cálculo</label>
+              <select id="metricAggInput">
+                <option value="count">Contar leads</option>
+                <option value="sum">Sumar valores (campo numérico)</option>
+              </select>
+            </div>
+          </div>
+          <div class="field"><label>Filtrar solo cuando el campo sea igual a (opcional, para "Contar")</label><input type="text" id="metricFilterInput" placeholder="Ej. Sí, VIP, San Isidro..."></div>
+          <button class="btn btn-sm" id="addCustomMetricBtn">+ Agregar métrica</button>
         </div>
 
         <div class="config-section">
@@ -435,6 +456,8 @@ main{max-width:1600px; margin:0 auto; padding:20px;}
         <div class="field"><label>Asesor asignado</label><select id="f_advisor"></select></div>
         <div class="field"><label>Producto de interés</label><select id="f_tier"></select></div>
       </div>
+      <div class="row3" id="customFieldsForm" style="margin-top:12px;"></div>
+
       <div class="section-divider">
         <h4>Cita</h4>
         <div class="row3">
@@ -453,11 +476,6 @@ main{max-width:1600px; margin:0 auto; padding:20px;}
           <div class="field"><label>Hora (opcional)</label><input type="time" id="f_taskTime"></div>
         </div>
         <button class="btn btn-sm" id="gtaskBtn">✅ Agregar tarea a Google Calendar</button>
-      </div>
-
-      <div class="section-divider" id="customFieldsFormWrap" style="display:none;">
-        <h4>Campos personalizados</h4>
-        <div class="row3" id="customFieldsForm"></div>
       </div>
 
       <div class="section-divider">
@@ -576,11 +594,13 @@ const DEFAULT_CONFIG = {
   ],
   commissionRates: {contado:17, estandar:15, sin_intereses:13.5, mal_credito:5},
   themeColor: '#cc1111',
+  bgColor: '#0b0b0c',
   customFields: [],
+  customMetrics: [],
   dashboardWidgets: {
     kpis:true, funnel:true, effectiveness:true, zoneRevenue:true, zoneRanking:true,
     trend:true, customerProfile:true, tiersSold:true, advisorRanking:true, channels:true,
-    repurchase:true,
+    repurchase:true, rescheduling:true,
   },
 };
 
@@ -780,6 +800,7 @@ function mergeConfigDefaults(saved){
   });
   merged.dashboardWidgets = Object.assign({}, DEFAULT_CONFIG.dashboardWidgets, saved.dashboardWidgets||{});
   if(!Array.isArray(merged.customFields)) merged.customFields = [];
+  if(!Array.isArray(merged.customMetrics)) merged.customMetrics = [];
   return merged;
 }
 
@@ -792,8 +813,28 @@ function applyTheme(){
   document.documentElement.style.setProperty('--red', CONFIG.themeColor || '#cc1111');
   document.documentElement.style.setProperty('--red-soft', `rgba(${r},${g},${b},.22)`);
   document.documentElement.style.setProperty('--red-glow', `rgba(${r},${g},${b},.35)`);
+
+  const bg = CONFIG.bgColor || '#0b0b0c';
+  document.documentElement.style.setProperty('--bg', bg);
+  document.documentElement.style.setProperty('--bg-elev', shadeColor(bg, 8));
+  document.documentElement.style.setProperty('--card', shadeColor(bg, 14));
+  document.documentElement.style.setProperty('--card-hover', shadeColor(bg, 20));
+  document.documentElement.style.setProperty('--border', shadeColor(bg, 26));
+  document.documentElement.style.setProperty('--border-soft', shadeColor(bg, 20));
+
   const madeBy = document.getElementById('madeByCredit');
   if(madeBy) madeBy.style.color = CONFIG.themeColor || '#cc1111';
+}
+
+// Aclara (o oscurece, si percent es negativo) un color hex en un porcentaje dado — para derivar
+// las variantes de superficie (tarjetas, bordes) a partir del color de fondo elegido por cada empresa.
+function shadeColor(hex, percent){
+  hex = hex.replace('#','');
+  let r = parseInt(hex.substr(0,2),16), g = parseInt(hex.substr(2,2),16), b = parseInt(hex.substr(4,2),16);
+  r = Math.min(255, Math.max(0, Math.round(r + (255-r)*(percent/100))));
+  g = Math.min(255, Math.max(0, Math.round(g + (255-g)*(percent/100))));
+  b = Math.min(255, Math.max(0, Math.round(b + (255-b)*(percent/100))));
+  return '#' + [r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
 }
 async function saveConfig(){ await storageSet(STORAGE_KEYS.config, CONFIG); renderAll(); }
 
@@ -1174,10 +1215,8 @@ document.getElementById('addPurchaseBtn').addEventListener('click', async ()=>{
 
 function renderCustomFieldsForm(lead){
   const fields = CONFIG.customFields || [];
-  const formWrap = document.getElementById('customFieldsFormWrap');
   const form = document.getElementById('customFieldsForm');
-  if(!fields.length){ formWrap.style.display = 'none'; return; }
-  formWrap.style.display = 'block';
+  if(!fields.length){ form.innerHTML = ''; return; }
   const values = lead?.customFields || {};
   form.innerHTML = fields.map(f=>`
     <div class="field">
@@ -1226,8 +1265,15 @@ document.getElementById('saveLeadBtn').addEventListener('click', async ()=>{
   lead.source = document.getElementById('f_source').value;
   lead.advisor = document.getElementById('f_advisor').value;
   lead.tier = document.getElementById('f_tier').value;
-  lead.apptDate = document.getElementById('f_apptDate').value;
-  lead.apptTime = document.getElementById('f_apptTime').value;
+  const newApptDate = document.getElementById('f_apptDate').value;
+  const newApptTime = document.getElementById('f_apptTime').value;
+  // Si ya ten\u00eda una cita agendada y la fecha/hora cambi\u00f3, cuenta como reprogramaci\u00f3n
+  if(lead.apptDate && (lead.apptDate !== newApptDate || lead.apptTime !== newApptTime) && newApptDate){
+    lead.rescheduleCount = (lead.rescheduleCount||0) + 1;
+    addLogEntry(lead, `Cita reprogramada: ${lead.apptDate||'—'} ${lead.apptTime||''} → ${newApptDate} ${newApptTime||''}`, 'reschedule');
+  }
+  lead.apptDate = newApptDate;
+  lead.apptTime = newApptTime;
   lead.apptLocation = document.getElementById('f_apptLocation').value.trim();
   lead.customFields = lead.customFields || {};
   document.querySelectorAll('#customFieldsForm [data-cf]').forEach(inp=>{
@@ -1426,9 +1472,13 @@ function renderTierEditor(){
 document.getElementById('addTierBtn').addEventListener('click', ()=>{ CONFIG.tiers.push({name:'Nuevo producto', min:0, max:null}); saveConfig(); });
 
 function renderThemeColorInput(){
-  const input = document.getElementById('themeColorInput');
-  input.value = CONFIG.themeColor || '#cc1111';
-  input.oninput = ()=>{ CONFIG.themeColor = input.value; applyTheme(); saveConfig(); };
+  const themeInput = document.getElementById('themeColorInput');
+  themeInput.value = CONFIG.themeColor || '#cc1111';
+  themeInput.oninput = ()=>{ CONFIG.themeColor = themeInput.value; applyTheme(); saveConfig(); };
+
+  const bgInput = document.getElementById('bgColorInput');
+  bgInput.value = CONFIG.bgColor || '#0b0b0c';
+  bgInput.oninput = ()=>{ CONFIG.bgColor = bgInput.value; applyTheme(); saveConfig(); };
 }
 
 const DASHBOARD_WIDGET_LABELS = {
@@ -1443,6 +1493,7 @@ const DASHBOARD_WIDGET_LABELS = {
   advisorRanking: 'Ranking de asesores',
   channels: 'Canales de captación',
   repurchase: 'Tasa de recompra',
+  rescheduling: 'Tasa de reprogramación de citas',
 };
 
 function renderDashboardWidgetEditor(){
@@ -1493,6 +1544,80 @@ document.getElementById('addCustomFieldBtn').addEventListener('click', ()=>{
   input.value = '';
   saveConfig();
 });
+
+// Campos disponibles para armar una métrica: los fijos del lead + los personalizados de cada empresa
+function metricFieldOptions(){
+  const base = [
+    {id:'zone', label:'Zona / distrito'},
+    {id:'source', label:'Canal de captación'},
+    {id:'advisor', label:'Asesor asignado'},
+    {id:'tier', label:'Producto de interés'},
+    {id:'payment', label:'Condición de pago'},
+    {id:'saleAmount', label:'Monto de venta (S/)'},
+  ];
+  const custom = (CONFIG.customFields||[]).map(f=>({id:'cf:'+f.id, label:f.label+' (personalizado)'}));
+  return base.concat(custom);
+}
+
+function getFieldValue(lead, fieldKey){
+  if(fieldKey.startsWith('cf:')){
+    const cfId = fieldKey.slice(3);
+    return (lead.customFields||{})[cfId];
+  }
+  return lead[fieldKey];
+}
+
+function renderMetricFieldSelect(){
+  const sel = document.getElementById('metricFieldInput');
+  sel.innerHTML = metricFieldOptions().map(f=>`<option value="${f.id}">${escHtml(f.label)}</option>`).join('');
+}
+
+function renderCustomMetricEditor(){
+  const wrap = document.getElementById('customMetricEditor');
+  const metrics = CONFIG.customMetrics || [];
+  if(!metrics.length){
+    wrap.innerHTML = '<div class="hint" style="margin:0 0 8px;">Todavía no agregaste métricas personalizadas.</div>';
+    return;
+  }
+  const fieldLabel = (key)=> (metricFieldOptions().find(f=>f.id===key)||{}).label || key;
+  wrap.innerHTML = metrics.map((m,i)=>`
+    <div class="stage-row" data-i="${i}">
+      <div style="flex:1;font-size:13px;color:var(--white);">
+        <strong>${escHtml(m.label)}</strong>
+        <span style="color:var(--muted);"> — ${m.agg==='sum'?'suma de':'cuenta'} ${escHtml(fieldLabel(m.field))}${m.filterValue?` = "${escHtml(m.filterValue)}"`:''}</span>
+      </div>
+      <button class="btn btn-ghost btn-sm" data-act="del">✕</button>
+    </div>
+  `).join('');
+  wrap.querySelectorAll('.stage-row').forEach(row=>{
+    const i = Number(row.dataset.i);
+    row.querySelector('[data-act=del]').addEventListener('click', ()=>{ CONFIG.customMetrics.splice(i,1); saveConfig(); });
+  });
+}
+
+document.getElementById('addCustomMetricBtn').addEventListener('click', ()=>{
+  const label = document.getElementById('metricLabelInput').value.trim();
+  const field = document.getElementById('metricFieldInput').value;
+  const agg = document.getElementById('metricAggInput').value;
+  const filterValue = document.getElementById('metricFilterInput').value.trim();
+  if(!label){ toast('Ponle un nombre a la métrica', false); return; }
+  CONFIG.customMetrics = CONFIG.customMetrics || [];
+  CONFIG.customMetrics.push({ id:'metric_'+Date.now(), label, field, agg, filterValue });
+  document.getElementById('metricLabelInput').value = '';
+  document.getElementById('metricFilterInput').value = '';
+  saveConfig();
+});
+
+function computeCustomMetric(metric, leads){
+  if(metric.agg === 'sum'){
+    return leads.reduce((a,l)=> a + (Number(getFieldValue(l, metric.field))||0), 0);
+  }
+  // count
+  if(metric.filterValue){
+    return leads.filter(l => String(getFieldValue(l, metric.field)||'').toLowerCase() === metric.filterValue.toLowerCase()).length;
+  }
+  return leads.filter(l => getFieldValue(l, metric.field)).length;
+}
 
 function renderRateEditor(){
   const labels = {contado:'Al contado', estandar:'Crédito estándar', sin_intereses:'Venta sin intereses', mal_credito:'Mal crédito / alto riesgo'};
@@ -1603,6 +1728,11 @@ function renderDashboard(){
   const repeaters = wonWithHistory.filter(l=> (l.purchases && l.purchases.length>1));
   const repurchaseRate = wonWithHistory.length ? (repeaters.length/wonWithHistory.length*100) : 0;
 
+  // Tasa de reprogramación: % de leads con cita agendada que cambiaron la fecha/hora al menos una vez
+  const leadsConCita = leads.filter(l=> l.apptDate || (l.rescheduleCount||0)>0);
+  const reprogramados = leadsConCita.filter(l=> (l.rescheduleCount||0)>0);
+  const reprogramacionRate = leadsConCita.length ? (reprogramados.length/leadsConCita.length*100) : 0;
+
   let kpiHtml = '';
   if(w.kpis!==false){
     kpiHtml += `
@@ -1617,6 +1747,16 @@ function renderDashboard(){
   if(w.repurchase!==false){
     kpiHtml += `<div class="kpi-card"><div class="kpi-label">Tasa de recompra</div><div class="kpi-value">${repurchaseRate.toFixed(1)}%</div><div class="kpi-sub">${repeaters.length} de ${wonWithHistory.length} clientes repiten</div></div>`;
   }
+  if(w.rescheduling!==false){
+    kpiHtml += `<div class="kpi-card"><div class="kpi-label">Tasa de reprogramación</div><div class="kpi-value">${reprogramacionRate.toFixed(1)}%</div><div class="kpi-sub">${reprogramados.length} de ${leadsConCita.length} citas reprogramadas</div></div>`;
+  }
+  (CONFIG.customMetrics||[]).forEach(metric=>{
+    try{
+      const value = computeCustomMetric(metric, leads);
+      const display = metric.agg==='sum' ? fmtMoney(value) : value;
+      kpiHtml += `<div class="kpi-card"><div class="kpi-label">${escHtml(metric.label)}</div><div class="kpi-value">${display}</div><div class="kpi-sub">Métrica personalizada</div></div>`;
+    }catch(e){ console.error('Error en métrica personalizada "'+metric.label+'":', e); }
+  });
   document.getElementById('kpiGrid').innerHTML = kpiHtml;
   document.getElementById('kpiGrid').style.display = kpiHtml ? '' : 'none';
 
@@ -1630,15 +1770,23 @@ function renderDashboard(){
     if(el) el.style.display = (w[key]!==false) ? '' : 'none';
   });
 
-  if(w.funnel!==false) renderFunnel(leads);
-  if(w.effectiveness!==false) renderEffectiveness(leads, won, lost, citasAgendadas, citasRealizadas);
-  if(w.zoneRevenue!==false) renderZonaChart(won);
-  if(w.zoneRanking!==false) renderZonaRank(won);
-  if(w.trend!==false) renderTrendChart(won);
-  if(w.customerProfile!==false) renderProfile(won);
-  if(w.tiersSold!==false) renderTierChart(won);
-  if(w.advisorRanking!==false) renderAdvisorRank(won);
-  if(w.channels!==false) renderSourceChart(leads);
+  if(w.funnel!==false) safeRender('funnel', ()=>renderFunnel(leads));
+  if(w.effectiveness!==false) safeRender('effectiveness', ()=>renderEffectiveness(leads, won, lost, citasAgendadas, citasRealizadas));
+  if(w.zoneRevenue!==false) safeRender('zoneRevenue', ()=>renderZonaChart(won));
+  if(w.zoneRanking!==false) safeRender('zoneRanking', ()=>renderZonaRank(won));
+  if(w.trend!==false) safeRender('trend', ()=>renderTrendChart(won));
+  if(w.customerProfile!==false) safeRender('customerProfile', ()=>renderProfile(won));
+  if(w.tiersSold!==false) safeRender('tiersSold', ()=>renderTierChart(won));
+  if(w.advisorRanking!==false) safeRender('advisorRanking', ()=>renderAdvisorRank(won));
+  if(w.channels!==false) safeRender('channels', ()=>renderSourceChart(leads));
+}
+
+function safeRender(label, fn){
+  try{
+    fn();
+  }catch(e){
+    console.error('Error renderizando el bloque "'+label+'" del dashboard:', e);
+  }
 }
 
 function renderFunnel(leads){
@@ -1845,6 +1993,8 @@ function renderAll(){
   renderRateEditor();
   renderThemeColorInput();
   renderCustomFieldEditor();
+  renderMetricFieldSelect();
+  renderCustomMetricEditor();
   renderDashboardWidgetEditor();
   if(currentView==='dashboard') renderDashboard();
 }
