@@ -250,51 +250,51 @@ main{max-width:1600px; margin:0 auto; padding:20px;}
     <div class="kpi-grid" id="kpiGrid"></div>
 
     <div class="dash-grid">
-      <div class="panel">
+      <div class="panel" id="panel-funnel">
         <h3>Embudo de conversión <small>leads que alcanzaron cada etapa</small></h3>
         <div id="funnelWrap"></div>
       </div>
-      <div class="panel">
+      <div class="panel" id="panel-effectiveness">
         <h3>Efectividad <small>tasas clave</small></h3>
         <div id="effWrap"></div>
       </div>
     </div>
 
     <div class="dash-grid">
-      <div class="panel">
+      <div class="panel" id="panel-zoneRevenue">
         <h3>Ventas por zona <small>monto cerrado (S/)</small></h3>
         <div class="chart-wrap"><canvas id="chartZona"></canvas></div>
       </div>
-      <div class="panel">
+      <div class="panel" id="panel-zoneRanking">
         <h3>Zona más rentable <small>ranking por ticket total</small></h3>
         <ul class="rank-list" id="rankZona"></ul>
       </div>
     </div>
 
     <div class="dash-grid">
-      <div class="panel">
+      <div class="panel" id="panel-trend">
         <h3>Tendencia de ventas <small>por mes, S/</small></h3>
         <div class="chart-wrap"><canvas id="chartTrend"></canvas></div>
       </div>
-      <div class="panel">
+      <div class="panel" id="panel-customerProfile">
         <h3>Perfil de cliente común <small>entre ventas cerradas</small></h3>
         <div id="profileWrap"></div>
       </div>
     </div>
 
     <div class="dash-grid">
-      <div class="panel">
+      <div class="panel" id="panel-tiersSold">
         <h3>Productos vendidos <small>por categoría</small></h3>
         <div class="chart-wrap"><canvas id="chartTier"></canvas></div>
       </div>
-      <div class="panel">
+      <div class="panel" id="panel-advisorRanking">
         <h3>Ranking de asesores <small>por monto vendido</small></h3>
         <ul class="rank-list" id="rankAdvisor"></ul>
       </div>
     </div>
 
     <div class="dash-grid" style="grid-template-columns:1fr;">
-      <div class="panel">
+      <div class="panel" id="panel-channels">
         <h3>Canales de captación <small>de dónde vienen los leads</small></h3>
         <div class="chart-wrap"><canvas id="chartSource"></canvas></div>
       </div>
@@ -345,6 +345,25 @@ main{max-width:1600px; margin:0 auto; padding:20px;}
           <h3>Comisiones sobre base neta</h3>
           <div class="hint">% aplicado a la Base Comisionable Neta (Precio de lista ÷ 1.18).</div>
           <div id="rateEditor"></div>
+        </div>
+
+        <div class="config-section">
+          <h3>Personalizar dashboard</h3>
+          <div class="hint">Elige qué bloques quieres ver — cada empresa analiza cosas distintas.</div>
+          <div id="dashboardWidgetEditor"></div>
+        </div>
+
+        <div class="config-section">
+          <h3>Apariencia</h3>
+          <div class="hint">El color de acento se usa en botones, pestaña activa y detalles en toda la app.</div>
+          <input type="color" id="themeColorInput" style="width:100%;height:38px;border:1px solid var(--border);border-radius:8px;background:var(--card);cursor:pointer;">
+        </div>
+
+        <div class="config-section">
+          <h3>Campos personalizados</h3>
+          <div class="hint">Agrega tus propios campos a cada lead (ej. "DNI", "Referido por", "Talla"). Aparecen en la ficha de cada lead.</div>
+          <div id="customFieldEditor"></div>
+          <div class="add-inline"><input type="text" id="customFieldInput" placeholder="Nombre del campo, ej. DNI"><button class="btn btn-sm" id="addCustomFieldBtn">Agregar</button></div>
         </div>
 
         <div class="config-section">
@@ -436,9 +455,17 @@ main{max-width:1600px; margin:0 auto; padding:20px;}
         <button class="btn btn-sm" id="gtaskBtn">✅ Agregar tarea a Google Calendar</button>
       </div>
 
+      <div class="section-divider" id="customFieldsFormWrap" style="display:none;">
+        <h4>Campos personalizados</h4>
+        <div class="row3" id="customFieldsForm"></div>
+      </div>
+
       <div class="section-divider">
-        <h4>Cierre de venta</h4>
+        <h4>Historial de compras</h4>
+        <div class="hint">Cada compra queda registrada aquí, en la misma ficha — no crees un lead nuevo cuando un cliente vuelve a comprar.</div>
+        <div id="purchaseHistoryList" style="margin-bottom:14px;"></div>
         <div class="row3">
+          <div class="field"><label>Fecha de la compra</label><input type="date" id="f_purchaseDate"></div>
           <div class="field"><label>Base neta comisionable (S/)</label><input type="number" id="f_saleAmount" placeholder="0"></div>
           <div class="field"><label>Condición de pago</label>
             <select id="f_payment">
@@ -448,11 +475,14 @@ main{max-width:1600px; margin:0 auto; padding:20px;}
               <option value="mal_credito">Mal crédito / alto riesgo</option>
             </select>
           </div>
+        </div>
+        <div class="row3">
           <div class="field"><label>¿Trabajo en dupla?</label>
             <select id="f_duo"><option value="no">No</option><option value="si">Sí, 50/50</option></select>
           </div>
+          <div class="field" id="duoPartnerWrap" style="display:none;"><label>Asesor dupla</label><select id="f_duoPartner"></select></div>
+          <div class="field" style="display:flex; align-items:flex-end;"><button type="button" class="btn btn-sm" id="addPurchaseBtn" style="width:100%;">+ Agregar compra</button></div>
         </div>
-        <div class="field" id="duoPartnerWrap" style="display:none;"><label>Asesor dupla</label><select id="f_duoPartner"></select></div>
         <div style="font-size:12.5px; color:var(--muted); background:var(--card); border-radius:8px; padding:9px 12px;" id="commissionPreview"></div>
       </div>
 
@@ -545,6 +575,13 @@ const DEFAULT_CONFIG = {
     {name:'Plan Premium', min:5000, max:null},
   ],
   commissionRates: {contado:17, estandar:15, sin_intereses:13.5, mal_credito:5},
+  themeColor: '#cc1111',
+  customFields: [],
+  dashboardWidgets: {
+    kpis:true, funnel:true, effectiveness:true, zoneRevenue:true, zoneRanking:true,
+    trend:true, customerProfile:true, tiersSold:true, advisorRanking:true, channels:true,
+    repurchase:true,
+  },
 };
 
 let STAGES = JSON.parse(JSON.stringify(DEFAULT_STAGES));
@@ -726,7 +763,8 @@ async function loadAll(){
   ]);
   STAGES = s || JSON.parse(JSON.stringify(DEFAULT_STAGES));
   LEADS = l || [];
-  CONFIG = c || JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+  CONFIG = mergeConfigDefaults(c || {});
+  applyTheme();
   if(!s) await storageSet(STORAGE_KEYS.stages, STAGES);
   if(!l) await storageSet(STORAGE_KEYS.leads, LEADS);
   if(!c) await storageSet(STORAGE_KEYS.config, CONFIG);
@@ -734,8 +772,29 @@ async function loadAll(){
   renderAll();
 }
 
+// Rellena con valores por defecto cualquier campo nuevo que una empresa ya existente no tenga guardado todavía
+function mergeConfigDefaults(saved){
+  const merged = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+  Object.keys(saved).forEach(k=>{
+    if(saved[k] !== undefined && saved[k] !== null) merged[k] = saved[k];
+  });
+  merged.dashboardWidgets = Object.assign({}, DEFAULT_CONFIG.dashboardWidgets, saved.dashboardWidgets||{});
+  if(!Array.isArray(merged.customFields)) merged.customFields = [];
+  return merged;
+}
+
 async function saveStages(){ STAGES.sort((a,b)=>a.order-b.order); await storageSet(STORAGE_KEYS.stages, STAGES); renderAll(); }
 async function saveLeads(){ await storageSet(STORAGE_KEYS.leads, LEADS); renderAll(); }
+
+function applyTheme(){
+  const hex = (CONFIG.themeColor || '#cc1111').replace('#','');
+  const r = parseInt(hex.substr(0,2),16), g = parseInt(hex.substr(2,2),16), b = parseInt(hex.substr(4,2),16);
+  document.documentElement.style.setProperty('--red', CONFIG.themeColor || '#cc1111');
+  document.documentElement.style.setProperty('--red-soft', `rgba(${r},${g},${b},.22)`);
+  document.documentElement.style.setProperty('--red-glow', `rgba(${r},${g},${b},.35)`);
+  const madeBy = document.getElementById('madeByCredit');
+  if(madeBy) madeBy.style.color = CONFIG.themeColor || '#cc1111';
+}
 async function saveConfig(){ await storageSet(STORAGE_KEYS.config, CONFIG); renderAll(); }
 
 /* ============================= UTIL ============================= */
@@ -981,11 +1040,14 @@ function openLeadModal(leadId, defaultStageId){
   document.getElementById('f_taskText').value = '';
   document.getElementById('f_taskDate').value = '';
   document.getElementById('f_taskTime').value = '';
-  document.getElementById('f_saleAmount').value = lead?.saleAmount || '';
-  document.getElementById('f_payment').value = lead?.payment || 'contado';
-  document.getElementById('f_duo').value = lead?.duo || 'no';
-  document.getElementById('f_duoPartner').value = lead?.duoPartner || '';
-  document.getElementById('duoPartnerWrap').style.display = (lead?.duo==='si') ? 'block' : 'none';
+  document.getElementById('f_purchaseDate').value = new Date().toISOString().slice(0,10);
+  document.getElementById('f_saleAmount').value = '';
+  document.getElementById('f_payment').value = 'contado';
+  document.getElementById('f_duo').value = 'no';
+  document.getElementById('f_duoPartner').value = '';
+  document.getElementById('duoPartnerWrap').style.display = 'none';
+  renderPurchaseHistory(lead);
+  renderCustomFieldsForm(lead);
 
   const stageId = lead?.stageId || defaultStageId || sortedStages()[0]?.id;
   renderStagePills(stageId);
@@ -1025,8 +1087,104 @@ function updateCommissionPreview(){
   };
   const c = computeCommission(fake);
   document.getElementById('commissionPreview').innerHTML =
-    `Tasa aplicada: <strong>${c.rate}%</strong> · Comisión total: <strong>${fmtMoney(c.total)}</strong>` +
+    `Compra a registrar — Tasa: <strong>${c.rate}%</strong> · Comisión: <strong>${fmtMoney(c.total)}</strong>` +
     (fake.duo==='si' ? ` · Por asesor (50/50): <strong>${fmtMoney(c.perAdvisor)}</strong>` : '');
+}
+
+function recomputeLeadTotals(lead){
+  const purchases = lead.purchases || [];
+  lead.saleAmount = purchases.reduce((a,p)=>a+(Number(p.saleAmount)||0),0);
+  const last = purchases[purchases.length-1];
+  if(last){ lead.payment = last.payment; lead.duo = last.duo; lead.duoPartner = last.duoPartner; }
+}
+
+const PAYMENT_LABELS = {contado:'Al contado', estandar:'Crédito estándar', sin_intereses:'Sin intereses', mal_credito:'Mal crédito'};
+
+function renderPurchaseHistory(lead){
+  const wrap = document.getElementById('purchaseHistoryList');
+  const purchases = lead?.purchases || [];
+  if(!purchases.length){
+    if(lead && Number(lead.saleAmount)>0){
+      wrap.innerHTML = `<div class="hint" style="margin:0 0 8px;">Venta registrada antes de este historial: <strong>${fmtMoney(Number(lead.saleAmount))}</strong> (${PAYMENT_LABELS[lead.payment]||lead.payment||'—'}). Sigue contando en tus totales.</div>`;
+    } else {
+      wrap.innerHTML = '<div class="hint" style="margin:0 0 8px;">Todavía no hay compras registradas para este lead.</div>';
+    }
+    return;
+  }
+  const totalAmount = purchases.reduce((a,p)=>a+(Number(p.saleAmount)||0),0);
+  const totalCommission = purchases.reduce((a,p)=>a+computeCommission(p).total,0);
+  wrap.innerHTML =
+    `<div style="font-size:12px; color:var(--muted); margin-bottom:8px;">${purchases.length} compra${purchases.length>1?'s':''} · Total: <strong style="color:var(--white);">${fmtMoney(totalAmount)}</strong> · Comisión total: <strong style="color:var(--white);">${fmtMoney(totalCommission)}</strong></div>` +
+    purchases.slice().reverse().map(p=>{
+      const c = computeCommission(p);
+      return `<div class="purchase-row" data-id="${p.id}" style="display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--border-soft);border-radius:8px;margin-bottom:6px;font-size:13px;">
+        <div style="flex:1;">
+          <strong>${fmtMoney(Number(p.saleAmount)||0)}</strong>
+          <span style="color:var(--muted);"> · ${PAYMENT_LABELS[p.payment]||p.payment}${p.duo==='si'?' · Dupla':''}</span>
+        </div>
+        <div style="color:var(--muted-dim);">${p.date||''}</div>
+        <div style="color:var(--muted);">Comisión: ${fmtMoney(c.total)}</div>
+        <button type="button" class="btn btn-ghost btn-sm" data-act="del-purchase" data-id="${p.id}">✕</button>
+      </div>`;
+    }).join('');
+  wrap.querySelectorAll('[data-act=del-purchase]').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      const lead = LEADS.find(l=>l.id===currentLeadId);
+      if(!lead) return;
+      lead.purchases = (lead.purchases||[]).filter(p=>p.id!==btn.dataset.id);
+      recomputeLeadTotals(lead);
+      lead.updatedAt = new Date().toISOString();
+      await saveLeads();
+      renderPurchaseHistory(lead);
+      updateCommissionPreview();
+    });
+  });
+}
+
+document.getElementById('addPurchaseBtn').addEventListener('click', async ()=>{
+  const lead = LEADS.find(l=>l.id===currentLeadId);
+  if(!lead){ toast('Guarda el lead primero para poder registrar una compra', false); return; }
+  const amount = document.getElementById('f_saleAmount').value;
+  if(!amount || Number(amount)<=0){ toast('Ingresa un monto válido', false); return; }
+  const purchase = {
+    id: uid('purchase'),
+    date: document.getElementById('f_purchaseDate').value || new Date().toISOString().slice(0,10),
+    saleAmount: amount,
+    payment: document.getElementById('f_payment').value,
+    duo: document.getElementById('f_duo').value,
+    duoPartner: document.getElementById('f_duoPartner').value,
+  };
+  lead.purchases = lead.purchases || [];
+  lead.purchases.push(purchase);
+  recomputeLeadTotals(lead);
+  lead.updatedAt = new Date().toISOString();
+  addLogEntry(lead, `Compra registrada: ${fmtMoney(Number(amount))} (${PAYMENT_LABELS[purchase.payment]})`, 'sale');
+  await saveLeads();
+
+  document.getElementById('f_purchaseDate').value = new Date().toISOString().slice(0,10);
+  document.getElementById('f_saleAmount').value = '';
+  document.getElementById('f_payment').value = 'contado';
+  document.getElementById('f_duo').value = 'no';
+  document.getElementById('duoPartnerWrap').style.display = 'none';
+
+  renderPurchaseHistory(lead);
+  updateCommissionPreview();
+  renderLogList(lead);
+});
+
+function renderCustomFieldsForm(lead){
+  const fields = CONFIG.customFields || [];
+  const formWrap = document.getElementById('customFieldsFormWrap');
+  const form = document.getElementById('customFieldsForm');
+  if(!fields.length){ formWrap.style.display = 'none'; return; }
+  formWrap.style.display = 'block';
+  const values = lead?.customFields || {};
+  form.innerHTML = fields.map(f=>`
+    <div class="field">
+      <label>${escHtml(f.label)}</label>
+      <input type="${f.type==='number'?'number':(f.type==='date'?'date':'text')}" data-cf="${f.id}" value="${escAttr(values[f.id]||'')}">
+    </div>
+  `).join('');
 }
 
 document.getElementById('addNoteBtn').addEventListener('click', async ()=>{
@@ -1071,10 +1229,10 @@ document.getElementById('saveLeadBtn').addEventListener('click', async ()=>{
   lead.apptDate = document.getElementById('f_apptDate').value;
   lead.apptTime = document.getElementById('f_apptTime').value;
   lead.apptLocation = document.getElementById('f_apptLocation').value.trim();
-  lead.saleAmount = document.getElementById('f_saleAmount').value;
-  lead.payment = document.getElementById('f_payment').value;
-  lead.duo = document.getElementById('f_duo').value;
-  lead.duoPartner = document.getElementById('f_duoPartner').value;
+  lead.customFields = lead.customFields || {};
+  document.querySelectorAll('#customFieldsForm [data-cf]').forEach(inp=>{
+    lead.customFields[inp.dataset.cf] = inp.value;
+  });
   lead.stageId = stageId;
   lead.updatedAt = now;
   if(isNew){
@@ -1267,6 +1425,75 @@ function renderTierEditor(){
 }
 document.getElementById('addTierBtn').addEventListener('click', ()=>{ CONFIG.tiers.push({name:'Nuevo producto', min:0, max:null}); saveConfig(); });
 
+function renderThemeColorInput(){
+  const input = document.getElementById('themeColorInput');
+  input.value = CONFIG.themeColor || '#cc1111';
+  input.oninput = ()=>{ CONFIG.themeColor = input.value; applyTheme(); saveConfig(); };
+}
+
+const DASHBOARD_WIDGET_LABELS = {
+  kpis: 'Tarjetas de KPIs (ingresos, tasa de cierre, etc.)',
+  funnel: 'Embudo de conversión',
+  effectiveness: 'Efectividad (tasas clave)',
+  zoneRevenue: 'Ventas por zona (gráfico)',
+  zoneRanking: 'Zona más rentable (ranking)',
+  trend: 'Tendencia de ventas',
+  customerProfile: 'Perfil de cliente común',
+  tiersSold: 'Productos vendidos',
+  advisorRanking: 'Ranking de asesores',
+  channels: 'Canales de captación',
+  repurchase: 'Tasa de recompra',
+};
+
+function renderDashboardWidgetEditor(){
+  const wrap = document.getElementById('dashboardWidgetEditor');
+  wrap.innerHTML = Object.keys(DASHBOARD_WIDGET_LABELS).map(key=>`
+    <label style="display:flex; align-items:center; gap:8px; font-size:13px; color:var(--muted); padding:5px 0; cursor:pointer;">
+      <input type="checkbox" data-key="${key}" ${CONFIG.dashboardWidgets[key]!==false?'checked':''} style="width:16px;height:16px;accent-color:var(--red);">
+      ${DASHBOARD_WIDGET_LABELS[key]}
+    </label>
+  `).join('');
+  wrap.querySelectorAll('input[type=checkbox]').forEach(cb=>{
+    cb.addEventListener('change', ()=>{
+      CONFIG.dashboardWidgets[cb.dataset.key] = cb.checked;
+      saveConfig();
+    });
+  });
+}
+
+function renderCustomFieldEditor(){
+  const wrap = document.getElementById('customFieldEditor');
+  if(!CONFIG.customFields.length){
+    wrap.innerHTML = '<div class="hint" style="margin:0 0 8px;">Todavía no agregaste campos personalizados.</div>';
+    return;
+  }
+  wrap.innerHTML = CONFIG.customFields.map((f,i)=>`
+    <div class="stage-row" data-i="${i}">
+      <input type="text" value="${escAttr(f.label)}" data-field="label" style="flex:1.4;">
+      <select data-field="type" style="width:120px;">
+        <option value="text" ${f.type==='text'?'selected':''}>Texto</option>
+        <option value="number" ${f.type==='number'?'selected':''}>Número</option>
+        <option value="date" ${f.type==='date'?'selected':''}>Fecha</option>
+      </select>
+      <button class="btn btn-ghost btn-sm" data-act="del">✕</button>
+    </div>
+  `).join('');
+  wrap.querySelectorAll('.stage-row').forEach(row=>{
+    const i = Number(row.dataset.i);
+    row.querySelector('[data-field=label]').addEventListener('change', e=>{ CONFIG.customFields[i].label=e.target.value.trim(); saveConfig(); });
+    row.querySelector('[data-field=type]').addEventListener('change', e=>{ CONFIG.customFields[i].type=e.target.value; saveConfig(); });
+    row.querySelector('[data-act=del]').addEventListener('click', ()=>{ CONFIG.customFields.splice(i,1); saveConfig(); });
+  });
+}
+document.getElementById('addCustomFieldBtn').addEventListener('click', ()=>{
+  const input = document.getElementById('customFieldInput');
+  const label = input.value.trim();
+  if(!label) return;
+  CONFIG.customFields.push({ id: 'cf_' + Date.now(), label, type:'text' });
+  input.value = '';
+  saveConfig();
+});
+
 function renderRateEditor(){
   const labels = {contado:'Al contado', estandar:'Crédito estándar', sin_intereses:'Venta sin intereses', mal_credito:'Mal crédito / alto riesgo'};
   const wrap = document.getElementById('rateEditor');
@@ -1350,6 +1577,7 @@ function dashLeads(){
 }
 
 function renderDashboard(){
+  const w = CONFIG.dashboardWidgets || {};
   const leads = dashLeads();
   const wonStageIds = new Set(STAGES.filter(s=>s.type==='won').map(s=>s.id));
   const lostStageIds = new Set(STAGES.filter(s=>s.type==='lost').map(s=>s.id));
@@ -1370,25 +1598,47 @@ function renderDashboard(){
   const citasRealizadas = realizadaStage ? reachedStage(realizadaStage) : 0;
   const asistencia = citasAgendadas ? (citasRealizadas/citasAgendadas*100) : 0;
 
-  document.getElementById('kpiGrid').innerHTML = `
+  // Tasa de recompra: % de clientes con venta cerrada que volvieron a comprar más de una vez
+  const wonWithHistory = won.filter(l=> ((l.purchases&&l.purchases.length) || (Number(l.saleAmount)>0?1:0)) >= 1);
+  const repeaters = wonWithHistory.filter(l=> (l.purchases && l.purchases.length>1));
+  const repurchaseRate = wonWithHistory.length ? (repeaters.length/wonWithHistory.length*100) : 0;
+
+  let kpiHtml = '';
+  if(w.kpis!==false){
+    kpiHtml += `
     <div class="kpi-card accent"><div class="kpi-label">Ticket promedio</div><div class="kpi-value">${fmtMoney(ticketProm)}</div><div class="kpi-sub">${won.length} ventas cerradas</div></div>
     <div class="kpi-card"><div class="kpi-label">Ingresos totales</div><div class="kpi-value">${fmtMoney(totalRevenue)}</div><div class="kpi-sub">Base neta comisionable</div></div>
     <div class="kpi-card"><div class="kpi-label">Comisiones generadas</div><div class="kpi-value">${fmtMoney(totalCommission)}</div><div class="kpi-sub">Sobre ventas cerradas</div></div>
     <div class="kpi-card"><div class="kpi-label">Tasa de cierre</div><div class="kpi-value">${closeRate.toFixed(1)}%</div><div class="kpi-sub">${won.length} de ${leads.length} leads</div></div>
     <div class="kpi-card"><div class="kpi-label">Tasa de pérdida</div><div class="kpi-value">${lossRate.toFixed(1)}%</div><div class="kpi-sub">${lost.length} leads perdidos</div></div>
     <div class="kpi-card"><div class="kpi-label">Asistencia a citas</div><div class="kpi-value">${asistencia.toFixed(0)}%</div><div class="kpi-sub">${citasRealizadas} de ${citasAgendadas} agendadas</div></div>
-    <div class="kpi-card"><div class="kpi-label">Total leads</div><div class="kpi-value">${leads.length}</div><div class="kpi-sub">en el periodo seleccionado</div></div>
-  `;
+    <div class="kpi-card"><div class="kpi-label">Total leads</div><div class="kpi-value">${leads.length}</div><div class="kpi-sub">en el periodo seleccionado</div></div>`;
+  }
+  if(w.repurchase!==false){
+    kpiHtml += `<div class="kpi-card"><div class="kpi-label">Tasa de recompra</div><div class="kpi-value">${repurchaseRate.toFixed(1)}%</div><div class="kpi-sub">${repeaters.length} de ${wonWithHistory.length} clientes repiten</div></div>`;
+  }
+  document.getElementById('kpiGrid').innerHTML = kpiHtml;
+  document.getElementById('kpiGrid').style.display = kpiHtml ? '' : 'none';
 
-  renderFunnel(leads);
-  renderEffectiveness(leads, won, lost, citasAgendadas, citasRealizadas);
-  renderZonaChart(won);
-  renderZonaRank(won);
-  renderTrendChart(won);
-  renderProfile(won);
-  renderTierChart(won);
-  renderAdvisorRank(won);
-  renderSourceChart(leads);
+  const panelMap = {
+    funnel:'panel-funnel', effectiveness:'panel-effectiveness', zoneRevenue:'panel-zoneRevenue',
+    zoneRanking:'panel-zoneRanking', trend:'panel-trend', customerProfile:'panel-customerProfile',
+    tiersSold:'panel-tiersSold', advisorRanking:'panel-advisorRanking', channels:'panel-channels',
+  };
+  Object.keys(panelMap).forEach(key=>{
+    const el = document.getElementById(panelMap[key]);
+    if(el) el.style.display = (w[key]!==false) ? '' : 'none';
+  });
+
+  if(w.funnel!==false) renderFunnel(leads);
+  if(w.effectiveness!==false) renderEffectiveness(leads, won, lost, citasAgendadas, citasRealizadas);
+  if(w.zoneRevenue!==false) renderZonaChart(won);
+  if(w.zoneRanking!==false) renderZonaRank(won);
+  if(w.trend!==false) renderTrendChart(won);
+  if(w.customerProfile!==false) renderProfile(won);
+  if(w.tiersSold!==false) renderTierChart(won);
+  if(w.advisorRanking!==false) renderAdvisorRank(won);
+  if(w.channels!==false) renderSourceChart(leads);
 }
 
 function renderFunnel(leads){
@@ -1593,6 +1843,9 @@ function renderAll(){
   renderChipList('sourceChips','sources');
   renderTierEditor();
   renderRateEditor();
+  renderThemeColorInput();
+  renderCustomFieldEditor();
+  renderDashboardWidgetEditor();
   if(currentView==='dashboard') renderDashboard();
 }
 
@@ -1600,5 +1853,6 @@ function renderAll(){
 initAuth();
 setInterval(()=>{ if(currentOrg && !document.querySelector('.modal-overlay.active')) loadAll(); }, 20000);
 </script>
+<div id="madeByCredit" style="position:fixed;left:14px;bottom:12px;z-index:40;font-size:10.5px;letter-spacing:0.06em;text-transform:uppercase;color:var(--red);opacity:0.55;font-weight:600;pointer-events:none;user-select:none;">Creado por: Coaching TDHA</div>
 </body>
 </html>
