@@ -38,7 +38,7 @@ label{font-size:11.5px; color:var(--muted); text-transform:uppercase; letter-spa
 ::-webkit-scrollbar-track{background:transparent;}
 
 /* HEADER */
-header{position:sticky; top:0; z-index:40; background:rgba(11,11,12,.92); backdrop-filter:blur(10px); border-bottom:1px solid var(--border); padding:12px 20px;}
+header{position:sticky; top:0; z-index:40; background:rgba(var(--bg-rgb,11,11,12),.92); backdrop-filter:blur(10px); border-bottom:1px solid var(--border); padding:12px 20px;}
 .header-inner{display:flex; align-items:center; gap:18px; max-width:1600px; margin:0 auto; flex-wrap:wrap;}
 .brand{display:flex; align-items:center; gap:10px; margin-right:auto;}
 .brand-mark{width:34px; height:34px; border-radius:8px; background:linear-gradient(135deg,var(--red),#7a0d0d); display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:700; font-size:15px; flex-shrink:0;}
@@ -388,6 +388,13 @@ main{max-width:1600px; margin:0 auto; padding:20px;}
         </div>
 
         <div class="config-section">
+          <h3>Importar leads (JSON)</h3>
+          <div class="hint">Sube un archivo .json con leads ya preparados (por ejemplo, una migración desde otra fuente). Los que compartan teléfono con un lead que ya existe se omiten, para que puedas subir el archivo más de una vez sin duplicar.</div>
+          <input type="file" id="importLeadsInput" accept="application/json">
+          <div id="importLeadsResult" style="margin-top:8px; font-size:12.5px; color:var(--muted);"></div>
+        </div>
+
+        <div class="config-section">
           <h3>Mi cuenta</h3>
           <div class="hint">Cada empresa tiene su propio espacio, separado de las demás. Solo tu equipo ve esta información.</div>
           <div class="profile-chip"><span>Empresa</span><span id="orgInfoName" style="font-weight:700;"></span></div>
@@ -455,6 +462,11 @@ main{max-width:1600px; margin:0 auto; padding:20px;}
       <div class="row2">
         <div class="field"><label>Asesor asignado</label><select id="f_advisor"></select></div>
         <div class="field"><label>Producto de interés</label><select id="f_tier"></select></div>
+      </div>
+      <div class="row3">
+        <div class="field"><label>Punto de captación</label><input type="text" id="f_puntoCaptacion" placeholder="Ej. Real Plaza Salaverry"></div>
+        <div class="field"><label>Fecha de captación</label><input type="date" id="f_fechaCaptacion"></div>
+        <div class="field"><label>N° Ticket</label><input type="text" id="f_ticketNumber" placeholder="Ej. 000874"></div>
       </div>
       <div class="row3" id="customFieldsForm" style="margin-top:12px;"></div>
 
@@ -576,11 +588,12 @@ const DEFAULT_STAGES = [
   {id:'s2', name:'Contactado', color:'#22b8b0', type:'normal', order:1},
   {id:'s3', name:'Seguimiento (No responde)', color:'#d9a52a', type:'normal', order:2},
   {id:'s4', name:'Cita Agendada', color:'#9b6bf2', type:'normal', order:3},
-  {id:'s5', name:'Cita Realizada', color:'#6bb2f2', type:'normal', order:4},
-  {id:'s6', name:'Negociación / Cierre', color:'#f28b3b', type:'normal', order:5},
-  {id:'s7', name:'Venta Cerrada', color:'#28a862', type:'won', order:6},
-  {id:'s8', name:'Post-Venta', color:'#1f8f5b', type:'won', order:7},
-  {id:'s9', name:'Perdido', color:'#8a8a8a', type:'lost', order:8},
+  {id:'s10', name:'Cita No Realizada / Reprogramar', color:'#e0568c', type:'normal', order:4},
+  {id:'s5', name:'Cita Realizada', color:'#6bb2f2', type:'normal', order:5},
+  {id:'s6', name:'Negociación / Cierre', color:'#f28b3b', type:'normal', order:6},
+  {id:'s7', name:'Venta Cerrada', color:'#28a862', type:'won', order:7},
+  {id:'s8', name:'Post-Venta', color:'#1f8f5b', type:'won', order:8},
+  {id:'s9', name:'Perdido', color:'#8a8a8a', type:'lost', order:9},
 ];
 
 const DEFAULT_CONFIG = {
@@ -815,25 +828,45 @@ function applyTheme(){
   document.documentElement.style.setProperty('--red-glow', `rgba(${r},${g},${b},.35)`);
 
   const bg = CONFIG.bgColor || '#0b0b0c';
+  const light = isLightColor(bg);
+  const bgHex = bg.replace('#','');
+  const bgR = parseInt(bgHex.substr(0,2),16), bgG = parseInt(bgHex.substr(2,2),16), bgB = parseInt(bgHex.substr(4,2),16);
+  document.documentElement.style.setProperty('--bg-rgb', `${bgR},${bgG},${bgB}`);
+  // Si el fondo elegido es claro, las capas de encima (tarjetas, bordes) se oscurecen en vez de aclararse,
+  // y el texto pasa a tonos oscuros para que siga siendo legible.
+  const layerDir = light ? -1 : 1;
   document.documentElement.style.setProperty('--bg', bg);
-  document.documentElement.style.setProperty('--bg-elev', shadeColor(bg, 8));
-  document.documentElement.style.setProperty('--card', shadeColor(bg, 14));
-  document.documentElement.style.setProperty('--card-hover', shadeColor(bg, 20));
-  document.documentElement.style.setProperty('--border', shadeColor(bg, 26));
-  document.documentElement.style.setProperty('--border-soft', shadeColor(bg, 20));
+  document.documentElement.style.setProperty('--bg-elev', shadeColor(bg, 8*layerDir));
+  document.documentElement.style.setProperty('--card', shadeColor(bg, 14*layerDir));
+  document.documentElement.style.setProperty('--card-hover', shadeColor(bg, 20*layerDir));
+  document.documentElement.style.setProperty('--border', shadeColor(bg, 30*layerDir));
+  document.documentElement.style.setProperty('--border-soft', shadeColor(bg, 22*layerDir));
+
+  document.documentElement.style.setProperty('--white', light ? '#18181a' : '#f2f2f0');
+  document.documentElement.style.setProperty('--muted', light ? '#55555c' : '#98979c');
+  document.documentElement.style.setProperty('--muted-dim', light ? '#83838a' : '#6b6a70');
 
   const madeBy = document.getElementById('madeByCredit');
   if(madeBy) madeBy.style.color = CONFIG.themeColor || '#cc1111';
 }
 
-// Aclara (o oscurece, si percent es negativo) un color hex en un porcentaje dado — para derivar
-// las variantes de superficie (tarjetas, bordes) a partir del color de fondo elegido por cada empresa.
+// Determina si un color hex es "claro" (fondo tipo blanco/pastel) usando luminancia percibida,
+// para saber si el texto debe ser oscuro o claro sobre \u00e9l.
+function isLightColor(hex){
+  hex = hex.replace('#','');
+  const r = parseInt(hex.substr(0,2),16), g = parseInt(hex.substr(2,2),16), b = parseInt(hex.substr(4,2),16);
+  const luminance = (0.299*r + 0.587*g + 0.114*b) / 255;
+  return luminance > 0.6;
+}
+
+// Aclara (percent positivo, hacia blanco) u oscurece (percent negativo, hacia negro) un color hex.
 function shadeColor(hex, percent){
   hex = hex.replace('#','');
   let r = parseInt(hex.substr(0,2),16), g = parseInt(hex.substr(2,2),16), b = parseInt(hex.substr(4,2),16);
-  r = Math.min(255, Math.max(0, Math.round(r + (255-r)*(percent/100))));
-  g = Math.min(255, Math.max(0, Math.round(g + (255-g)*(percent/100))));
-  b = Math.min(255, Math.max(0, Math.round(b + (255-b)*(percent/100))));
+  const adjust = (c)=> percent >= 0 ? c + (255-c)*(percent/100) : c * (1 + percent/100);
+  r = Math.min(255, Math.max(0, Math.round(adjust(r))));
+  g = Math.min(255, Math.max(0, Math.round(adjust(g))));
+  b = Math.min(255, Math.max(0, Math.round(adjust(b))));
   return '#' + [r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
 }
 async function saveConfig(){ await storageSet(STORAGE_KEYS.config, CONFIG); renderAll(); }
@@ -1075,6 +1108,9 @@ function openLeadModal(leadId, defaultStageId){
   document.getElementById('f_source').value = lead?.source || '';
   document.getElementById('f_advisor').value = lead?.advisor || '';
   document.getElementById('f_tier').value = lead?.tier || '';
+  document.getElementById('f_puntoCaptacion').value = lead?.puntoCaptacion || '';
+  document.getElementById('f_fechaCaptacion').value = lead?.fechaCaptacion || '';
+  document.getElementById('f_ticketNumber').value = lead?.ticketNumber || '';
   document.getElementById('f_apptDate').value = lead?.apptDate || '';
   document.getElementById('f_apptTime').value = lead?.apptTime || '';
   document.getElementById('f_apptLocation').value = lead?.apptLocation || '';
@@ -1265,6 +1301,9 @@ document.getElementById('saveLeadBtn').addEventListener('click', async ()=>{
   lead.source = document.getElementById('f_source').value;
   lead.advisor = document.getElementById('f_advisor').value;
   lead.tier = document.getElementById('f_tier').value;
+  lead.puntoCaptacion = document.getElementById('f_puntoCaptacion').value.trim();
+  lead.fechaCaptacion = document.getElementById('f_fechaCaptacion').value;
+  lead.ticketNumber = document.getElementById('f_ticketNumber').value.trim();
   const newApptDate = document.getElementById('f_apptDate').value;
   const newApptTime = document.getElementById('f_apptTime').value;
   // Si ya ten\u00eda una cita agendada y la fecha/hora cambi\u00f3, cuenta como reprogramaci\u00f3n
@@ -1321,11 +1360,34 @@ document.getElementById('gcalBtn').addEventListener('click', async ()=>{
   const start = new Date(date+'T'+time+':00');
   const end = new Date(start.getTime() + 60*60*1000);
   const fmt = d => d.toISOString().replace(/[-:]/g,'').split('.')[0]+'Z';
-  const details = `Cita de venta${currentOrg?.name ? ' — ' + currentOrg.name : ''}.%0ATeléfono: ${document.getElementById('f_phone').value}%0AAsesor: ${document.getElementById('f_advisor').value}`;
+
+  const lead = LEADS.find(l=>l.id===currentLeadId);
+  const asesor = document.getElementById('f_advisor').value || '—';
+  const punto = document.getElementById('f_puntoCaptacion').value.trim() || '—';
+  const fechaCap = document.getElementById('f_fechaCaptacion').value || '—';
+  const ticket = document.getElementById('f_ticketNumber').value.trim() || '—';
+  const phone = document.getElementById('f_phone').value.trim() || '—';
+  const zona = document.getElementById('f_zone').value || '—';
+  const notesText = (lead?.log||[]).length
+    ? lead.log.map(l=>`${new Date(l.at).toLocaleDateString('es-PE')}: ${l.text}`).join('\n')
+    : 'Sin notas registradas todavía.';
+
+  const detailsPlain =
+`ASESOR: ${asesor}
+PUNTO DE CAPTACIÓN: ${punto}
+FECHA DE CAPTACIÓN: ${fechaCap}
+N° TICKET: ${ticket}
+PROSPECTO: ${name}
+NÚMERO DEL PROSPECTO: ${phone}
+DISTRITO/ZONA: ${zona}
+
+NOTAS:
+${notesText}`;
+
+  const details = encodeURIComponent(detailsPlain);
   const location = document.getElementById('f_apptLocation').value || '';
   const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('Cita - '+name)}&dates=${fmt(start)}/${fmt(end)}&details=${details}&location=${encodeURIComponent(location)}`;
   window.open(url, '_blank');
-  const lead = LEADS.find(l=>l.id===currentLeadId);
   if(lead){
     addLogEntry(lead, `Cita agregada a Google Calendar: ${date}${time?' '+time:''}`, 'stage');
     lead.updatedAt = new Date().toISOString();
@@ -1554,6 +1616,8 @@ function metricFieldOptions(){
     {id:'tier', label:'Producto de interés'},
     {id:'payment', label:'Condición de pago'},
     {id:'saleAmount', label:'Monto de venta (S/)'},
+    {id:'puntoCaptacion', label:'Punto de captación'},
+    {id:'ticketNumber', label:'N° Ticket'},
   ];
   const custom = (CONFIG.customFields||[]).map(f=>({id:'cf:'+f.id, label:f.label+' (personalizado)'}));
   return base.concat(custom);
@@ -1594,6 +1658,70 @@ function renderCustomMetricEditor(){
     row.querySelector('[data-act=del]').addEventListener('click', ()=>{ CONFIG.customMetrics.splice(i,1); saveConfig(); });
   });
 }
+
+document.getElementById('importLeadsInput').addEventListener('change', async (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const resultEl = document.getElementById('importLeadsResult');
+  resultEl.textContent = 'Leyendo archivo...';
+  try{
+    const text = await file.text();
+    const incoming = JSON.parse(text);
+    if(!Array.isArray(incoming)) throw new Error('El archivo debe ser una lista (array) de leads.');
+
+    const existingPhones = new Set(LEADS.map(l=>l.phone).filter(Boolean));
+    let added = 0, skipped = 0;
+    const newAdvisors = new Set(CONFIG.advisors||[]);
+    const newZones = new Set(CONFIG.zones||[]);
+    const existingCustomFieldIds = new Set((CONFIG.customFields||[]).map(f=>f.id));
+
+    incoming.forEach(raw=>{
+      if(raw.phone && existingPhones.has(raw.phone)){ skipped++; return; }
+      const lead = {
+        id: raw.id || uid('lead'),
+        name: raw.name || 'Sin nombre',
+        phone: raw.phone || '',
+        zone: raw.zone || '',
+        tier: raw.tier || '',
+        advisor: raw.advisor || '',
+        stageId: raw.stageId || 's1',
+        source: raw.source || 'Base de datos',
+        createdAt: raw.createdAt || new Date().toISOString(),
+        updatedAt: raw.updatedAt || new Date().toISOString(),
+        apptDate: raw.apptDate || '', apptTime: raw.apptTime || '', apptLocation: raw.apptLocation || '',
+        puntoCaptacion: raw.puntoCaptacion || '', fechaCaptacion: raw.fechaCaptacion || '', ticketNumber: raw.ticketNumber || '',
+        history: raw.history || [],
+        log: raw.log || (raw.importNotes ? [{at: raw.createdAt || new Date().toISOString(), text: raw.importNotes, kind:'note'}] : []),
+        purchases: raw.purchases || [],
+        customFields: raw.customFields || {},
+      };
+      LEADS.push(lead);
+      if(raw.phone) existingPhones.add(raw.phone);
+      if(lead.advisor) newAdvisors.add(lead.advisor);
+      if(lead.zone) newZones.add(lead.zone);
+      Object.keys(lead.customFields||{}).forEach(cfId=>{
+        if(!existingCustomFieldIds.has(cfId)){
+          CONFIG.customFields.push({id: cfId, label: cfId.replace(/^cf_/,''), type:'text'});
+          existingCustomFieldIds.add(cfId);
+        }
+      });
+      added++;
+    });
+
+    CONFIG.advisors = Array.from(newAdvisors);
+    CONFIG.zones = Array.from(newZones);
+
+    await saveLeads();
+    await saveConfig();
+    resultEl.textContent = `Listo: ${added} leads importados, ${skipped} omitidos por teléfono repetido.`;
+    toast(`${added} leads importados`, true);
+  }catch(err){
+    console.error('Error importando leads:', err);
+    resultEl.textContent = 'Error al importar: ' + err.message;
+    toast('Error al importar el archivo', false);
+  }
+  e.target.value = '';
+});
 
 document.getElementById('addCustomMetricBtn').addEventListener('click', ()=>{
   const label = document.getElementById('metricLabelInput').value.trim();
