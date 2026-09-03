@@ -459,8 +459,9 @@ main{max-width:1600px; margin:0 auto; padding:20px;}
         <div class="field"><label>Zona / distrito</label><select id="f_zone"></select></div>
         <div class="field"><label>Canal de captación</label><select id="f_source"></select></div>
       </div>
-      <div class="row2">
-        <div class="field"><label>Asesor asignado</label><select id="f_advisor"></select></div>
+      <div class="row3">
+        <div class="field"><label>Asesor que captó el lead</label><select id="f_advisor"></select></div>
+        <div class="field"><label>Asesor que vendió (cierre)</label><select id="f_closerAdvisor"></select></div>
         <div class="field"><label>Producto de interés</label><select id="f_tier"></select></div>
       </div>
       <div class="row3">
@@ -988,6 +989,7 @@ function refreshAllSelects(){
   fillSelect(document.getElementById('f_zone'), zoneNames, '— Seleccionar —');
   fillSelect(document.getElementById('f_source'), sourceNames, '— Seleccionar —');
   fillSelect(document.getElementById('f_advisor'), advisorNames, '— Seleccionar —');
+  fillSelect(document.getElementById('f_closerAdvisor'), advisorNames, '— Sin definir aún —');
   fillSelect(document.getElementById('f_tier'), tierNames, '— Seleccionar —');
   fillSelect(document.getElementById('f_duoPartner'), advisorNames, '— Seleccionar —');
 }
@@ -1107,6 +1109,7 @@ function openLeadModal(leadId, defaultStageId){
   document.getElementById('f_zone').value = lead?.zone || '';
   document.getElementById('f_source').value = lead?.source || '';
   document.getElementById('f_advisor').value = lead?.advisor || '';
+  document.getElementById('f_closerAdvisor').value = lead?.closerAdvisor || '';
   document.getElementById('f_tier').value = lead?.tier || '';
   document.getElementById('f_puntoCaptacion').value = lead?.puntoCaptacion || '';
   document.getElementById('f_fechaCaptacion').value = lead?.fechaCaptacion || '';
@@ -1300,6 +1303,7 @@ document.getElementById('saveLeadBtn').addEventListener('click', async ()=>{
   lead.zone = document.getElementById('f_zone').value;
   lead.source = document.getElementById('f_source').value;
   lead.advisor = document.getElementById('f_advisor').value;
+  lead.closerAdvisor = document.getElementById('f_closerAdvisor').value;
   lead.tier = document.getElementById('f_tier').value;
   lead.puntoCaptacion = document.getElementById('f_puntoCaptacion').value.trim();
   lead.fechaCaptacion = document.getElementById('f_fechaCaptacion').value;
@@ -1363,6 +1367,7 @@ document.getElementById('gcalBtn').addEventListener('click', async ()=>{
 
   const lead = LEADS.find(l=>l.id===currentLeadId);
   const asesor = document.getElementById('f_advisor').value || '—';
+  const asesorCierre = document.getElementById('f_closerAdvisor').value || '—';
   const punto = document.getElementById('f_puntoCaptacion').value.trim() || '—';
   const fechaCap = document.getElementById('f_fechaCaptacion').value || '—';
   const ticket = document.getElementById('f_ticketNumber').value.trim() || '—';
@@ -1373,7 +1378,8 @@ document.getElementById('gcalBtn').addEventListener('click', async ()=>{
     : 'Sin notas registradas todavía.';
 
   const detailsPlain =
-`ASESOR: ${asesor}
+`ASESOR QUE CAPTÓ: ${asesor}
+ASESOR QUE VENDE (CIERRE): ${asesorCierre}
 PUNTO DE CAPTACIÓN: ${punto}
 FECHA DE CAPTACIÓN: ${fechaCap}
 N° TICKET: ${ticket}
@@ -1669,14 +1675,44 @@ document.getElementById('importLeadsInput').addEventListener('change', async (e)
     const incoming = JSON.parse(text);
     if(!Array.isArray(incoming)) throw new Error('El archivo debe ser una lista (array) de leads.');
 
-    const existingPhones = new Set(LEADS.map(l=>l.phone).filter(Boolean));
-    let added = 0, skipped = 0;
+    const leadsByPhone = {};
+    LEADS.forEach(l=>{ if(l.phone) leadsByPhone[l.phone] = l; });
+    let created = 0, updatedCount = 0, skippedNoPhone = 0;
     const newAdvisors = new Set(CONFIG.advisors||[]);
     const newZones = new Set(CONFIG.zones||[]);
     const existingCustomFieldIds = new Set((CONFIG.customFields||[]).map(f=>f.id));
 
     incoming.forEach(raw=>{
-      if(raw.phone && existingPhones.has(raw.phone)){ skipped++; return; }
+      const existing = raw.phone ? leadsByPhone[raw.phone] : null;
+
+      if(existing){
+        // Ya existe un lead con este teléfono: actualiza etapa y agrega lo nuevo (compras, notas),
+        // sin borrar nada de lo que ya tenía.
+        existing.stageId = raw.stageId || existing.stageId;
+        if(raw.closerAdvisor && !existing.closerAdvisor) existing.closerAdvisor = raw.closerAdvisor;
+        if(raw.puntoCaptacion && !existing.puntoCaptacion) existing.puntoCaptacion = raw.puntoCaptacion;
+        if(raw.ticketNumber && !existing.ticketNumber) existing.ticketNumber = raw.ticketNumber;
+        (raw.purchases||[]).forEach(p=>{
+          existing.purchases = existing.purchases || [];
+          if(!existing.purchases.some(ep=>ep.id===p.id)) existing.purchases.push(p);
+        });
+        if(existing.purchases && existing.purchases.length){
+          existing.saleAmount = existing.purchases.reduce((a,p)=>a+(Number(p.saleAmount)||0),0);
+          const last = existing.purchases[existing.purchases.length-1];
+          existing.payment = last.payment; existing.duo = last.duo;
+        }
+        const noteText = raw.importNotes || (raw.log && raw.log[0] && raw.log[0].text);
+        if(noteText){
+          existing.log = existing.log || [];
+          if(!existing.log.some(l=>l.text===noteText)) existing.log.push({at: new Date().toISOString(), text: noteText, kind:'note'});
+        }
+        existing.updatedAt = new Date().toISOString();
+        updatedCount++;
+        return;
+      }
+
+      if(!raw.phone){ skippedNoPhone++; return; }
+
       const lead = {
         id: raw.id || uid('lead'),
         name: raw.name || 'Sin nombre',
@@ -1684,6 +1720,7 @@ document.getElementById('importLeadsInput').addEventListener('change', async (e)
         zone: raw.zone || '',
         tier: raw.tier || '',
         advisor: raw.advisor || '',
+        closerAdvisor: raw.closerAdvisor || '',
         stageId: raw.stageId || 's1',
         source: raw.source || 'Base de datos',
         createdAt: raw.createdAt || new Date().toISOString(),
@@ -1696,8 +1733,9 @@ document.getElementById('importLeadsInput').addEventListener('change', async (e)
         customFields: raw.customFields || {},
       };
       LEADS.push(lead);
-      if(raw.phone) existingPhones.add(raw.phone);
+      leadsByPhone[lead.phone] = lead;
       if(lead.advisor) newAdvisors.add(lead.advisor);
+      if(lead.closerAdvisor) newAdvisors.add(lead.closerAdvisor);
       if(lead.zone) newZones.add(lead.zone);
       Object.keys(lead.customFields||{}).forEach(cfId=>{
         if(!existingCustomFieldIds.has(cfId)){
@@ -1705,7 +1743,7 @@ document.getElementById('importLeadsInput').addEventListener('change', async (e)
           existingCustomFieldIds.add(cfId);
         }
       });
-      added++;
+      created++;
     });
 
     CONFIG.advisors = Array.from(newAdvisors);
@@ -1713,8 +1751,8 @@ document.getElementById('importLeadsInput').addEventListener('change', async (e)
 
     await saveLeads();
     await saveConfig();
-    resultEl.textContent = `Listo: ${added} leads importados, ${skipped} omitidos por teléfono repetido.`;
-    toast(`${added} leads importados`, true);
+    resultEl.textContent = `Listo: ${created} leads nuevos, ${updatedCount} actualizados (ya existían por teléfono), ${skippedNoPhone} omitidos por no tener teléfono.`;
+    toast(`${created} nuevos, ${updatedCount} actualizados`, true);
   }catch(err){
     console.error('Error importando leads:', err);
     resultEl.textContent = 'Error al importar: ' + err.message;
