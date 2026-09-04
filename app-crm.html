@@ -797,6 +797,20 @@ async function loadAll(){
   ]);
   STAGES = s || JSON.parse(JSON.stringify(DEFAULT_STAGES));
   LEADS = l || [];
+  // Auto-corrección: si un lead tiene compras registradas pero su saleAmount total no está
+  // sincronizado (ej. datos que llegaron por importación masiva), se recalcula aquí siempre,
+  // así el dashboard nunca se queda en cero por un total desactualizado.
+  LEADS.forEach(lead=>{
+    if(lead.purchases && lead.purchases.length){
+      const total = lead.purchases.reduce((a,p)=>a+(Number(p.saleAmount)||0),0);
+      if(Number(lead.saleAmount||0) !== total){
+        lead.saleAmount = total;
+        const last = lead.purchases[lead.purchases.length-1];
+        lead.payment = last.payment || lead.payment;
+        lead.duo = last.duo || lead.duo || 'no';
+      }
+    }
+  });
   CONFIG = mergeConfigDefaults(c || {});
   applyTheme();
   if(!s) await storageSet(STORAGE_KEYS.stages, STAGES);
@@ -1732,6 +1746,11 @@ document.getElementById('importLeadsInput').addEventListener('change', async (e)
         purchases: raw.purchases || [],
         customFields: raw.customFields || {},
       };
+      if(lead.purchases.length){
+        lead.saleAmount = lead.purchases.reduce((a,p)=>a+(Number(p.saleAmount)||0),0);
+        const last = lead.purchases[lead.purchases.length-1];
+        lead.payment = last.payment; lead.duo = last.duo || 'no';
+      }
       LEADS.push(lead);
       leadsByPhone[lead.phone] = lead;
       if(lead.advisor) newAdvisors.add(lead.advisor);
@@ -1880,13 +1899,15 @@ function renderDashboard(){
   const closeRate = leads.length ? (won.length/leads.length*100) : 0;
   const lossRate = leads.length ? (lost.length/leads.length*100) : 0;
 
-  // stages reached (for citas)
-  const stageOrderMap = {}; sortedStages().forEach((s,i)=>stageOrderMap[s.id]=i);
-  const citaStage = sortedStages().find(s=>/cita agendada/i.test(s.name)) || sortedStages()[3];
-  const realizadaStage = sortedStages().find(s=>/cita realizada/i.test(s.name)) || sortedStages()[4];
-  const reachedStage = (stage)=> leads.filter(l=> (l.history||[]).some(h=>h.stageId===stage?.id) || l.stageId===stage?.id).length;
-  const citasAgendadas = citaStage ? reachedStage(citaStage) : 0;
-  const citasRealizadas = realizadaStage ? reachedStage(realizadaStage) : 0;
+  // Citas: "Total citas" = todo lead que llegó a tener una cita agendada, sin importar en qué
+  // etapa esté ahora (agendada, reprogramar, realizada, negociación, venta o post-venta).
+  // "Citas dadas" = las que efectivamente se realizaron (realizada, negociación, venta, post-venta).
+  // Se usa la etapa ACTUAL de cada lead (no el historial), porque los leads importados en bloque
+  // no traen historial de movimientos paso a paso, solo su etapa final conocida.
+  const CITA_STAGE_IDS = ['s4','s10','s5','s6','s7','s8'];
+  const CITA_DADA_STAGE_IDS = ['s5','s6','s7','s8'];
+  const citasAgendadas = leads.filter(l=>CITA_STAGE_IDS.includes(l.stageId)).length;
+  const citasRealizadas = leads.filter(l=>CITA_DADA_STAGE_IDS.includes(l.stageId)).length;
   const asistencia = citasAgendadas ? (citasRealizadas/citasAgendadas*100) : 0;
 
   // Tasa de recompra: % de clientes con venta cerrada que volvieron a comprar más de una vez
@@ -1894,9 +1915,11 @@ function renderDashboard(){
   const repeaters = wonWithHistory.filter(l=> (l.purchases && l.purchases.length>1));
   const repurchaseRate = wonWithHistory.length ? (repeaters.length/wonWithHistory.length*100) : 0;
 
-  // Tasa de reprogramación: % de leads con cita agendada que cambiaron la fecha/hora al menos una vez
-  const leadsConCita = leads.filter(l=> l.apptDate || (l.rescheduleCount||0)>0);
-  const reprogramados = leadsConCita.filter(l=> (l.rescheduleCount||0)>0);
+  // Tasa de reprogramación: cuenta tanto los leads que la propia app fue marcando como reprogramados
+  // (rescheduleCount, al cambiar la fecha de una cita ya agendada) como los que llegaron ya
+  // clasificados en la etapa "Cita No Realizada / Reprogramar" desde una importación.
+  const leadsConCita = leads.filter(l=> CITA_STAGE_IDS.includes(l.stageId) || l.apptDate || (l.rescheduleCount||0)>0);
+  const reprogramados = leadsConCita.filter(l=> l.stageId==='s10' || (l.rescheduleCount||0)>0);
   const reprogramacionRate = leadsConCita.length ? (reprogramados.length/leadsConCita.length*100) : 0;
 
   let kpiHtml = '';
