@@ -1097,6 +1097,7 @@ async function moveLeadToStage(leadId, stageId){
   const fromStage = stageById(lead.stageId);
   const toStage = stageById(stageId);
   lead.stageId = stageId;
+  lead.stageSetManually = true;
   lead.updatedAt = new Date().toISOString();
   lead.history = lead.history||[];
   lead.history.push({stageId, at: lead.updatedAt});
@@ -1337,6 +1338,7 @@ document.getElementById('saveLeadBtn').addEventListener('click', async ()=>{
     lead.customFields[inp.dataset.cf] = inp.value;
   });
   lead.stageId = stageId;
+  lead.stageSetManually = true;
   lead.updatedAt = now;
   if(isNew){
     lead.history = [{stageId, at:now}];
@@ -1691,7 +1693,7 @@ document.getElementById('importLeadsInput').addEventListener('change', async (e)
 
     const leadsByPhone = {};
     LEADS.forEach(l=>{ if(l.phone) leadsByPhone[l.phone] = l; });
-    let created = 0, updatedCount = 0, skippedNoPhone = 0;
+    let created = 0, updatedCount = 0, skippedNoPhone = 0, protegidos = 0;
     const newAdvisors = new Set(CONFIG.advisors||[]);
     const newZones = new Set(CONFIG.zones||[]);
     const existingCustomFieldIds = new Set((CONFIG.customFields||[]).map(f=>f.id));
@@ -1701,8 +1703,13 @@ document.getElementById('importLeadsInput').addEventListener('change', async (e)
 
       if(existing){
         // Ya existe un lead con este teléfono: actualiza etapa y agrega lo nuevo (compras, notas),
-        // sin borrar nada de lo que ya tenía.
-        existing.stageId = raw.stageId || existing.stageId;
+        // sin borrar nada de lo que ya tenía. Si TÚ moviste este lead a mano en el pipeline
+        // (existing.stageSetManually), la importación NO le toca la etapa — respeta tu decisión.
+        if(!existing.stageSetManually){
+          existing.stageId = raw.stageId || existing.stageId;
+        } else {
+          protegidos++;
+        }
         if(raw.closerAdvisor && !existing.closerAdvisor) existing.closerAdvisor = raw.closerAdvisor;
         if(raw.puntoCaptacion && !existing.puntoCaptacion) existing.puntoCaptacion = raw.puntoCaptacion;
         if(raw.ticketNumber && !existing.ticketNumber) existing.ticketNumber = raw.ticketNumber;
@@ -1770,7 +1777,7 @@ document.getElementById('importLeadsInput').addEventListener('change', async (e)
 
     await saveLeads();
     await saveConfig();
-    resultEl.textContent = `Listo: ${created} leads nuevos, ${updatedCount} actualizados (ya existían por teléfono), ${skippedNoPhone} omitidos por no tener teléfono.`;
+    resultEl.textContent = `Listo: ${created} leads nuevos, ${updatedCount} actualizados (ya existían por teléfono), ${protegidos} protegidos (etapa que moviste a mano, no se tocó), ${skippedNoPhone} omitidos por no tener teléfono.`;
     toast(`${created} nuevos, ${updatedCount} actualizados`, true);
   }catch(err){
     console.error('Error importando leads:', err);
@@ -1891,12 +1898,15 @@ function renderDashboard(){
   const leads = dashLeads();
   const wonStageIds = new Set(STAGES.filter(s=>s.type==='won').map(s=>s.id));
   const lostStageIds = new Set(STAGES.filter(s=>s.type==='lost').map(s=>s.id));
-  const won = leads.filter(l=>wonStageIds.has(l.stageId) && Number(l.saleAmount)>0);
+  // "won" (con monto) alimenta ingresos/comisión/ticket promedio -- solo puede contar lo que
+  // realmente sabemos que se cobró. "wonAll" (sin exigir monto) alimenta la tasa de cierre,
+  // porque un Post-Venta sin monto registrado igual sigue siendo un cliente convertido.
+  const wonAll = leads.filter(l=>wonStageIds.has(l.stageId));
+  const won = wonAll.filter(l=>Number(l.saleAmount)>0);
   const lost = leads.filter(l=>lostStageIds.has(l.stageId));
   const totalRevenue = won.reduce((a,l)=>a+Number(l.saleAmount||0),0);
   const ticketProm = won.length ? totalRevenue/won.length : 0;
   const totalCommission = won.reduce((a,l)=>a+computeCommission(l).total,0);
-  const closeRate = leads.length ? (won.length/leads.length*100) : 0;
   const lossRate = leads.length ? (lost.length/leads.length*100) : 0;
 
   // Citas: "Total citas" = todo lead que llegó a tener una cita agendada, sin importar en qué
@@ -1909,6 +1919,10 @@ function renderDashboard(){
   const citasAgendadas = leads.filter(l=>CITA_STAGE_IDS.includes(l.stageId)).length;
   const citasRealizadas = leads.filter(l=>CITA_DADA_STAGE_IDS.includes(l.stageId)).length;
   const asistencia = citasAgendadas ? (citasRealizadas/citasAgendadas*100) : 0;
+
+  // Tasa de cierre: de las citas que SÍ se dieron, cuántas terminaron en venta o post-venta.
+  // (antes se dividía entre el total de leads, incluyendo los que nunca llegaron a tener cita)
+  const closeRate = citasRealizadas ? (wonAll.length/citasRealizadas*100) : 0;
 
   // Tasa de recompra: % de clientes con venta cerrada que volvieron a comprar más de una vez
   const wonWithHistory = won.filter(l=> ((l.purchases&&l.purchases.length) || (Number(l.saleAmount)>0?1:0)) >= 1);
@@ -1928,7 +1942,7 @@ function renderDashboard(){
     <div class="kpi-card accent"><div class="kpi-label">Ticket promedio</div><div class="kpi-value">${fmtMoney(ticketProm)}</div><div class="kpi-sub">${won.length} ventas cerradas</div></div>
     <div class="kpi-card"><div class="kpi-label">Ingresos totales</div><div class="kpi-value">${fmtMoney(totalRevenue)}</div><div class="kpi-sub">Base neta comisionable</div></div>
     <div class="kpi-card"><div class="kpi-label">Comisiones generadas</div><div class="kpi-value">${fmtMoney(totalCommission)}</div><div class="kpi-sub">Sobre ventas cerradas</div></div>
-    <div class="kpi-card"><div class="kpi-label">Tasa de cierre</div><div class="kpi-value">${closeRate.toFixed(1)}%</div><div class="kpi-sub">${won.length} de ${leads.length} leads</div></div>
+    <div class="kpi-card"><div class="kpi-label">Tasa de cierre</div><div class="kpi-value">${closeRate.toFixed(1)}%</div><div class="kpi-sub">${wonAll.length} de ${citasRealizadas} citas dadas</div></div>
     <div class="kpi-card"><div class="kpi-label">Tasa de pérdida</div><div class="kpi-value">${lossRate.toFixed(1)}%</div><div class="kpi-sub">${lost.length} leads perdidos</div></div>
     <div class="kpi-card"><div class="kpi-label">Asistencia a citas</div><div class="kpi-value">${asistencia.toFixed(0)}%</div><div class="kpi-sub">${citasRealizadas} de ${citasAgendadas} agendadas</div></div>
     <div class="kpi-card"><div class="kpi-label">Total leads</div><div class="kpi-value">${leads.length}</div><div class="kpi-sub">en el periodo seleccionado</div></div>`;
@@ -1960,7 +1974,7 @@ function renderDashboard(){
   });
 
   if(w.funnel!==false) safeRender('funnel', ()=>renderFunnel(leads));
-  if(w.effectiveness!==false) safeRender('effectiveness', ()=>renderEffectiveness(leads, won, lost, citasAgendadas, citasRealizadas));
+  if(w.effectiveness!==false) safeRender('effectiveness', ()=>renderEffectiveness(leads, wonAll, lost, citasAgendadas, citasRealizadas));
   if(w.zoneRevenue!==false) safeRender('zoneRevenue', ()=>renderZonaChart(won));
   if(w.zoneRanking!==false) safeRender('zoneRanking', ()=>renderZonaRank(won));
   if(w.trend!==false) safeRender('trend', ()=>renderTrendChart(won));
@@ -1995,14 +2009,14 @@ function renderFunnel(leads){
   }).join('');
 }
 
-function renderEffectiveness(leads, won, lost, agendadas, realizadas){
+function renderEffectiveness(leads, wonAll, lost, agendadas, realizadas){
   const total = leads.length || 1;
   const contactados = leads.filter(l=> (l.history||[]).length>1 || l.stageId!==sortedStages()[0]?.id).length;
   const rows = [
     ['Tasa de contacto', contactados/total*100],
     ['Tasa de agendamiento', agendadas/total*100],
     ['Tasa de asistencia', agendadas? realizadas/agendadas*100:0],
-    ['Tasa de cierre', won.length/total*100],
+    ['Tasa de cierre', realizadas? wonAll.length/realizadas*100:0],
     ['Tasa de pérdida', lost.length/total*100],
   ];
   document.getElementById('effWrap').innerHTML = rows.map(([label,val])=>`
