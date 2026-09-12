@@ -771,8 +771,11 @@ async function storageGet(key, fallback){
   try{
     const { data, error } = await sb.from('pipeline_store').select('value').eq('org_id', currentOrg.id).eq('key', key).maybeSingle();
     if(error) throw error;
-    return data ? data.value : fallback;
-  }catch(e){ console.error('storageGet', key, e); return fallback; }
+    return { value: data ? data.value : fallback, ok: true };
+  }catch(e){
+    console.error('storageGet', key, e);
+    return { value: fallback, ok: false };
+  }
 }
 async function storageSet(key, value){
   setSyncing(true);
@@ -790,11 +793,24 @@ async function storageSet(key, value){
 async function loadAll(){
   if(!currentOrg) return;
   setSyncing(true);
-  const [s,l,c] = await Promise.all([
+  const [sRes, lRes, cRes] = await Promise.all([
     storageGet(STORAGE_KEYS.stages, null),
     storageGet(STORAGE_KEYS.leads, null),
     storageGet(STORAGE_KEYS.config, null),
   ]);
+
+  // CRÍTICO: si la lectura de leads o stages falló (no que "no había datos", sino que hubo
+  // un error real de red/Supabase), NUNCA se continúa como si la cuenta estuviera vacía, y
+  // JAMÁS se vuelve a escribir nada. Antes, cualquier fallo de conexión se trataba igual que
+  // "cuenta nueva sin datos" y sobrescribía todo con una lista vacía. Ahora se detiene y avisa.
+  if(!lRes.ok || !sRes.ok || !cRes.ok){
+    setSyncing(false);
+    toast('No se pudo cargar tu información desde el servidor. NO se modificó nada — recarga la página o revisa tu conexión antes de seguir trabajando.', false);
+    document.getElementById('lastSavedNote').textContent = '⚠ Error al cargar — no se guardó nada, tus datos anteriores siguen intactos en el servidor.';
+    return;
+  }
+
+  const s = sRes.value, l = lRes.value, c = cRes.value;
   STAGES = s || JSON.parse(JSON.stringify(DEFAULT_STAGES));
   LEADS = l || [];
   // Auto-corrección: si un lead tiene compras registradas pero su saleAmount total no está
@@ -813,9 +829,11 @@ async function loadAll(){
   });
   CONFIG = mergeConfigDefaults(c || {});
   applyTheme();
-  if(!s) await storageSet(STORAGE_KEYS.stages, STAGES);
-  if(!l) await storageSet(STORAGE_KEYS.leads, LEADS);
-  if(!c) await storageSet(STORAGE_KEYS.config, CONFIG);
+  // Solo se inicializa en Supabase si genuinamente se confirmó (sin error) que la cuenta
+  // todavía no tiene nada guardado — nunca como reacción a un fallo de lectura.
+  if(s===null) await storageSet(STORAGE_KEYS.stages, STAGES);
+  if(l===null) await storageSet(STORAGE_KEYS.leads, LEADS);
+  if(c===null) await storageSet(STORAGE_KEYS.config, CONFIG);
   setSyncing(false);
   renderAll();
 }
@@ -1686,6 +1704,10 @@ document.getElementById('importLeadsInput').addEventListener('change', async (e)
   if(!file) return;
   const resultEl = document.getElementById('importLeadsResult');
   resultEl.textContent = 'Leyendo archivo...';
+  if(LEADS.length){
+    downloadBackup(true);
+    resultEl.textContent = 'Se descargó un respaldo automático de tus ' + LEADS.length + ' leads actuales antes de importar, por seguridad. Continuando...';
+  }
   try{
     const text = await file.text();
     const incoming = JSON.parse(text);
@@ -1826,15 +1848,16 @@ function renderRateEditor(){
 }
 
 /* ============================= BACKUP / RESET ============================= */
-document.getElementById('downloadBackupBtn').addEventListener('click', ()=>{
+function downloadBackup(auto){
   const payload = { exportedAt: new Date().toISOString(), stages: STAGES, leads: LEADS, config: CONFIG };
   const blob = new Blob([JSON.stringify(payload,null,2)], {type:'application/json'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'royal-prestige-pipeline-backup-'+new Date().toISOString().slice(0,10)+'.json';
+  a.download = (currentOrg?.name||'cierre-crm').toLowerCase().replace(/[^a-z0-9]+/g,'-') + '-backup-'+new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')+'.json';
   a.click();
-  toast('Respaldo descargado');
-});
+  if(!auto) toast('Respaldo descargado');
+}
+document.getElementById('downloadBackupBtn').addEventListener('click', ()=> downloadBackup(false));
 document.getElementById('restoreBackupBtn').addEventListener('click', ()=> document.getElementById('restoreFileInput').click());
 document.getElementById('restoreFileInput').addEventListener('change', async e=>{
   const file = e.target.files[0];
