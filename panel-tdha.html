@@ -111,6 +111,11 @@
   .kpi-card .value small{font-size:14px;color:var(--text-dim);font-weight:500;}
   .kpi-card .sub{font-size:11.5px;color:var(--text-faint);margin-top:4px;}
   .kpi-card::after{content:'';position:absolute;right:-20px;top:-20px;width:70px;height:70px;border-radius:50%;background:var(--accent-soft);filter:blur(2px);}
+  .kpi-donut-card{align-items:flex-start;}
+  .kpi-donut{position:relative;width:64px;height:64px;margin:6px 0 2px;}
+  .kpi-donut svg{position:relative;z-index:1;}
+  .kpi-donut-value{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--text);z-index:1;}
 
   /* ---------- Habits ---------- */
   .habits-toolbar{display:flex;justify-content:space-between;align-items:center;margin-top:8px;}
@@ -328,12 +333,36 @@
   .cmp-bar-value{position:absolute;right:8px;top:50%;transform:translateY(-50%);
     font-size:11px;font-family:'JetBrains Mono',monospace;font-weight:700;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.4);}
 
-  /* ---------- Alertas y comparativas ---------- */
-  .insight-row{display:flex;gap:11px;align-items:flex-start;background:var(--surface);border:1px solid var(--border);
-    border-radius:10px;padding:12px 14px;}
-  .insight-icon{font-size:16px;flex-shrink:0;}
-  .insight-text{font-size:12.5px;color:var(--text-dim);line-height:1.5;}
-  .insight-text b{color:var(--text);}
+  /* ---------- Tendencia mensual ---------- */
+  .trend-chart-wrap{animation:trendFadeIn .5s ease;}
+  @keyframes trendFadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+  .trend-dot{transition:r .15s ease, filter .15s ease;cursor:pointer;}
+  .trend-dot:hover{filter:drop-shadow(0 0 6px var(--accent));}
+  .trend-line-path{transition:stroke-dashoffset 1s cubic-bezier(.4,0,.2,1);}
+
+  .trend-month-donuts{display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between;margin-top:22px;}
+  .tmd-item{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;
+    padding:10px 6px;border-radius:12px;transition:.15s;flex:1;min-width:72px;border:1px solid transparent;}
+  .tmd-item:hover{background:var(--surface-2);}
+  .tmd-item.active{background:var(--accent-soft);border-color:var(--accent-soft-2);}
+  .tmd-label{font-size:11px;color:var(--text-dim);text-transform:capitalize;font-weight:600;}
+  .tmd-donut{position:relative;width:52px;height:52px;}
+  .tmd-donut-value{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--text);}
+  .tmd-empty{opacity:.35;}
+
+  .month-detail-panel{margin-top:20px;border-top:1px solid var(--border);padding-top:16px;
+    animation:trendFadeIn .3s ease;}
+  .month-detail-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+  .month-detail-header .mdh-title{font-weight:600;font-size:13.5px;text-transform:capitalize;}
+  .month-detail-header .mdh-sub{font-size:11px;color:var(--text-faint);font-weight:500;text-transform:none;}
+  .month-detail-grid{display:flex;flex-wrap:wrap;gap:18px;}
+  .mdg-item{display:flex;flex-direction:column;align-items:center;gap:7px;width:82px;}
+  .mdg-donut{position:relative;width:60px;height:60px;}
+  .mdg-donut-value{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--text);}
+  .mdg-label{font-size:10.5px;color:var(--text-dim);text-align:center;display:flex;align-items:center;
+    justify-content:center;gap:3px;line-height:1.3;}
 
   /* ---------- Objetivos por período (estilo CRM) ---------- */
   .status-badge{display:inline-block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;
@@ -473,11 +502,25 @@
       <div id="comparisonList"></div>
     </div>
 
-    <div class="section-title" id="insightsSection" style="display:none;">
-      <h2>🔍 Alertas</h2>
-      <span class="hint">rachas en riesgo y tus días más difíciles</span>
+    <div class="section-title" id="trendSection" style="display:none;">
+      <h2>📈 Tendencia mensual</h2>
+      <span class="hint">evolución mes a mes · general o por hábito</span>
     </div>
-    <div id="insightsList" style="display:flex;flex-direction:column;gap:8px;"></div>
+    <div class="panel-box" id="trendBox" style="display:none;">
+      <div class="field" style="max-width:280px;margin-bottom:16px;">
+        <label>Ver</label>
+        <select id="trendHabitSelect"></select>
+      </div>
+      <div id="trendChart" class="trend-chart-wrap"></div>
+      <div id="trendMonthList" class="trend-month-donuts"></div>
+      <div id="monthDetailPanel" class="month-detail-panel" style="display:none;">
+        <div class="month-detail-header">
+          <span class="mdh-title" id="monthDetailTitle"></span>
+          <button class="icon-mini" id="closeMonthDetailBtn">✕</button>
+        </div>
+        <div class="month-detail-grid" id="monthDetailGrid"></div>
+      </div>
+    </div>
   </section>
 
   <!-- ============ VISTA AGENDA + EISENHOWER ============ -->
@@ -1135,6 +1178,23 @@
     </svg>`;
   }
 
+  function donutSVG(pct, color, opts){
+    opts = opts || {};
+    const size = opts.size || 64;
+    const sw = opts.strokeWidth || 6;
+    const cls = opts.wrapClass || "kpi-donut";
+    const valClass = opts.valueClass || "kpi-donut-value";
+    const cx = size/2, r = size/2 - sw, c = 2*Math.PI*r, off = c - (Math.min(pct,100)/100)*c;
+    return `<div class="${cls}" style="width:${size}px;height:${size}px;">
+      <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+        <circle cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="var(--surface-3)" stroke-width="${sw}"/>
+        <circle class="trend-dot" cx="${cx}" cy="${cx}" r="${r}" fill="none" stroke="${color}" stroke-width="${sw}"
+          stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${off}" transform="rotate(-90 ${cx} ${cx})"/>
+      </svg>
+      <div class="${valClass}">${pct}%</div>
+    </div>`;
+  }
+
   function computeHabitStats(h){
     const start = getHabitStart(h);
     const now = new Date();
@@ -1163,16 +1223,41 @@
     const grid = document.getElementById("kpiGrid");
     if(habits.length===0){ grid.innerHTML = ""; return; }
     const activeCount = habits.length;
-    const bestActive = Math.max(0, ...habits.map(computeStreak));
-    const bestEver = Math.max(0, ...habits.map(computeBestStreak));
+
+    let bestActiveHabit=null, bestActive=0;
+    let bestEverHabit=null, bestEver=0;
+    habits.forEach(h=>{
+      const s = computeStreak(h);
+      if(s>bestActive || bestActiveHabit===null){ bestActive=s; bestActiveHabit=h; }
+      const be = computeBestStreak(h);
+      if(be>bestEver || bestEverHabit===null){ bestEver=be; bestEverHabit=h; }
+    });
+
     const avgWeekly = Math.round(habits.reduce((s,h)=>s+weeklyRate(h),0)/habits.length);
     const avgConversion = Math.round(habits.reduce((s,h)=>s+computeHabitStats(h).allTimeRate,0)/habits.length);
+
     grid.innerHTML = `
-      <div class="kpi-card"><div class="label">Racha activa máx.</div><div class="value">${bestActive}<small> días</small></div><div class="sub">racha más larga hoy</div></div>
-      <div class="kpi-card"><div class="label">Cumplimiento semanal</div><div class="value">${avgWeekly}<small>%</small></div><div class="sub">promedio de todos los hábitos</div></div>
+      <div class="kpi-card">
+        <div class="label">Racha activa máx.</div>
+        <div class="value">${bestActive}<small> días</small></div>
+        <div class="sub">${bestActiveHabit?`🔥 ${bestActiveHabit.icon} ${bestActiveHabit.name}`:"sin datos"}</div>
+      </div>
+      <div class="kpi-card kpi-donut-card">
+        <div class="label">Cumplimiento semanal</div>
+        ${donutSVG(avgWeekly, progressColor(avgWeekly))}
+        <div class="sub">promedio de todos los hábitos</div>
+      </div>
       <div class="kpi-card"><div class="label">Hábitos activos</div><div class="value">${activeCount}</div><div class="sub">en seguimiento</div></div>
-      <div class="kpi-card"><div class="label">Mejor racha histórica</div><div class="value">${bestEver}<small> días</small></div><div class="sub">tu récord personal</div></div>
-      <div class="kpi-card"><div class="label">Tasa de conversión global</div><div class="value">${avgConversion}<small>%</small></div><div class="sub">días cumplidos vs. días de seguimiento</div></div>
+      <div class="kpi-card">
+        <div class="label">Mejor racha histórica</div>
+        <div class="value">${bestEver}<small> días</small></div>
+        <div class="sub">${bestEverHabit?`🏆 ${bestEverHabit.icon} ${bestEverHabit.name}`:"sin datos"}</div>
+      </div>
+      <div class="kpi-card kpi-donut-card">
+        <div class="label">Tasa de conversión global</div>
+        ${donutSVG(avgConversion, progressColor(avgConversion))}
+        <div class="sub">días cumplidos vs. días de seguimiento</div>
+      </div>
     `;
   }
 
@@ -1203,30 +1288,8 @@
     table.innerHTML = html;
   }
 
-  /* ---------------- Alertas y comparativas ---------------- */
+  /* ---------------- Comparativa y tendencia ---------------- */
   const WEEKDAY_NAMES = ["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
-
-  function computeHardestWeekdayHabits(){
-    if(state.habits.length===0) return null;
-    const sums = [0,0,0,0,0,0,0], counts = [0,0,0,0,0,0,0];
-    for(let i=0;i<56;i++){
-      const d = dateFromOffset(-i);
-      const key = todayKey(d);
-      if(isDayDisabled(key)) continue;
-      const doneCount = state.habits.filter(h=>h.logs[key]).length;
-      const rate = doneCount / state.habits.length;
-      const wd = d.getDay();
-      sums[wd]+=rate; counts[wd]++;
-    }
-    let worstIdx=-1, worstRate=Infinity;
-    for(let i=0;i<7;i++){
-      if(counts[i]<2) continue;
-      const avg = sums[i]/counts[i];
-      if(avg<worstRate){ worstRate=avg; worstIdx=i; }
-    }
-    if(worstIdx===-1) return null;
-    return { weekday: WEEKDAY_NAMES[worstIdx], rate: Math.round(worstRate*100) };
-  }
 
   function computeHardestWeekdayProductivity(){
     const sums=[0,0,0,0,0,0,0], counts=[0,0,0,0,0,0,0];
@@ -1273,40 +1336,236 @@
     `).join("");
   }
 
-  function buildInsightsList(){
-    const insights = [];
-    if(state.habits.length===0) return insights;
+  function lastMonths(n){
+    const arr = [];
+    const now = new Date();
+    for(let i=n-1;i>=0;i--){
+      arr.push(new Date(now.getFullYear(), now.getMonth()-i, 1));
+    }
+    return arr;
+  }
 
-    const tKey = todayKey();
-    if(!isDayDisabled(tKey)){
-      state.habits.forEach(h=>{
-        if(!h.logs[tKey]){
-          const streak = computeStreak(h);
-          if(streak>=3){
-            insights.push({icon:"🔥", text:`Tu racha de <b>${streak} días</b> en <b>${h.icon} ${h.name}</b> está en juego — aún no la registras hoy.`});
-          }
-        }
+  function computeMonthlyRate(habit, monthDate){
+    const year = monthDate.getFullYear(), month = monthDate.getMonth();
+    const monthStart = new Date(year, month, 1);
+    const monthEnd = new Date(year, month+1, 0);
+    const now = new Date();
+    const effectiveEnd = monthEnd > now ? now : monthEnd;
+    if(effectiveEnd < monthStart) return null;
+
+    if(habit){
+      const start = getHabitStart(habit);
+      const rangeStart = start > monthStart ? start : monthStart;
+      if(rangeStart > effectiveEnd) return null;
+      let total=0, done=0;
+      for(let d=new Date(rangeStart); d<=effectiveEnd; d.setDate(d.getDate()+1)){
+        const key = todayKey(d);
+        if(isDayDisabled(key)) continue;
+        total++;
+        if(habit.logs[key]) done++;
+      }
+      if(total===0) return null;
+      return Math.round((done/total)*100);
+    } else {
+      if(state.habits.length===0) return null;
+      const rates = state.habits.map(h=>computeMonthlyRate(h, monthDate)).filter(r=>r!==null);
+      if(rates.length===0) return null;
+      return Math.round(rates.reduce((a,b)=>a+b,0)/rates.length);
+    }
+  }
+
+  function buildTrendHabitSelect(){
+    const sel = document.getElementById("trendHabitSelect");
+    const prev = sel.value || "__all__";
+    sel.innerHTML = `<option value="__all__">Vista general (todos los hábitos)</option>` +
+      state.habits.map(h=>`<option value="${h.id}">${h.icon} ${h.name}</option>`).join("");
+    const stillExists = prev==="__all__" || state.habits.some(h=>h.id===prev);
+    sel.value = stillExists ? prev : "__all__";
+  }
+  document.getElementById("trendHabitSelect").addEventListener("change", renderMonthlyTrend);
+
+  function smoothPath(points){
+    if(points.length===0) return "";
+    if(points.length===1) return `M ${points[0].x},${points[0].y}`;
+    let d = `M ${points[0].x},${points[0].y}`;
+    for(let i=0;i<points.length-1;i++){
+      const p0 = points[i-1] || points[i];
+      const p1 = points[i];
+      const p2 = points[i+1];
+      const p3 = points[i+2] || p2;
+      const cp1x = p1.x + (p2.x - p0.x)/6;
+      const cp1y = p1.y + (p2.y - p0.y)/6;
+      const cp2x = p2.x - (p3.x - p1.x)/6;
+      const cp2y = p2.y - (p3.y - p1.y)/6;
+      d += ` C ${cp1x.toFixed(1)},${cp1y.toFixed(1)} ${cp2x.toFixed(1)},${cp2y.toFixed(1)} ${p2.x.toFixed(1)},${p2.y.toFixed(1)}`;
+    }
+    return d;
+  }
+
+  let monthlyTrendPoints = []; // cache para el detalle por mes
+
+  function renderMonthlyTrend(){
+    const section = document.getElementById("trendSection");
+    const box = document.getElementById("trendBox");
+    if(state.habits.length===0){
+      section.style.display = "none"; box.style.display = "none";
+      return;
+    }
+    section.style.display = "flex"; box.style.display = "block";
+
+    const sel = document.getElementById("trendHabitSelect").value || "__all__";
+    const habit = sel==="__all__" ? null : state.habits.find(h=>h.id===sel);
+    const months = lastMonths(6);
+    const points = months.map(d=>({
+      date: d,
+      label: d.toLocaleDateString("es-PE",{month:"short"}).replace(".",""),
+      year: d.getFullYear(),
+      rate: computeMonthlyRate(habit, d)
+    }));
+    monthlyTrendPoints = points;
+
+    // --- gráfico lineal SVG: curva suave + área con degradado ---
+    const w=600, h=210, padL=34, padR=14, padT=16, padB=28;
+    const plotW = w-padL-padR, plotH = h-padT-padB;
+    const n = points.length;
+    const xAt = (i)=> padL + (n<=1 ? plotW/2 : (i/(n-1))*plotW);
+    const yAt = (rate)=> padT + plotH - (rate/100)*plotH;
+    const gradId = "trendGrad";
+
+    let gridSvg = "";
+    [0,25,50,75,100].forEach(g=>{
+      const y = yAt(g);
+      gridSvg += `<line x1="${padL}" y1="${y}" x2="${w-padR}" y2="${y}" stroke="var(--border)" stroke-width="1" stroke-dasharray="3,4"/>`;
+      gridSvg += `<text x="${padL-8}" y="${y+3}" text-anchor="end" font-size="9" fill="var(--text-faint)">${g}</text>`;
+    });
+
+    let segments = [], current = [];
+    points.forEach((p,i)=>{
+      if(p.rate===null){
+        if(current.length>1) segments.push(current);
+        current = [];
+      } else {
+        current.push({x:xAt(i), y:yAt(p.rate)});
+      }
+    });
+    if(current.length>1) segments.push(current);
+
+    const areaSvg = segments.map(seg=>{
+      const path = smoothPath(seg);
+      const base = h-padB;
+      return `<path d="${path} L ${seg[seg.length-1].x},${base} L ${seg[0].x},${base} Z" fill="url(#${gradId})" stroke="none"/>`;
+    }).join("");
+
+    const lineSvg = segments.map(seg=>
+      `<path class="trend-line-path" d="${smoothPath(seg)}" fill="none" stroke="var(--accent)" stroke-width="2.75" stroke-linejoin="round" stroke-linecap="round"/>`
+    ).join("");
+
+    const dotsSvg = points.map((p,i)=>{
+      if(p.rate===null) return "";
+      const x=xAt(i), y=yAt(p.rate);
+      return `<circle class="trend-dot" cx="${x}" cy="${y}" r="4.5" fill="${progressColor(p.rate)}" stroke="var(--bg)" stroke-width="1.5"><title>${p.label} ${p.year}: ${p.rate}%</title></circle>`;
+    }).join("");
+
+    const labelsSvg = points.map((p,i)=>
+      `<text x="${xAt(i)}" y="${h-8}" text-anchor="middle" font-size="10" fill="var(--text-faint)">${p.label}</text>`
+    ).join("");
+
+    document.getElementById("trendChart").innerHTML = `
+      <svg viewBox="0 0 ${w} ${h}" width="100%" height="210" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="var(--accent)" stop-opacity="0.32"/>
+            <stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        ${gridSvg}${areaSvg}${lineSvg}${dotsSvg}${labelsSvg}
+      </svg>`;
+
+    // animación de dibujo de la línea
+    requestAnimationFrame(()=>{
+      document.querySelectorAll("#trendChart .trend-line-path").forEach(path=>{
+        const len = path.getTotalLength();
+        path.style.strokeDasharray = len;
+        path.style.strokeDashoffset = len;
+        path.getBoundingClientRect(); // forzar reflow
+        path.style.strokeDashoffset = 0;
       });
-    }
+    });
 
-    const hardestHabits = computeHardestWeekdayHabits();
-    if(hardestHabits){
-      insights.push({icon:"📉", text:`Los <b>${hardestHabits.weekday}</b> sueles cumplir menos tus hábitos — ${hardestHabits.rate}% en promedio (últimas 8 semanas).`});
-    }
+    // --- donas por mes ---
+    const openMonthKey = document.getElementById("monthDetailPanel").dataset.monthKey;
+    document.getElementById("trendMonthList").innerHTML = points.map((p,i)=>{
+      const key = `${p.date.getFullYear()}-${String(p.date.getMonth()+1).padStart(2,"0")}`;
+      const isActive = key===openMonthKey;
+      if(p.rate===null){
+        return `<div class="tmd-item tmd-empty" data-month-idx="${i}">
+          ${donutSVG(0, "var(--surface-3)", {size:52, strokeWidth:5, wrapClass:"tmd-donut", valueClass:"tmd-donut-value"})}
+          <div class="tmd-label">${p.label}</div>
+        </div>`;
+      }
+      return `<div class="tmd-item ${isActive?"active":""}" data-month-idx="${i}">
+        ${donutSVG(p.rate, progressColor(p.rate), {size:52, strokeWidth:5, wrapClass:"tmd-donut", valueClass:"tmd-donut-value"})}
+        <div class="tmd-label">${p.label}</div>
+      </div>`;
+    }).join("");
 
-    return insights;
+    document.querySelectorAll("#trendMonthList .tmd-item").forEach(el=>{
+      el.addEventListener("click", ()=>{
+        const idx = parseInt(el.dataset.monthIdx);
+        showMonthDetail(points[idx]);
+      });
+    });
+
+    if(openMonthKey){
+      const match = points.find(p=>`${p.date.getFullYear()}-${String(p.date.getMonth()+1).padStart(2,"0")}`===openMonthKey);
+      if(match) showMonthDetail(match, true); else closeMonthDetail();
+    }
   }
 
-  function renderInsights(){
-    const section = document.getElementById("insightsSection");
-    const wrap = document.getElementById("insightsList");
-    const insights = buildInsightsList();
-    if(insights.length===0){ section.style.display="none"; wrap.innerHTML=""; return; }
-    section.style.display = "flex";
-    wrap.innerHTML = insights.map(i=>`
-      <div class="insight-row"><div class="insight-icon">${i.icon}</div><div class="insight-text">${i.text}</div></div>
-    `).join("");
+  function showMonthDetail(point, skipToggle){
+    const panel = document.getElementById("monthDetailPanel");
+    const key = `${point.date.getFullYear()}-${String(point.date.getMonth()+1).padStart(2,"0")}`;
+    if(!skipToggle && panel.dataset.monthKey===key){
+      closeMonthDetail();
+      return;
+    }
+    panel.dataset.monthKey = key;
+    panel.style.display = "block";
+    document.getElementById("monthDetailTitle").textContent =
+      `${point.date.toLocaleDateString("es-PE",{month:"long",year:"numeric"})} — por hábito`;
+
+    const grid = document.getElementById("monthDetailGrid");
+    if(state.habits.length===0){
+      grid.innerHTML = `<div style="font-size:12px;color:var(--text-faint);">No hay hábitos registrados.</div>`;
+    } else {
+      grid.innerHTML = state.habits.map(h=>{
+        const rate = computeMonthlyRate(h, point.date);
+        if(rate===null){
+          return `<div class="mdg-item">
+            ${donutSVG(0, "var(--surface-3)", {size:60, strokeWidth:6, wrapClass:"mdg-donut", valueClass:"mdg-donut-value"})}
+            <div class="mdg-label"><span>${h.icon}</span>${h.name}</div>
+          </div>`;
+        }
+        return `<div class="mdg-item">
+          ${donutSVG(rate, progressColor(rate), {size:60, strokeWidth:6, wrapClass:"mdg-donut", valueClass:"mdg-donut-value"})}
+          <div class="mdg-label"><span>${h.icon}</span>${h.name}</div>
+        </div>`;
+      }).join("");
+    }
+    // refresca el estado activo de la fila de meses
+    document.querySelectorAll("#trendMonthList .tmd-item").forEach((el,i)=>{
+      const p = monthlyTrendPoints[i];
+      const pKey = p ? `${p.date.getFullYear()}-${String(p.date.getMonth()+1).padStart(2,"0")}` : null;
+      el.classList.toggle("active", pKey===key);
+    });
   }
+  function closeMonthDetail(){
+    const panel = document.getElementById("monthDetailPanel");
+    panel.style.display = "none";
+    delete panel.dataset.monthKey;
+    document.querySelectorAll("#trendMonthList .tmd-item").forEach(el=> el.classList.remove("active"));
+  }
+  document.getElementById("closeMonthDetailBtn").addEventListener("click", closeMonthDetail);
 
   function renderHabits(){
     renderKPIs();
@@ -1326,7 +1585,8 @@
         <button class="btn" onclick="document.getElementById('addHabitBtn').click()">+ Nuevo hábito</button></div>`;
       renderHeatmap();
       renderHabitComparison();
-      renderInsights();
+      buildTrendHabitSelect();
+      renderMonthlyTrend();
       return;
     }
     list.innerHTML = "";
@@ -1376,7 +1636,8 @@
     renderHeatmap();
     renderStatsTable();
     renderHabitComparison();
-    renderInsights();
+    buildTrendHabitSelect();
+    renderMonthlyTrend();
   }
 
   function renderHeatmap(){
@@ -1649,7 +1910,7 @@
     const summaryEl = document.getElementById("agendaStatusSummary");
     if(list.length===0){
       summaryEl.textContent = "";
-      wrap.innerHTML = `<div class="empty-state" style="padding:30px 12px;"><div class="big">🗓️</div><p>No hay actividades para este día todavía. Van aquí tus actividades de todas las áreas de tu vida: trabajo, salud, mascota, personal, citas...</p></div>`;
+      wrap.innerHTML = `<div class="empty-state" style="padding:30px 12px;"><div class="big">🗓️</div><p>No hay actividades para este día todavía. Van aquí tus actividades de todas las áreas de tu vida: trabajo, personal, hogar, emprendimiento, reuniones...</p></div>`;
       return;
     }
     const counts = {};
