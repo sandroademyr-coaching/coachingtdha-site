@@ -4,25 +4,28 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Panel TDHA — Hábitos, Agenda y Prioridades</title>
-<link rel="icon" href="/favicon.ico" sizes="any">
-<link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32">
-<link rel="icon" href="/favicon-16x16.png" type="image/png" sizes="16x16">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#0a0b0e">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Panel TDHA">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" id="appIcon" href="data:,">
+<link rel="apple-touch-icon" id="appleIcon" href="data:,">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0d0d0d;
-    --surface:#151515;
-    --surface-2:#1c1c1c;
-    --surface-3:#232323;
-    --border:#2a2a2a;
+    --bg:#0a0b0e;
+    --surface:#12141c;
+    --surface-2:#181b25;
+    --surface-3:#1f2330;
+    --border:rgba(255,255,255,.08);
     --text:#f0f0f0;
     --text-dim:#8f8f8f;
     --text-faint:#5c5c5c;
-    --accent:#cc1111;
-    --accent-soft:rgba(204,17,17,.14);
-    --accent-soft-2:rgba(204,17,17,.28);
+    --accent:#ef4444;
+    --accent-soft:rgba(239,68,68,.12);
+    --accent-soft-2:rgba(239,68,68,.26);
     --success:#3ddc84;
     --success-soft:rgba(61,220,132,.14);
     --q2:#4d9de0;
@@ -68,7 +71,7 @@
     border-bottom:1px solid var(--border);
   }
   .brand{display:flex;align-items:center;gap:10px;margin-right:6px;}
-  .brand .dot{width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px var(--accent);}
+  .brand .dot{width:10px;height:10px;border-radius:50%;background:var(--accent);}
   .brand span{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;letter-spacing:.2px;}
   .tabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);padding:4px;border-radius:12px;}
   .tab-btn{
@@ -110,7 +113,6 @@
   .kpi-card .value{font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;margin-top:8px;color:var(--text);}
   .kpi-card .value small{font-size:14px;color:var(--text-dim);font-weight:500;}
   .kpi-card .sub{font-size:11.5px;color:var(--text-faint);margin-top:4px;}
-  .kpi-card::after{content:'';position:absolute;right:-20px;top:-20px;width:70px;height:70px;border-radius:50%;background:var(--accent-soft);filter:blur(2px);}
   .kpi-donut-card{align-items:flex-start;}
   .kpi-donut{position:relative;width:64px;height:64px;margin:6px 0 2px;}
   .kpi-donut svg{position:relative;z-index:1;}
@@ -248,11 +250,11 @@
 
   /* ---------- Modal ---------- */
   .modal-overlay{
-    position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(2px);
+    position:fixed;inset:0;background:rgba(10,11,14,.6);backdrop-filter:blur(6px);
     display:none;align-items:center;justify-content:center;z-index:100;padding:20px;
   }
   .modal-overlay.open{display:flex;}
-  .modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px;width:100%;max-width:420px;}
+  .modal{background:rgba(18,20,28,.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:16px;padding:22px;width:100%;max-width:420px;box-shadow:0 24px 60px -12px rgba(0,0,0,.7);}
   .modal h3{margin:0 0 16px;font-size:15px;}
   .field{margin-bottom:12px;}
   .field label{display:block;font-size:11.5px;color:var(--text-dim);margin-bottom:5px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;}
@@ -333,6 +335,282 @@
   .cmp-bar-value{position:absolute;right:8px;top:50%;transform:translateY(-50%);
     font-size:11px;font-family:'JetBrains Mono',monospace;font-weight:700;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.4);}
 
+  /* ---------- Profundidad / micro-interacciones ---------- */
+  .kpi-card,.habit-row,.tmd-item,.cmp-row{transition:all .25s cubic-bezier(.4,0,.2,1);}
+  .kpi-card:hover,.habit-row:hover{transform:translateY(-4px);
+    box-shadow:0 12px 28px -8px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.15);}
+  .habit-row{cursor:pointer;}
+  .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--c);margin-right:5px;vertical-align:middle;position:relative;}
+  .dot.pulse::after{content:'';position:absolute;inset:0;border-radius:50%;background:var(--c);animation:dotPulse 1.8s ease-out infinite;}
+  @keyframes dotPulse{0%{transform:scale(1);opacity:.7}100%{transform:scale(3.2);opacity:0}}
+  .status-txt .dot{font-size:0;}
+  .rich-tip{position:fixed;z-index:400;pointer-events:none;max-width:260px;padding:9px 12px;border-radius:10px;font-size:12px;line-height:1.5;
+    background:rgba(18,20,28,.88);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.14);
+    box-shadow:0 12px 28px -8px rgba(0,0,0,.7);color:var(--text-dim);opacity:0;transform:translateY(4px);transition:opacity .15s,transform .15s;}
+  .rich-tip.show{opacity:1;transform:none;}
+  .rich-tip b{color:var(--text);display:block;font-weight:600;}
+
+  /* ---------- Slide-over ---------- */
+  .slide-overlay{position:fixed;inset:0;background:rgba(10,11,14,.55);backdrop-filter:blur(4px);z-index:150;opacity:0;pointer-events:none;transition:opacity .25s;}
+  .slide-overlay.open{opacity:1;pointer-events:auto;}
+  .slide-over{position:fixed;top:0;right:0;bottom:0;width:min(460px,100vw);z-index:160;overflow-y:auto;padding:22px;
+    background:rgba(18,20,28,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-left:1px solid rgba(255,255,255,.1);
+    transform:translateX(102%);transition:transform .3s cubic-bezier(.4,0,.2,1);box-shadow:-24px 0 60px -12px rgba(0,0,0,.6);}
+  .slide-over.open{transform:none;}
+  .so-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:16px;}
+  .so-title{font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;display:flex;gap:10px;align-items:center;}
+  .so-sub{font-size:11.5px;color:var(--text-faint);margin-top:3px;}
+  .so-close{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:var(--surface-2);color:var(--text-dim);cursor:pointer;flex-shrink:0;}
+  .so-close:hover{color:var(--text);}
+  .so-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:6px;}
+  .so-stat{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;}
+  .so-stat .k{font-size:10px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.5px;font-weight:600;}
+  .so-stat .v{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:18px;margin-top:3px;}
+  .so-sec{font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--text-dim);font-weight:700;margin:20px 0 10px;}
+  .so-hm{display:grid;grid-template-columns:repeat(10,1fr);gap:5px;}
+  .so-cell{aspect-ratio:1;border-radius:5px;background:var(--surface-3);}
+  .so-cell.done{background:var(--ok,#10b981);}
+  .so-cell.miss{background:rgba(239,68,68,.35);}
+  .so-cell.pre{opacity:.25;}
+  .so-cell.off{background:repeating-linear-gradient(45deg,var(--surface-2),var(--surface-2) 3px,var(--surface-3) 3px,var(--surface-3) 6px);}
+  .so-cell.today{outline:1px solid rgba(255,255,255,.4);}
+  .so-log{display:flex;flex-direction:column;gap:6px;}
+  .so-log-row{display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:7px 10px;font-size:12px;}
+  .so-log-row .d{color:var(--text-dim);text-transform:capitalize;min-width:92px;}
+  .seg{display:flex;gap:4px;}
+  .seg button{background:transparent;border:1px solid var(--border);color:var(--text-faint);border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700;cursor:pointer;transition:all .2s;}
+  .seg button.on{background:var(--surface-3);color:var(--text);border-color:rgba(255,255,255,.25);}
+  .so-log select{background:var(--surface-3);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:4px 6px;font-size:11.5px;max-width:170px;}
+  .so-note{font-size:11px;color:var(--text-faint);line-height:1.5;margin-top:8px;}
+
+  .cause-pop{position:fixed;z-index:450;width:260px;padding:12px;border-radius:12px;background:rgba(18,20,28,.92);
+    backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.14);box-shadow:0 16px 40px -8px rgba(0,0,0,.7);}
+  .cause-pop .cp-t{font-size:12px;font-weight:700;margin-bottom:2px;}
+  .cause-pop .cp-s{font-size:11px;color:var(--text-faint);margin-bottom:8px;text-transform:capitalize;}
+  .cause-pop button{display:block;width:100%;text-align:left;background:var(--surface-2);border:1px solid var(--border);color:var(--text);
+    border-radius:8px;padding:8px 10px;font-size:12px;margin-top:5px;cursor:pointer;transition:all .2s;}
+  .cause-pop button:hover{border-color:rgba(255,255,255,.3);transform:translateX(2px);}
+  .cause-pop button.skip{background:transparent;color:var(--text-faint);}
+  .slot-view{display:flex;gap:4px;margin-bottom:14px;flex-wrap:wrap;}
+  .slot-view button{background:transparent;border:1px solid var(--border);color:var(--text-faint);border-radius:7px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;}
+  .slot-view button.on{background:var(--surface-3);color:var(--text);border-color:rgba(255,255,255,.25);}
+  .grp-row{display:flex;align-items:center;gap:8px;font-size:11.5px;padding:4px 0;color:var(--text-dim);}
+  .grp-row .nm{width:120px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .grp-row .bar{flex:1;height:6px;background:var(--surface-3);border-radius:4px;overflow:hidden;}
+  .grp-row .bar i{display:block;height:100%;border-radius:4px;transition:width .5s cubic-bezier(.4,0,.2,1);}
+  .grp-row b{width:36px;text-align:right;font-family:'JetBrains Mono',monospace;color:var(--text);}
+
+  /* ---------- Cuenta / sincronización ---------- */
+  .sync-pill{display:flex;align-items:center;gap:7px;height:36px;padding:0 12px;border-radius:9px;border:1px solid var(--border);
+    background:var(--surface);color:var(--text-dim);font-size:11.5px;font-weight:600;cursor:pointer;transition:.15s;white-space:nowrap;}
+  .sync-pill:hover{color:var(--text);border-color:var(--text-faint);}
+  .sync-pill .dot{margin:0;}
+  .auth-screen{position:fixed;inset:0;z-index:500;background:radial-gradient(1200px 600px at 50% -10%,rgba(239,68,68,.10),transparent),#0a0b0e;
+    display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto;}
+  .auth-card{width:100%;max-width:400px;background:rgba(18,20,28,.9);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:28px;
+    box-shadow:0 24px 60px -12px rgba(0,0,0,.7);}
+  .auth-logo{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:17px;display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+  .auth-logo .dot{width:10px;height:10px;border-radius:50%;background:var(--accent);display:inline-block;}
+  .auth-sub{font-size:12.5px;color:var(--text-dim);margin-bottom:18px;line-height:1.5;}
+  .auth-tabs{display:flex;gap:4px;background:var(--surface-2);border:1px solid var(--border);padding:4px;border-radius:11px;margin-bottom:16px;}
+  .auth-tabs button{flex:1;border:none;background:transparent;color:var(--text-dim);padding:9px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;}
+  .auth-tabs button.on{background:var(--surface-3);color:var(--text);}
+  .pw-wrap{position:relative;}
+  .pw-wrap input{padding-right:42px;}
+  .pw-wrap button{position:absolute;right:4px;top:50%;transform:translateY(-50%);background:transparent;border:none;cursor:pointer;font-size:16px;padding:6px 8px;opacity:.7;}
+  .auth-err{min-height:18px;font-size:12px;color:#ef4444;margin-top:2px;line-height:1.4;}
+  .auth-err.ok{color:#10b981;}
+  .auth-links{display:flex;justify-content:space-between;gap:10px;margin-top:16px;font-size:12px;}
+  .auth-links a{color:var(--text-faint);text-decoration:none;}
+  .auth-links a:hover{color:var(--text);}
+  .tab-btn .ti{display:none;}
+  .tab-btn .tl .short{display:none;}
+
+  /* ---------- Móvil ---------- */
+  @media(max-width:720px){
+    .topbar{padding:10px 14px;gap:8px;backdrop-filter:none;-webkit-backdrop-filter:none;background:rgba(10,11,14,.97);}
+    .brand span:last-child{font-size:13px;}
+    .today-pill{display:none;}
+    .icon-btn{width:40px;height:40px;}
+    .sync-pill{height:40px;padding:0 11px;}
+    #syncText{display:none;}
+    #mainTabs{position:fixed;left:0;right:0;bottom:0;z-index:60;border-radius:0;border:none;border-top:1px solid var(--border);
+      background:rgba(18,20,28,.94);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+      padding:6px 8px calc(6px + env(safe-area-inset-bottom));justify-content:space-around;gap:4px;order:5;}
+    #mainTabs .tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 4px;font-size:10.5px;border-radius:12px;}
+    #mainTabs .tab-btn .ti{display:block;font-size:19px;line-height:1;}
+    #mainTabs .tab-btn .tl .full{display:none;}
+    #mainTabs .tab-btn .tl .short{display:inline;}
+    #mainTabs .tab-btn.active{background:var(--accent-soft);color:var(--text);}
+    main{padding:16px 14px calc(96px + env(safe-area-inset-bottom));}
+    .section-title{margin:26px 0 12px;flex-wrap:wrap;gap:4px;}
+    .kpi-card{padding:14px;}
+    .kpi-card .value{font-size:24px;}
+    .modal-overlay{align-items:flex-end;padding:0;}
+    .modal{max-width:100%!important;border-radius:18px 18px 0 0;max-height:92vh;overflow-y:auto;padding:20px 18px calc(20px + env(safe-area-inset-bottom));}
+    .settings-pop{position:fixed;left:10px;right:10px;top:64px;width:auto;max-height:calc(100vh - 90px);overflow-y:auto;}
+    .toast{bottom:92px;max-width:92vw;text-align:center;}
+    input,select,textarea,.field input,.field select{font-size:16px!important;}
+    .day-nav{flex-wrap:wrap;}
+    #periodTabs .tab-btn{padding:9px 2px;font-size:12px;}
+    .blk-row{grid-template-columns:1fr 1fr;}
+    .blk-row input[data-f="icon"]{grid-column:1;}
+    .blk-row input[data-f="title"]{grid-column:1 / -1;}
+    .tl-card{flex-wrap:wrap;}
+    .tl-actions{width:100%;justify-content:flex-end;}
+    .cap-grid{grid-template-columns:44px repeat(7,1fr);gap:3px;}
+    .cap-cell{height:26px;font-size:9px;}
+    .rk-in{font-size:16px;}
+    .quick-btn{padding:10px 12px;}
+    .eisen-grid{grid-template-columns:1fr!important;}
+    .quad{min-width:0;}
+  }
+  @media(hover:none){
+    .kpi-card:hover,.habit-row:hover,.intel-card:hover,.quick-btn:hover{transform:none;box-shadow:none;}
+  }
+
+  /* ---------- Agenda cero fricción ---------- */
+  .rocks-card{margin-top:16px;border-radius:14px;padding:18px;background:linear-gradient(180deg,#161824,#12141c);
+    border:1px solid rgba(255,255,255,.1);transition:all .25s cubic-bezier(.4,0,.2,1);}
+  .rocks-card:hover{border-color:rgba(255,255,255,.18);}
+  .rocks-title{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px;margin-bottom:12px;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;}
+  .rocks-title span{font-family:'Inter',sans-serif;font-weight:500;font-size:11.5px;color:var(--text-faint);}
+  .rock{display:flex;align-items:center;gap:12px;padding:8px 0;}
+  .rock+.rock{border-top:1px solid rgba(255,255,255,.05);}
+  .rk-n{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--text-faint);width:14px;}
+  .rock input[type=checkbox]{width:20px;height:20px;accent-color:#10b981;cursor:pointer;flex-shrink:0;}
+  .rk-in{flex:1;background:transparent;border:none;border-bottom:1px solid transparent;color:var(--text);font-size:14.5px;padding:6px 2px;outline:none;transition:border-color .2s;}
+  .rk-in:focus{border-bottom-color:rgba(255,255,255,.25);}
+  .rk-in::placeholder{color:var(--text-faint);}
+  .rock.done .rk-in{text-decoration:line-through;color:var(--text-faint);}
+  .quick-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;}
+  .quick-btn{background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:9px;padding:8px 12px;font-size:12.5px;font-weight:600;cursor:pointer;transition:all .25s cubic-bezier(.4,0,.2,1);}
+  .quick-btn:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.25);}
+  .quick-btn small{color:var(--text-faint);font-weight:500;margin-left:4px;}
+  .quick-btn.ghost{background:transparent;color:var(--text-dim);border-style:dashed;}
+  .tl-item.fixed .tl-card{background:rgba(255,255,255,.025);}
+  .tl-item.fixed.respected .tl-card{border-color:rgba(16,185,129,.35);}
+  .tl-item.fixed.respected .tl-title{color:var(--text-dim);}
+  .tl-item.fixed.now .tl-card{border-color:rgba(255,255,255,.28);}
+  .tl-item.fixed .tl-tag{background:rgba(255,255,255,.05);color:var(--text-faint);}
+  .tl-item.fixed.respected .tl-tag{color:#10b981;background:rgba(16,185,129,.1);}
+  .blk-check{width:24px;height:24px;border-radius:7px;border:1.5px solid var(--border);background:transparent;color:#fff;cursor:pointer;flex-shrink:0;font-size:13px;transition:all .2s;}
+  .blk-check.on{background:#10b981;border-color:#10b981;}
+  .tl-time-input{width:104px;flex-shrink:0;background:transparent;border:1px solid transparent;color:var(--text-dim);
+    font-family:'JetBrains Mono',monospace;font-size:11.5px;border-radius:6px;padding:2px 4px;}
+  .tl-time-input:hover,.tl-time-input:focus{border-color:var(--border);background:var(--surface-3);}
+  .tl-range{width:84px;flex-shrink:0;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-dim);padding-top:2px;line-height:1.5;}
+  .blk-row{display:grid;grid-template-columns:90px 90px 48px 1fr auto auto;gap:6px;align-items:center;margin-bottom:6px;}
+  .blk-row input[type=time],.blk-row input[type=text]{background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:7px 8px;font-size:12.5px;width:100%;}
+  .blk-row label{font-size:10.5px;color:var(--text-faint);display:flex;gap:4px;align-items:center;white-space:nowrap;}
+  .cap-grid{display:grid;grid-template-columns:64px repeat(7,1fr);gap:5px;align-items:center;}
+  .cap-h{font-size:11px;font-weight:700;color:var(--text-faint);text-align:center;padding:2px 0;}
+  .cap-wk{font-size:10.5px;color:var(--text-faint);}
+  .cap-cell{height:30px;border-radius:7px;background:var(--surface-3);display:flex;align-items:center;justify-content:center;font-size:10.5px;
+    font-family:'JetBrains Mono',monospace;font-weight:700;color:#fff;transition:transform .2s;}
+  .cap-cell:hover{transform:scale(1.06);}
+  .cap-cell.empty{background:transparent;border:1px dashed rgba(255,255,255,.06);}
+  .cap-cell.warn{outline:1.5px dashed #f59e0b;outline-offset:1px;}
+  .cap-avg{margin-top:4px;}
+  .cap-h.warn{color:#f59e0b;}
+
+  /* ---------- Centro de inteligencia ---------- */
+  .intel-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
+  @media(max-width:920px){.intel-grid{grid-template-columns:1fr;}}
+  .intel-card{background:#161824;border:1px solid rgba(255,255,255,.05);border-radius:14px;padding:16px;transition:all .25s cubic-bezier(.4,0,.2,1);min-width:0;}
+  .intel-card:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.15);}
+  .intel-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:12px;}
+  .intel-h b{font-size:12.5px;font-weight:700;}
+  .intel-h span{font-size:10.5px;color:var(--text-faint);}
+  .mom-row,.spk-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:12.5px;}
+  .mom-row:last-child,.spk-row:last-child{border-bottom:none;}
+  .mom-row .nm,.spk-row .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;}
+  .mom-row .dl{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;min-width:64px;text-align:right;}
+  .mom-row .tx{font-size:10.5px;color:var(--text-faint);width:110px;text-align:right;}
+  .spk-row svg{flex-shrink:0;}
+  .spk-row b{font-family:'JetBrains Mono',monospace;width:38px;text-align:right;font-size:12px;}
+  .qual-bar{display:flex;height:12px;border-radius:7px;overflow:hidden;gap:2px;margin:4px 0 14px;}
+  .qual-bar i{display:block;transition:flex .5s cubic-bezier(.4,0,.2,1);min-width:3px;}
+  .qual-row{display:flex;align-items:center;gap:9px;padding:6px 0;font-size:12.5px;color:var(--text-dim);}
+  .qual-row i{width:9px;height:9px;border-radius:3px;flex-shrink:0;}
+  .qual-row b{margin-left:auto;font-family:'JetBrains Mono',monospace;color:var(--text);}
+  .qual-row small{color:var(--text-faint);font-size:10.5px;}
+  .dom-item{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:12.5px;line-height:1.5;color:var(--text-dim);}
+  .dom-item:last-child{border-bottom:none;}
+  .dom-item .bd{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:11.5px;padding:2px 7px;border-radius:6px;background:var(--surface-3);flex-shrink:0;}
+  .dom-item b{color:var(--text);font-weight:600;}
+
+  /* ---------- Insights (franja / fricción) ---------- */
+  .insights-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  @media(max-width:920px){.insights-grid{grid-template-columns:1fr;}}
+  .slot-big{display:flex;gap:12px;margin-bottom:14px;}
+  .slot-big>div{flex:1;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;}
+  .slot-big .k{font-size:10.5px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.5px;font-weight:600;}
+  .slot-big .v{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:700;margin-top:4px;}
+  .slot-row{padding:7px 0;}
+  .slot-row .nm{font-size:12px;font-weight:600;margin-bottom:5px;}
+  .slot-bar{display:flex;align-items:center;gap:8px;margin-bottom:3px;font-size:10.5px;color:var(--text-faint);}
+  .slot-bar i{display:block;height:7px;border-radius:4px;min-width:3px;transition:width .5s cubic-bezier(.4,0,.2,1);}
+  .slot-bar span{width:22px;font-weight:700;}
+  .fr-wrap{display:flex;gap:18px;align-items:center;flex-wrap:wrap;}
+  .fr-legend{display:flex;flex-direction:column;gap:8px;font-size:12px;flex:1;min-width:150px;}
+  .fr-legend div{display:flex;align-items:center;gap:8px;color:var(--text-dim);}
+  .fr-legend i{width:9px;height:9px;border-radius:3px;flex-shrink:0;}
+  .fr-legend b{margin-left:auto;font-family:'JetBrains Mono',monospace;color:var(--text);}
+  .fr-seg{transition:stroke-width .2s;cursor:pointer;}
+  .fr-seg:hover{stroke-width:18;}
+  .empty-note{font-size:12px;color:var(--text-faint);line-height:1.6;padding:6px 0;}
+
+  /* ---------- Pipeline de hábitos (niveles) ---------- */
+  .tier-head{display:flex;align-items:center;gap:10px;margin:18px 0 2px;padding:0 4px;}
+  .tier-head:first-child{margin-top:14px;}
+  .tier-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+  .tier-title{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:12.5px;letter-spacing:.5px;text-transform:uppercase;}
+  .tier-sub{font-size:11.5px;color:var(--text-faint);}
+  .tier-avg{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;}
+  .status-pill{display:inline-block;font-size:9.5px;font-weight:800;letter-spacing:.5px;padding:2px 7px;border-radius:5px;margin-left:6px;vertical-align:middle;}
+  .pillar-tag{font-size:9.5px;font-weight:800;letter-spacing:.5px;color:var(--accent);border:1px solid var(--accent-soft-2);
+    background:var(--accent-soft);padding:1px 6px;border-radius:5px;margin-left:6px;}
+  .kpi-lines{margin-top:6px;display:flex;flex-direction:column;gap:2px;}
+  .kpi-lines div{font-size:11px;color:var(--text-dim);display:flex;justify-content:space-between;gap:8px;}
+  .kpi-lines b{font-family:'JetBrains Mono',monospace;font-weight:700;}
+  .kpi-warn{font-size:11px;color:#ff8a5c;margin-top:6px;line-height:1.4;}
+
+  .status-txt{font-size:10.5px;color:var(--text-faint);margin-left:8px;white-space:nowrap;}
+  .status-txt span{font-size:9px;}
+  .pillar-mark{font-size:8px;color:var(--text-faint);margin-left:7px;vertical-align:middle;}
+  .kpi-note{font-size:10.5px;color:var(--text-faint);margin-top:6px;}
+  .cmp-bar-value{text-shadow:none!important;}
+  .emoji,.cmp-label>span:first-child{display:inline-flex;width:22px;justify-content:center;font-size:16px;line-height:1;}
+  #diagUse1,#diagUse3{background:var(--surface-2);border:1px solid var(--border);color:var(--text-dim);}
+  #diagUse1:hover,#diagUse3:hover{color:var(--text);}
+
+  /* ---------- Día fuga ---------- */
+  .leak-plot{position:relative;height:150px;display:flex;gap:12px;align-items:flex-end;padding:0 4px;}
+  .leak-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;}
+  .leak-bar{width:100%;max-width:56px;border-radius:7px 7px 3px 3px;min-height:4px;transition:height .5s cubic-bezier(.4,0,.2,1);}
+  .leak-val{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;margin-bottom:5px;color:var(--text);}
+  .leak-avg{position:absolute;left:0;right:0;border-top:1.5px dashed var(--text-faint);pointer-events:none;}
+  .leak-avg span{position:absolute;right:0;top:-16px;font-size:10px;color:var(--text-faint);background:var(--surface);padding:0 4px;}
+  .leak-labels{display:flex;gap:12px;padding:6px 4px 0;}
+  .leak-labels div{flex:1;text-align:center;font-size:11.5px;font-weight:700;color:var(--text-dim);}
+  .leak-labels div.leak{color:var(--accent);}
+  .leak-alert{margin-top:16px;border-radius:10px;padding:12px 14px;font-size:12.5px;line-height:1.55;
+    border:1px solid var(--border);background:var(--surface-2);color:var(--text-dim);}
+  .leak-alert b{color:var(--text);}
+  .leak-alert.bad{border-left:3px solid var(--accent);}
+  .leak-alert.good{border-left:3px solid #10b981;}
+
+  /* ---------- Diagnóstico ---------- */
+  .diag-q{padding:14px 0;border-bottom:1px solid var(--border);}
+  .diag-q:last-child{border-bottom:none;padding-bottom:0;}
+  .diag-q:first-child{padding-top:0;}
+  .diag-q-title{font-weight:600;font-size:13.5px;margin-bottom:6px;}
+  .diag-suggest{font-size:11.5px;color:var(--text-dim);margin-bottom:8px;line-height:1.5;display:flex;gap:10px;align-items:flex-start;justify-content:space-between;}
+  .diag-target-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+  .diag-target-row input{width:92px;background:var(--surface-2);border:1px solid var(--border);color:var(--text);
+    border-radius:8px;padding:9px 11px;font-size:14px;font-family:'JetBrains Mono',monospace;font-weight:700;}
+
   /* ---------- Tendencia mensual ---------- */
   .trend-chart-wrap{animation:trendFadeIn .5s ease;}
   @keyframes trendFadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
@@ -400,15 +678,38 @@
 </head>
 <body>
 
+<div class="auth-screen" id="authScreen" style="display:none;">
+  <div class="auth-card">
+    <div class="auth-logo"><span class="dot"></span> PANEL // TDHA</div>
+    <div class="auth-sub">Tus hábitos, agenda y journal, iguales en el celular y la laptop.</div>
+    <div class="auth-tabs">
+      <button class="on" id="authTabIn">Iniciar sesión</button>
+      <button id="authTabUp">Crear cuenta</button>
+    </div>
+    <div class="field"><label>Correo</label><input type="email" id="authEmail" autocomplete="email" inputmode="email" placeholder="tu@correo.com"></div>
+    <div class="field"><label>Contraseña</label>
+      <div class="pw-wrap"><input type="password" id="authPw" autocomplete="current-password" placeholder="Mínimo 6 caracteres"><button type="button" id="authPwToggle" title="Mostrar / ocultar">👁</button></div>
+    </div>
+    <div class="auth-err" id="authErr"></div>
+    <button class="btn" id="authSubmit" style="width:100%;margin-top:6px;">Entrar</button>
+    <div class="auth-links">
+      <a href="#" id="authForgot">¿Olvidaste tu contraseña?</a>
+      <a href="#" id="authSkip">Continuar sin cuenta</a>
+    </div>
+  </div>
+</div>
+
 <div class="topbar">
   <div class="brand"><span class="dot"></span><span>PANEL // sandro</span></div>
   <div class="tabs" id="mainTabs">
-    <button class="tab-btn active" data-view="habitos">Hábitos</button>
-    <button class="tab-btn" data-view="agenda">Agenda &amp; Prioridades</button>
-    <button class="tab-btn" data-view="journal">Journal</button>
+    <button class="tab-btn active" data-view="habitos"><span class="ti">🔥</span><span class="tl">Hábitos</span></button>
+    <button class="tab-btn" data-view="agenda"><span class="ti">🗓️</span><span class="tl"><span class="full">Agenda &amp; Prioridades</span><span class="short">Agenda</span></span></button>
+    <button class="tab-btn" data-view="journal"><span class="ti">📝</span><span class="tl">Journal</span></button>
   </div>
   <div class="topbar-right">
     <div class="today-pill mono" id="clockPill">—</div>
+    <button class="sync-pill" id="syncPill" title="Estado de sincronización"><i class="dot" id="syncDot" style="--c:#8f8f8f;"></i><span id="syncText">Solo este dispositivo</span></button>
+    <button class="icon-btn" id="backupBtn" title="Respaldo e importación">💾</button>
     <button class="icon-btn" id="remindersBtn" title="Recordatorios">🔔</button>
     <button class="icon-btn" id="settingsBtn" title="Ajustes">⚙</button>
   </div>
@@ -416,6 +717,15 @@
 
 <div class="settings-pop" id="settingsPop">
   <h4>Ajustes</h4>
+  <div class="field" id="accountBox" style="display:none;border-bottom:1px solid var(--border);padding-bottom:12px;">
+    <label>Cuenta</label>
+    <div id="accountEmail" style="font-size:12.5px;word-break:break-all;margin-bottom:8px;"></div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+      <button class="btn secondary small" id="syncNowBtn">Sincronizar ahora</button>
+      <button class="btn secondary small" id="resetPwBtn">Cambiar contraseña</button>
+      <button class="btn ghost small" id="logoutBtn">Cerrar sesión</button>
+    </div>
+  </div>
   <div class="field">
     <label>Color de acento</label>
     <div class="swatches" id="accentSwatches"></div>
@@ -490,16 +800,35 @@
       <h2>Estadísticas por hábito</h2>
       <span class="hint">tasa de conversión: días cumplidos ÷ días de seguimiento (excluye días libres)</span>
     </div>
-    <div class="panel-box">
-      <table class="stats-table" id="statsTable"></table>
+    <div class="panel-box" style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+      <table class="stats-table" id="statsTable" style="min-width:480px;"></table>
     </div>
 
     <div class="section-title" id="comparisonSection" style="display:none;">
-      <h2>📊 Comparativa de hábitos</h2>
-      <span class="hint">ranking de consistencia histórica</span>
+      <h2>🎛️ Centro de inteligencia operativa</h2>
+      <span class="hint">momentum, calidad de jornada, volatilidad y efecto dominó</span>
     </div>
-    <div class="panel-box" id="comparisonBox" style="display:none;">
+    <div class="panel-box" id="comparisonBox" style="display:none;padding:16px;">
       <div id="comparisonList"></div>
+    </div>
+
+    <div class="section-title" id="leakSection" style="display:none;">
+      <h2>🕳️ Día fuga</h2>
+      <span class="hint">cumplimiento por día de la semana · últimas 8 semanas</span>
+    </div>
+    <div class="panel-box" id="leakBox" style="display:none;">
+      <div class="leak-plot" id="leakPlot"></div>
+      <div class="leak-labels" id="leakLabels"></div>
+      <div class="leak-alert" id="leakAlert"></div>
+    </div>
+
+    <div class="section-title" id="insightsSection" style="display:none;">
+      <h2>⏱️ Franja horaria y fricción</h2>
+      <span class="hint">cuándo rindes y por qué fallas</span>
+    </div>
+    <div class="insights-grid" id="insightsGrid" style="display:none;">
+      <div class="panel-box"><h3>Eficiencia por franja <span class="hint">promedio 30 días</span></h3><div id="slotBox"></div></div>
+      <div class="panel-box"><h3>Causas de fricción <span class="hint">últimos 90 días</span></h3><div id="frictionBox"></div></div>
     </div>
 
     <div class="section-title" id="trendSection" style="display:none;">
@@ -511,6 +840,12 @@
         <label>Ver</label>
         <select id="trendHabitSelect"></select>
       </div>
+      <div class="cal-nav" id="trendNav" style="margin-bottom:14px;">
+        <button id="trendPrev" title="Meses anteriores">‹</button>
+        <div class="cal-month-label" id="trendRangeLabel">—</div>
+        <button id="trendNext" title="Meses siguientes">›</button>
+        <button class="cal-today-btn" id="trendRecentBtn">Recientes</button>
+      </div>
       <div id="trendChart" class="trend-chart-wrap"></div>
       <div id="trendMonthList" class="trend-month-donuts"></div>
       <div id="monthDetailPanel" class="month-detail-panel" style="display:none;">
@@ -519,6 +854,31 @@
           <button class="icon-mini" id="closeMonthDetailBtn">✕</button>
         </div>
         <div class="month-detail-grid" id="monthDetailGrid"></div>
+      </div>
+    </div>
+
+    <div class="section-title" id="diagSection" style="display:none;">
+      <h2>🧭 Diagnóstico y oportunidad de mejora</h2>
+      <span class="hint" id="diagWeekLabel"></span>
+    </div>
+    <div class="panel-box" id="diagBox" style="display:none;">
+      <div class="diag-q">
+        <div class="diag-q-title">1 · ¿Dónde estuvo el cuello de botella esta semana?</div>
+        <div class="diag-suggest"><span id="diagSuggest1"></span><button class="btn secondary small" id="diagUse1" style="flex-shrink:0;">Usar</button></div>
+        <textarea class="journal-textarea" id="diagBottleneck" rows="2" placeholder="Ej. La falta de descanso nocturno desplomó la sesión de estudio mañanera."></textarea>
+      </div>
+      <div class="diag-q">
+        <div class="diag-q-title">2 · ¿Qué acción correctora se aplicará?</div>
+        <div class="diag-suggest"><span id="diagSuggest2"></span></div>
+        <textarea class="journal-textarea" id="diagAction" rows="2" placeholder="Ej. Reajuste de horario: mover el bloque de estudio de la noche a la ventana del desayuno."></textarea>
+      </div>
+      <div class="diag-q">
+        <div class="diag-q-title">3 · Proyección a 7 días: meta de conversión para revertir la tendencia</div>
+        <div class="diag-suggest"><span id="diagSuggest3"></span><button class="btn secondary small" id="diagUse3" style="flex-shrink:0;">Usar meta</button></div>
+        <div class="diag-target-row">
+          <input type="number" id="diagTarget" min="0" max="100" placeholder="%">
+          <span id="diagGap" style="font-size:12px;color:var(--text-dim);"></span>
+        </div>
       </div>
     </div>
   </section>
@@ -545,38 +905,43 @@
 
       <div class="kpi-grid" id="agendaKpiGrid" style="margin-top:14px;"></div>
 
-      <div class="split">
-        <div class="panel-box">
-          <h3>Matriz de Eisenhower <span class="hint">prioridades del día</span></h3>
-          <div class="eisen-grid" id="eisenGrid"></div>
-        </div>
+      <div class="rocks-card">
+        <div class="rocks-title">🎯 Las 3 victorias del día <span>Must-wins · si se cumplen, el día es un éxito</span></div>
+        <div id="rocksList"></div>
+      </div>
 
-        <div class="panel-box">
-          <h3>Agenda del día <span class="hint" id="agendaRangeLabel"></span></h3>
-          <div class="hint" id="agendaStatusSummary" style="margin:-6px 0 10px;"></div>
-          <div class="timeline" id="timelineList"></div>
-          <div class="add-inline">
-            <input type="time" id="newActTime" style="width:88px;">
-            <input type="text" id="newActTitle" placeholder="Gimnasio, pasear a la perra, reunión, entrevista..." style="flex:1;">
-            <select id="newActType">
-              <option value="trabajo">Trabajo</option>
-              <option value="personal">Personal</option>
-              <option value="hogar">Hogar</option>
-              <option value="emprendimiento">Emprendimiento</option>
-              <option value="reunion">Reunión</option>
-              <option value="otro">Otro</option>
-            </select>
-            <button class="btn small" id="addActBtn">+</button>
-          </div>
+      <div class="panel-box" style="margin-top:16px;">
+        <h3>Agenda del día <span class="hint"><span id="agendaRangeLabel"></span> <button class="btn secondary small" id="editBlocksBtn" style="margin-left:8px;">⚙ Bloques fijos</button></span></h3>
+        <div class="hint" id="agendaStatusSummary" style="margin:-6px 0 10px;"></div>
+        <div class="timeline" id="timelineList"></div>
+        <div class="quick-row">
+          <button class="quick-btn" data-quick="carlos">+ Reunión Carlos <small>45 min</small></button>
+          <button class="quick-btn" data-quick="prospeccion">+ Llamada Prospección</button>
+          <button class="quick-btn" data-quick="tramite">+ Trámite Personal</button>
+          <button class="quick-btn ghost" id="toggleExtraBtn">+ Agregar tarea excepcional</button>
+        </div>
+        <div class="add-inline" id="extraForm" style="display:none;">
+          <input type="time" id="newActTime" style="width:88px;">
+          <input type="text" id="newActTitle" placeholder="Reunión puntual, llamada médica..." style="flex:1;">
+          <select id="newActType">
+            <option value="trabajo">Trabajo</option>
+            <option value="marca">Marca Personal</option>
+            <option value="personal">Personal</option>
+            <option value="hogar">Hogar</option>
+            <option value="emprendimiento">Emprendimiento</option>
+            <option value="reunion">Reunión</option>
+            <option value="otro">Otro</option>
+          </select>
+          <button class="btn small" id="addActBtn">+</button>
         </div>
       </div>
 
       <div class="section-title">
-        <h2>Tendencia de productividad y disciplina</h2>
-        <span class="hint">últimos 14 días · hábitos + prioridades cumplidas</span>
+        <h2>Capacidad operativa semanal</h2>
+        <span class="hint">últimas 8 semanas · hábitos + victorias del día</span>
       </div>
       <div class="panel-box">
-        <div class="prod-bars" id="prodBars"></div>
+        <div id="prodBars"></div>
         <div id="prodInsightLine" style="font-size:12px;color:var(--text-dim);margin-top:12px;"></div>
       </div>
     </div>
@@ -660,6 +1025,41 @@
     <div class="field">
       <label>Color</label>
       <div class="swatches" id="habitSwatches"></div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Nivel del pipeline</label>
+        <select id="habitTierInput">
+          <option value="core">🔴 Core / Motor</option>
+          <option value="recarga">🟡 Recarga y biología</option>
+          <option value="base">🟢 Disciplina base</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Hábito pilar (máx. 3)</label>
+        <select id="habitPillarInput">
+          <option value="0">No</option>
+          <option value="1">Sí · lead KPI</option>
+        </select>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Naturaleza (franja)</label>
+        <select id="habitTimeframeInput">
+          <option value="am">AM · Ejecución mañanera</option>
+          <option value="pm">PM · Cierre nocturno</option>
+          <option value="24h">24H · Resultado del día</option>
+        </select>
+      </div>
+      <div class="field" id="habitPhaseField">
+        <label>Bloque AM</label>
+        <select id="habitPhaseInput">
+          <option value="">Sin bloque</option>
+          <option value="1">Fase 1 · 5:30–7:30</option>
+          <option value="2">Fase 2 · 8:00–10:20</option>
+        </select>
+      </div>
     </div>
     <div class="field">
       <label>Meta semanal (días)</label>
@@ -847,6 +1247,44 @@
   </div>
 </div>
 
+<div class="slide-overlay" id="slideOverlay"></div>
+<aside class="slide-over" id="slideOver" aria-label="Detalle del hábito"><div id="slideBody"></div></aside>
+<div class="rich-tip" id="richTip"></div>
+<div class="modal-overlay" id="backupModal">
+  <div class="modal" style="max-width:560px;max-height:88vh;overflow-y:auto;">
+    <h3>💾 Respaldo e importación</h3>
+    <div class="hint" id="backupLast" style="margin:-4px 0 14px;"></div>
+
+    <div class="so-sec" style="margin-top:4px;">1 · Exportar copia de seguridad</div>
+    <div class="hint" style="margin-bottom:8px;">Descarga todo (hábitos, agenda, journal, objetivos) en un archivo. Guárdalo en tu nube (Drive, correo). Tus datos viven solo en este navegador: si cambias de equipo o borras datos del navegador, se pierden.</div>
+    <button class="btn" id="exportBtn2">Descargar respaldo (.json)</button>
+
+    <div class="so-sec">2 · Restaurar desde un respaldo</div>
+    <div class="hint" style="margin-bottom:8px;">Si tienes un archivo <b>.json</b> de este panel. Reemplaza lo que haya aquí.</div>
+    <input type="file" id="importJsonFile" accept=".json,application/json">
+
+    <div class="so-sec">3 · Importar historial de hábitos (Excel / Google Sheets)</div>
+    <div class="hint" style="margin-bottom:8px;">Pega la tabla o sube un .csv/.tsv. Acepta <b>hábitos en filas y fechas en columnas</b> (o al revés). Celdas con 1, ✓, x, sí o TRUE cuentan como cumplido; 0, no o FALSE como no cumplido; las vacías se ignoran. Fechas: 2026-03-15 o 15/03/2026.</div>
+    <textarea id="csvPaste" class="journal-textarea" rows="5" placeholder="Hábito&#9;2026-10-01&#9;2026-10-02&#9;...&#10;Estudio&#9;1&#9;0&#9;..."></textarea>
+    <input type="file" id="csvFile" accept=".csv,.tsv,.txt" style="margin-top:8px;">
+    <div id="csvPreview" class="so-note" style="margin-top:10px;"></div>
+    <button class="btn" id="csvApplyBtn" style="display:none;margin-top:10px;">Importar al panel (se suma a lo existente)</button>
+
+    <div class="modal-actions"><button class="btn secondary" id="closeBackupBtn">Cerrar</button></div>
+  </div>
+</div>
+<div class="modal-overlay" id="blocksModal">
+  <div class="modal" style="max-width:560px;">
+    <h3>Bloques fijos de la rutina</h3>
+    <div class="hint" style="margin:-4px 0 12px;">Se cargan solos en cada día (menos los días libres). El bloque marcado como operativo alimenta «Tiempo operativo restante».</div>
+    <div id="blocksEditList"></div>
+    <button class="btn secondary small" id="addBlockRowBtn" style="margin-top:6px;">+ Agregar bloque</button>
+    <div class="modal-actions">
+      <button class="btn secondary" id="cancelBlocksBtn">Cancelar</button>
+      <button class="btn" id="saveBlocksBtn">Guardar</button>
+    </div>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -855,6 +1293,12 @@
 
   /* ---------------- Persistencia ---------------- */
   const STORAGE_KEY = "panel_sandro_v1";
+
+  /* ====== NUBE: pega aquí la configuración de tu proyecto Firebase (ver guía) ====== */
+  const FIREBASE_CONFIG = { apiKey:"AIzaSyAaI1vesv96XnO9qNhuf-wrgGi3dToqlLo", authDomain:"panel-tdha.firebaseapp.com", projectId:"panel-tdha", appId:"1:1084459906856:web:a84183e1507cf750a0821d" };
+  const cloud = { on:false, user:null, auth:null, db:null, ref:null, unsub:null, baseRev:0, dirty:false, seq:0, timer:null,
+                  pushing:false, applying:false, pendingRemote:null, retry:null, status:"local",
+                  deviceId: (function(){ try{ let d=localStorage.getItem("panel_device_id"); if(!d){ d=Math.random().toString(36).slice(2,12); localStorage.setItem("panel_device_id",d);} return d; }catch(e){ return "dev"; } })() };
   const ACCENTS = ["#cc1111","#4d9de0","#3ddc84","#e8a33d","#b06fe0","#e0568c"];
   const EMOJIS = ["🎯","📚","💧","🏃","🧘","💪","🛌","🥗","✍️","🎧","🧠","☀️","💼","🎨","🚭","💰"];
 
@@ -865,9 +1309,35 @@
   }
   function uid(){ return Math.random().toString(36).slice(2,10); }
 
+  function normName(n){ return String(n||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""); }
+  function guessTier(name){
+    const n = normName(name);
+    if(/estudi|ejercic|lectur|entren|gym|trabaj|program/.test(n)) return "core";
+    if(/descans|dormir|sueno|meditac|respir|yoga|siesta/.test(n)) return "recarga";
+    return "base";
+  }
+  function guessTimeframe(name){
+    const n = normName(name);
+    if(/cierre|orden|limpiez/.test(n)) return "pm";
+    if(/hidrat|agua|movil|celular|pantalla|abstin|descans|dormir|sueno|redes/.test(n)) return "24h";
+    return "am";
+  }
+  function guessPhase(name){
+    const n = normName(name);
+    if(/ejercic|gym|cardio|lectur/.test(n)) return "1";
+    if(/estudi|paseo|luna|meditac/.test(n)) return "2";
+    return "";
+  }
+  function isAbstinence(h){
+    return /abstin|movil|celular|pantalla|redes|uso reducido/.test(normName(h.name));
+  }
+  function guessPillar(name){
+    return /estudi|ejercic|descans/.test(normName(name));
+  }
+
   function defaultState(){
     return {
-      settings: { accent: "#cc1111", bgColor: "#0d0d0d", dayStart: 17, dayEnd: 23 },
+      settings: { accent: "#cc1111", bgColor: "#0d0d0d", dayStart: 17, dayEnd: 23, lastBackup: "" },
       habits: [],
       agenda: {},
       eisenhower: {},
@@ -875,7 +1345,17 @@
       objectives: { week:{}, month:{}, quarter:{}, year:{} },
       periodEisenhower: { week:{}, month:{}, quarter:{}, year:{} },
       reminders: [],
-      disabledDays: {}
+      disabledDays: {},
+      diagnostics: {},
+      bigRocks: {},
+      blockLog: {},
+      routineBlocks: [
+        {id:"b1", start:"05:30", end:"08:00", icon:"🟢", title:"Rutina AM & Gimnasio"},
+        {id:"b2", start:"08:15", end:"08:45", icon:"📘", title:"Desayuno + Estudio PNL/Ventas"},
+        {id:"b3", start:"09:00", end:"10:20", icon:"🐕", title:"Parque con Luna & Meditación Cuadrada"},
+        {id:"b4", start:"10:30", end:"19:00", icon:"💼", title:"Turno Operativo & Prospección", op:true},
+        {id:"b5", start:"19:00", end:"19:15", icon:"🧹", title:"Cierre de Estación + Respiración 4-7-8"}
+      ]
     };
   }
 
@@ -887,6 +1367,19 @@
       const parsed = JSON.parse(raw);
       const merged = Object.assign(defaultState(), parsed);
       merged.settings = Object.assign({}, defaultState().settings, parsed.settings||{});
+      // migración: nivel de pipeline y hábito pilar (valores sugeridos por nombre, editables en el hábito)
+      (merged.habits||[]).forEach(h=>{
+        if(!h.tier) h.tier = guessTier(h.name);
+        if(h.pillar===undefined) h.pillar = guessPillar(h.name);
+        if(!h.timeframe) h.timeframe = guessTimeframe(h.name);
+        if(h.phase===undefined) h.phase = h.timeframe==="am" ? guessPhase(h.name) : "";
+        if(h.causes){
+          const map = {fatiga:"energia", interrupcion:"tiempo", desorganizacion:"tiempo"};
+          Object.keys(h.causes).forEach(k=>{ if(map[h.causes[k]]) h.causes[k] = map[h.causes[k]]; });
+        }
+      });
+      const pillarsNow = (merged.habits||[]).filter(h=>h.pillar);
+      if(pillarsNow.length>3) pillarsNow.slice(3).forEach(h=>{ h.pillar = false; });
       // migración: recordatorios antiguos guardaban "datetime" en vez de "eventDatetime"+"offsetMinutes"
       merged.reminders = (merged.reminders||[]).map(r=>{
         if(r.eventDatetime) return r;
@@ -909,6 +1402,7 @@
   }
   function save(){
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    cloudTouch();
   }
 
   function toast(msg){
@@ -1010,27 +1504,10 @@
     de.onchange = ()=>{ state.settings.dayEnd = parseInt(de.value); save(); renderAgenda(); };
   }
 
-  document.getElementById("exportBtn").addEventListener("click", ()=>{
-    const blob = new Blob([JSON.stringify(state,null,2)], {type:"application/json"});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url; a.download = `panel-sandro-${todayKey()}.json`; a.click();
-    URL.revokeObjectURL(url);
-    toast("Datos exportados");
-  });
+  document.getElementById("exportBtn").addEventListener("click", ()=>doExport());
   document.getElementById("importInput").addEventListener("change", (e)=>{
     const file = e.target.files[0];
-    if(!file) return;
-    const reader = new FileReader();
-    reader.onload = ()=>{
-      try{
-        const parsed = JSON.parse(reader.result);
-        state = Object.assign(defaultState(), parsed);
-        save(); applyAccent(); buildSettingsUI(); renderAll();
-        toast("Datos importados correctamente");
-      }catch(err){ toast("Archivo inválido"); }
-    };
-    reader.readAsText(file);
+    if(file) importJsonFile(file);
     e.target.value = "";
   });
 
@@ -1040,11 +1517,21 @@
   let selectedEmoji = EMOJIS[0];
   let selectedColor = ACCENTS[0];
 
+  function togglePhaseField(){
+    const am = document.getElementById("habitTimeframeInput").value==="am";
+    document.getElementById("habitPhaseField").style.display = am ? "" : "none";
+  }
+  document.getElementById("habitTimeframeInput").addEventListener("change", togglePhaseField);
   function openHabitModal(habit){
     editingHabitId = habit ? habit.id : null;
     document.getElementById("habitModalTitle").textContent = habit ? "Editar hábito" : "Nuevo hábito";
     document.getElementById("habitNameInput").value = habit ? habit.name : "";
     document.getElementById("habitTargetInput").value = habit ? habit.target : 7;
+    document.getElementById("habitTierInput").value = habit ? (habit.tier || guessTier(habit.name)) : "base";
+    document.getElementById("habitPillarInput").value = habit && habit.pillar ? "1" : "0";
+    document.getElementById("habitTimeframeInput").value = habit ? (habit.timeframe || guessTimeframe(habit.name)) : "am";
+    document.getElementById("habitPhaseInput").value = habit ? (habit.phase || "") : "";
+    togglePhaseField();
     selectedEmoji = habit ? habit.icon : EMOJIS[0];
     selectedColor = habit ? habit.color : ACCENTS[0];
     document.getElementById("deleteHabitBtn").style.display = habit ? "inline-flex" : "none";
@@ -1082,11 +1569,17 @@
     const name = document.getElementById("habitNameInput").value.trim();
     if(!name){ toast("Ponle un nombre al hábito"); return; }
     const target = parseInt(document.getElementById("habitTargetInput").value);
+    const tier = document.getElementById("habitTierInput").value;
+    const pillar = document.getElementById("habitPillarInput").value==="1";
+    const timeframe = document.getElementById("habitTimeframeInput").value;
+    const phase = timeframe==="am" ? document.getElementById("habitPhaseInput").value : "";
+    const otherPillars = state.habits.filter(x=>x.pillar && x.id!==editingHabitId).length;
+    if(pillar && otherPillars>=3){ toast("Ya tienes 3 hábitos pilar. Quita uno para marcar este."); return; }
     if(editingHabitId){
       const h = state.habits.find(x=>x.id===editingHabitId);
-      h.name=name; h.icon=selectedEmoji; h.color=selectedColor; h.target=target;
+      h.name=name; h.icon=selectedEmoji; h.color=selectedColor; h.target=target; h.tier=tier; h.pillar=pillar; h.timeframe=timeframe; h.phase=phase;
     } else {
-      state.habits.push({ id:uid(), name, icon:selectedEmoji, color:selectedColor, target, createdAt:todayKey(), logs:{} });
+      state.habits.push({ id:uid(), name, icon:selectedEmoji, color:selectedColor, target, tier, pillar, timeframe, phase, createdAt:todayKey(), logs:{} });
     }
     save(); closeHabitModal(); renderHabits();
   });
@@ -1160,13 +1653,11 @@
     return Math.min(100, Math.round((done / denom) * 100));
   }
 
+  const COL = {ok:"#10b981", warn:"#f59e0b", bad:"#ef4444", neutral:"#2a2e3b"};
   function progressColor(pct){
-    if(pct>=80) return "#0b8043";
-    if(pct>=70) return "#b7e1cd";
-    if(pct>=50) return "#ffc000";
-    if(pct>=40) return "#ffe599";
-    if(pct>30) return "#ea9999";
-    return "#ff0000";
+    if(pct>=80) return COL.ok;
+    if(pct>=50) return COL.warn;
+    return COL.bad;
   }
 
   function ringSVG(pct, color){
@@ -1218,48 +1709,436 @@
     return { totalDone, allTimeRate, monthDone, monthRate, best: computeBestStreak(h) };
   }
 
+  /* ---------------- Métricas de alto rendimiento ---------------- */
+  const TIER_META = {
+    core:{label:"Hábitos Core / Motor", sub:"Alto impacto cognitivo", color:"#8f8f8f"},
+    recarga:{label:"Recarga y biología", sub:"Sostén", color:"#8f8f8f"},
+    base:{label:"Disciplina base", sub:"Baja fricción", color:"#8f8f8f"}
+  };
+  const TIER_ORDER = ["core","recarga","base"];
+  const DAY_NAMES = ["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
+  function tierOf(h){ return TIER_META[h.tier] ? h.tier : guessTier(h.name); }
+  function startOfToday(){ const d = new Date(); d.setHours(0,0,0,0); return d; }
+  function shortMonth(d){ return d.toLocaleDateString("es-PE",{month:"short"}).replace(".",""); }
+  function avg(arr){ return arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : null; }
+
+  function statusFor(pct){
+    if(pct===null) return {label:"sin datos", color:"#5c5c5c"};
+    if(pct>=80) return {label:"estable", color:COL.ok};
+    if(pct>=65) return {label:"en riesgo", color:COL.warn};
+    if(pct>=50) return {label:"desviación", color:COL.warn};
+    if(pct>=20) return {label:"baja ejecución", color:COL.bad};
+    if(pct===0) return {label:"fuga total", color:COL.bad};
+    return {label:"alerta roja", color:COL.bad};
+  }
+
+  // % de cumplimiento de un hábito en un rango de días (excluye días libres y días previos al inicio del hábito)
+  function rangeRate(habit, start, end){
+    const hs = getHabitStart(habit);
+    const from = start > hs ? start : hs;
+    let total=0, done=0;
+    for(let d=new Date(from); d<=end; d.setDate(d.getDate()+1)){
+      const key = todayKey(d);
+      if(isDayDisabled(key)) continue;
+      total++;
+      if(habit.logs[key]) done++;
+    }
+    return total ? Math.round(done/total*100) : null;
+  }
+  // ventana de los últimos N días completos (termina ayer)
+  function rateLastDays(habit, n){
+    const end = startOfToday(); end.setDate(end.getDate()-1);
+    const start = new Date(end); start.setDate(start.getDate()-(n-1));
+    return rangeRate(habit, start, end);
+  }
+  function overallLastDays(n){
+    const rates = state.habits.map(h=>rateLastDays(h,n)).filter(r=>r!==null);
+    const a = avg(rates);
+    return a===null ? null : Math.round(a);
+  }
+
+  function computeMoM(){
+    const now = new Date();
+    const cur = new Date(now.getFullYear(), now.getMonth(), 1);
+    const prev = new Date(now.getFullYear(), now.getMonth()-1, 1);
+    const prev2 = new Date(now.getFullYear(), now.getMonth()-2, 1);
+    const rc = computeMonthlyRate(null, cur), rp = computeMonthlyRate(null, prev), rp2 = computeMonthlyRate(null, prev2);
+    const rel = (a,b)=> (a===null||b===null||b===0) ? null : ((a-b)/b)*100;
+    return { cur, prev, prev2, rc, rp, rp2, relCur: rel(rc,rp), relPrev: rel(rp,rp2), daysSample: now.getDate() };
+  }
+
+  function computeChurn(){
+    const today = startOfToday();
+    const winStart = new Date(today); winStart.setDate(winStart.getDate()-30);
+    const scanStart = new Date(today); scanStart.setDate(scanStart.getDate()-150);
+    const perWeekday = [0,0,0,0,0,0,0];
+    const events = [];
+    state.habits.forEach(h=>{
+      const hs = getHabitStart(h);
+      const from = hs > scanStart ? hs : scanStart;
+      let run = 0;
+      for(let d=new Date(from); d<today; d.setDate(d.getDate()+1)){
+        const key = todayKey(d);
+        if(isDayDisabled(key)) continue;
+        if(h.logs[key]){ run++; continue; }
+        if(run>=3 && d>=winStart){ events.push({habit:h, len:run, date:new Date(d)}); perWeekday[d.getDay()]++; }
+        run = 0;
+      }
+    });
+    let top = -1;
+    perWeekday.forEach((c,i)=>{ if(c>0 && (top===-1 || c>perWeekday[top])) top = i; });
+    return { count: events.length, lostDays: events.reduce((a,e)=>a+e.len,0), perWeekday, topDay: top, events };
+  }
+
+  // Resiliencia: de los días en que fallaste, % en que recuperaste el hábito al día siguiente (últimos 90 días)
+  function computeResilience(){
+    const today = startOfToday();
+    let misses=0, bounces=0;
+    state.habits.forEach(h=>{
+      const hs = getHabitStart(h);
+      for(let i=2;i<=90;i++){
+        const d = new Date(today); d.setDate(d.getDate()-i);
+        if(d<hs) break;
+        const k = todayKey(d);
+        if(isDayDisabled(k) || h.logs[k]) continue;
+        const n = new Date(d); n.setDate(n.getDate()+1);
+        let nk = todayKey(n), guard=0;
+        while(isDayDisabled(nk) && guard<4){ n.setDate(n.getDate()+1); nk=todayKey(n); guard++; }
+        misses++; if(h.logs[nk]) bounces++;
+      }
+    });
+    return misses ? {rate:Math.round(bounces/misses*100), misses, bounces} : null;
+  }
+  // Días maestros: días del mes en que TODOS los hábitos pilar se cumplieron
+  function computeMasterDays(){
+    const pillars = state.habits.filter(h=>h.pillar);
+    if(!pillars.length) return null;
+    const today = startOfToday();
+    let count=0, elapsed=0;
+    for(let d=new Date(today.getFullYear(), today.getMonth(), 1); d<=today; d.setDate(d.getDate()+1)){
+      const k = todayKey(d);
+      if(isDayDisabled(k)) continue;
+      const isToday = k===todayKey(today);
+      const all = pillars.every(h=>h.logs[k]);
+      if(all) count++;
+      if(!isToday || all) elapsed++;
+    }
+    return {count, elapsed};
+  }
+
   function renderKPIs(){
     const habits = state.habits;
     const grid = document.getElementById("kpiGrid");
     if(habits.length===0){ grid.innerHTML = ""; return; }
-    const activeCount = habits.length;
 
-    let bestActiveHabit=null, bestActive=0;
-    let bestEverHabit=null, bestEver=0;
-    habits.forEach(h=>{
-      const s = computeStreak(h);
-      if(s>bestActive || bestActiveHabit===null){ bestActive=s; bestActiveHabit=h; }
-      const be = computeBestStreak(h);
-      if(be>bestEver || bestEverHabit===null){ bestEver=be; bestEverHabit=h; }
-    });
+    const g30 = overallLastDays(30) || 0;
+    const globalCard = `
+      <div class="kpi-card kpi-donut-card" data-tip="Cumplimiento global\\nPromedio de todos tus hábitos, últimos 30 días">
+        <div class="label">Cumplimiento global 30d</div>
+        ${donutSVG(g30, progressColor(g30))}
+      </div>`;
 
-    const avgWeekly = Math.round(habits.reduce((s,h)=>s+weeklyRate(h),0)/habits.length);
-    const avgConversion = Math.round(habits.reduce((s,h)=>s+computeHabitStats(h).allTimeRate,0)/habits.length);
+    const pillars = habits.filter(h=>h.pillar).slice(0,3);
+    let pillarCard;
+    if(pillars.length===0){
+      pillarCard = `<div class="kpi-card"><div class="label">Índice hábitos pilar</div><div class="value">—</div><div class="kpi-note">Marca hasta 3 pilares (✎ en el hábito)</div></div>`;
+    } else {
+      const rows = pillars.map(h=>({h, r:rateLastDays(h,30)})).filter(x=>x.r!==null);
+      const idx = rows.length ? Math.round(avg(rows.map(x=>x.r))) : 0;
+      const weak = rows.slice().sort((a,b)=>a.r-b.r)[0];
+      const wst = weak ? statusFor(weak.r) : null;
+      const tip = rows.map(x=>`${x.h.name.split("(")[0].trim()}: ${x.r}%`).join("\\n");
+      pillarCard = `
+      <div class="kpi-card kpi-donut-card" data-tip="Índice pilar\\n${tip.replace(/"/g,"&quot;")}">
+        <div class="label">Índice hábitos pilar</div>
+        ${donutSVG(idx, progressColor(idx))}
+        ${weak && weak.r<80 ? `<div class="kpi-note"><i class="dot ${weak.r<20?"pulse":""}" style="--c:${wst.color};"></i>${weak.h.name.split("(")[0].trim()} ${wst.label}</div>` : `<div class="kpi-note">Pilares estables</div>`}
+      </div>`;
+    }
 
-    grid.innerHTML = `
-      <div class="kpi-card">
-        <div class="label">Racha activa máx.</div>
-        <div class="value">${bestActive}<small> días</small></div>
-        <div class="sub">${bestActiveHabit?`🔥 ${bestActiveHabit.icon} ${bestActiveHabit.name}`:"sin datos"}</div>
-      </div>
-      <div class="kpi-card kpi-donut-card">
-        <div class="label">Cumplimiento semanal</div>
-        ${donutSVG(avgWeekly, progressColor(avgWeekly))}
-        <div class="sub">promedio de todos los hábitos</div>
-      </div>
-      <div class="kpi-card"><div class="label">Hábitos activos</div><div class="value">${activeCount}</div><div class="sub">en seguimiento</div></div>
-      <div class="kpi-card">
-        <div class="label">Mejor racha histórica</div>
-        <div class="value">${bestEver}<small> días</small></div>
-        <div class="sub">${bestEverHabit?`🏆 ${bestEverHabit.icon} ${bestEverHabit.name}`:"sin datos"}</div>
-      </div>
-      <div class="kpi-card kpi-donut-card">
-        <div class="label">Tasa de conversión global</div>
-        ${donutSVG(avgConversion, progressColor(avgConversion))}
-        <div class="sub">días cumplidos vs. días de seguimiento</div>
-      </div>
-    `;
+    const rs = computeResilience();
+    const resCard = `
+      <div class="kpi-card" data-tip="Tasa de resiliencia\\nDe ${rs?rs.misses:0} días fallados, recuperaste el hábito al día siguiente ${rs?rs.bounces:0} veces (90 días)">
+        <div class="label">Resiliencia</div>
+        <div class="value" style="color:${rs?progressColor(rs.rate):"var(--text)"};">${rs?rs.rate:"—"}<small>${rs?"%":""}</small></div>
+        <div class="sub">recuperas al día siguiente</div>
+      </div>`;
+
+    const md = computeMasterDays();
+    const mdCard = `
+      <div class="kpi-card" data-tip="Días maestros\\nDías de este mes con tus hábitos pilar al 100%">
+        <div class="label">Días maestros</div>
+        <div class="value">${md?md.count:"—"}<small>${md?` / ${md.elapsed}`:""}</small></div>
+        <div class="sub">${md?"pilares al 100% este mes":"define tus pilares"}</div>
+      </div>`;
+
+    const m = computeMoM();
+    const pl = shortMonth(m.prev);
+    const momColor = m.relCur===null ? "var(--text)" : (m.relCur<0 ? COL.bad : COL.ok);
+    const momTxt = m.relCur===null ? "—" : `${m.relCur>0?"+":""}${m.relCur.toFixed(1)}%`;
+    const momCard = `
+      <div class="kpi-card" data-tip="MoM\\n${shortMonth(m.cur)}: ${m.rc===null?"—":m.rc+"%"} vs ${pl}: ${m.rp===null?"—":m.rp+"%"}">
+        <div class="label">MoM variación</div>
+        <div class="value" style="color:${momColor};">${momTxt}</div>
+        <div class="sub">vs ${pl}${m.rp!==null?` (${m.rp}%)`:""}</div>
+        ${m.daysSample<7 && m.rc!==null ? `<div class="kpi-note">Muestra en estabilización (día ${m.daysSample}/7)</div>` : ""}
+      </div>`;
+
+    const info = getLeakInfo();
+    let leakCard;
+    if(!info || info.worst===-1){
+      leakCard = `<div class="kpi-card"><div class="label">Día fuga principal</div><div class="value">—</div><div class="kpi-note">Aún sin datos suficientes</div></div>`;
+    } else {
+      const w = info.worst, wr = info.st.rates[w];
+      const worstHab = Object.values(info.st.perHabit[w]).filter(x=>x.total>=2).map(x=>({h:x.h, r:x.done/x.total})).sort((a,b)=>a.r-b.r)[0];
+      const isLeak = info.leak.includes(w);
+      leakCard = `
+      <div class="kpi-card" data-tip="${leakTip(info.st,w)}">
+        <div class="label">Día fuga principal</div>
+        <div class="value" style="font-size:22px;color:${isLeak?progressColor(wr):"var(--text)"};">${DAY_NAMES[w].charAt(0).toUpperCase()+DAY_NAMES[w].slice(1)} <small>(${wr}%)</small></div>
+        <div class="sub">${isLeak && worstHab ? `${worstHab.h.icon} ${worstHab.h.name.split("(")[0].trim()}` : "Sin fuga sistemática"}</div>
+      </div>`;
+    }
+
+    grid.innerHTML = globalCard + pillarCard + resCard + mdCard + momCard + leakCard;
   }
+
+  /* ---------------- Franja horaria + fricción ---------------- */
+  const CAUSES = {
+    dopamina:{label:"Impulso / Evasión dopaminérgica", short:"Impulso / Evasión", color:"#ef4444"},
+    energia:{label:"Baja energía / Fatiga biológica", short:"Baja energía", color:"#f59e0b"},
+    multitasking:{label:"Multitasking / Sobrecarga laboral", short:"Sobrecarga laboral", color:"#64748b"},
+    tiempo:{label:"Falta de tiempo / Desorganización", short:"Falta de tiempo", color:"#94a3b8"}
+  };
+  function causeOptions(h){ return Object.keys(CAUSES).filter(k=> k!=="dopamina" || isAbstinence(h)); }
+  function causeLabel(k){ return (CAUSES[k]||{label:"—"}).label; }
+  function daysBack(n){ const out=[]; const t=startOfToday(); for(let i=0;i<n;i++){ const d=new Date(t); d.setDate(d.getDate()-i); out.push(d);} return out; }
+  function slotCounts(h, n){
+    let am=0, pm=0;
+    daysBack(n).forEach(d=>{ const k=todayKey(d); if(h.logs[k] && h.slots && h.slots[k]){ if(h.slots[k]==="am") am++; else pm++; } });
+    return {am,pm};
+  }
+  function causeTotals(habits, n){
+    const c={dopamina:0,energia:0,multitasking:0,tiempo:0};
+    habits.forEach(h=>{ if(!h.causes) return; daysBack(n).forEach(d=>{ const k=todayKey(d); if(!h.logs[k] && c[h.causes[k]]!==undefined) c[h.causes[k]]++; }); });
+    return c;
+  }
+  function askCause(h, key, evt){
+    const tKey = todayKey(startOfToday());
+    if(key>=tKey || isDayDisabled(key)) return;
+    closeCausePop();
+    const pop = document.createElement("div");
+    pop.className = "cause-pop"; pop.id = "causePop";
+    const d = new Date(key+"T00:00:00").toLocaleDateString("es-PE",{weekday:"long",day:"numeric",month:"short"});
+    pop.innerHTML = `<div class="cp-t">¿Qué causó el fallo?</div><div class="cp-s"></div>` +
+      causeOptions(h).map(k=>`<button data-c="${k}">${CAUSES[k].label}</button>`).join("") +
+      `<button class="skip" data-c="">Omitir</button>`;
+    pop.querySelector(".cp-s").textContent = `${h.name.split("(")[0].trim()} · ${d}`;
+    document.body.appendChild(pop);
+    const x = Math.min((evt&&evt.clientX||200), window.innerWidth-pop.offsetWidth-10);
+    const y = Math.min((evt&&evt.clientY||200)+12, window.innerHeight-pop.offsetHeight-10);
+    pop.style.left = Math.max(10,x)+"px"; pop.style.top = Math.max(10,y)+"px";
+    pop.addEventListener("click", e=>{
+      const b = e.target.closest("button"); if(!b) return;
+      if(b.dataset.c){ h.causes = h.causes || {}; h.causes[key] = b.dataset.c; save(); renderInsights(); if(slideHabitId) renderSlide(); }
+      closeCausePop();
+    });
+    setTimeout(()=>document.addEventListener("click", outsideCause, true),0);
+  }
+  function outsideCause(e){ const p=document.getElementById("causePop"); if(p && !p.contains(e.target)) closeCausePop(); }
+  function closeCausePop(){ const p=document.getElementById("causePop"); if(p) p.remove(); document.removeEventListener("click", outsideCause, true); }
+  function escAttr(t){ return String(t).replace(/"/g,"&quot;"); }
+
+  let slotView = null;
+  document.getElementById("slotBox").addEventListener("click", e=>{
+    const b = e.target.closest("[data-view]"); if(!b) return;
+    slotView = b.dataset.view; renderInsights();
+  });
+  function renderInsights(){
+    const sec=document.getElementById("insightsSection"), grid=document.getElementById("insightsGrid");
+    if(!state.habits.length){ sec.style.display="none"; grid.style.display="none"; return; }
+    sec.style.display="flex"; grid.style.display="grid";
+
+    // Franja: solo hábitos AM / PM / 24H según su naturaleza (los 24H no entran en AM vs PM)
+    const tf = h=>h.timeframe||guessTimeframe(h.name);
+    const grp = (fn)=>{ const hs=state.habits.filter(fn); const rs=hs.map(h=>({h, r:rateLastDays(h,30)})).filter(x=>x.r!==null);
+      return {hs, rows:rs, rate: rs.length ? Math.round(avg(rs.map(x=>x.r))) : null}; };
+    const views = {
+      ampm:{name:"AM vs PM", A:{t:"AM · Ejecución mañanera", g:grp(h=>tf(h)==="am")}, B:{t:"PM · Cierre nocturno", g:grp(h=>tf(h)==="pm")},
+            note:"Los hábitos 24H no entran en esta comparativa."},
+      fases:{name:"Fase 1 vs 2", A:{t:"Fase 1 · 5:30–7:30", g:grp(h=>tf(h)==="am" && h.phase==="1")}, B:{t:"Fase 2 · 8:00–10:20", g:grp(h=>tf(h)==="am" && h.phase==="2")},
+            note:"Solo hábitos AM con bloque asignado (✎ en el hábito)."},
+      activa:{name:"Activa vs 24H", A:{t:"Ejecución activa (AM)", g:grp(h=>tf(h)==="am")}, B:{t:"Resistencia de estado (24H)", g:grp(h=>tf(h)==="24h")},
+            note:"Acciones matutinas frente a disciplina pasiva del día."}
+    };
+    if(!slotView) slotView = views.ampm.B.g.hs.length===0 ? "activa" : "ampm";
+    const v = views[slotView];
+    const card = (side,color)=>`<div data-tip="${escAttr(side.t+"\n"+(side.g.hs.length)+" hábito(s) · promedio 30 días")}"><div class="k">${side.t}</div>
+      <div class="v" style="color:${side.g.rate===null?"var(--text-faint)":progressColor(side.g.rate)};">${side.g.rate===null?"—":side.g.rate+"%"}</div></div>`;
+    const rowsHtml = (side)=> side.g.rows.length ? side.g.rows.map(x=>`<div class="grp-row" data-tip="${escAttr(x.h.name+"\n30 días: "+x.r+"%")}">
+        <span class="nm">${x.h.icon} ${x.h.name.split("(")[0].trim()}</span><div class="bar"><i style="width:${Math.max(x.r,3)}%;background:${progressColor(x.r)};"></i></div><b>${x.r}%</b></div>`).join("")
+      : `<div class="empty-note">Sin hábitos en esta franja. Asígnalos con ✎.</div>`;
+    let insight = "";
+    if(v.A.g.rate!==null && v.B.g.rate!==null){
+      const diff = v.A.g.rate - v.B.g.rate;
+      insight = diff===0 ? "Ambos bloques rinden igual." : (diff>0
+        ? `${v.A.t.split(" · ")[0]} rinde ${diff} puntos más que ${v.B.t.split(" · ")[0]}.`
+        : `${v.B.t.split(" · ")[0]} rinde ${-diff} puntos más que ${v.A.t.split(" · ")[0]}.`);
+    }
+    document.getElementById("slotBox").innerHTML = `
+      <div class="slot-view">${Object.keys(views).map(k=>`<button data-view="${k}" class="${k===slotView?"on":""}">${views[k].name}</button>`).join("")}</div>
+      <div class="slot-big">${card(v.A)}${card(v.B)}</div>
+      <div class="so-sec" style="margin-top:6px;">${v.A.t}</div>${rowsHtml(v.A)}
+      <div class="so-sec">${v.B.t}</div>${rowsHtml(v.B)}
+      <div class="so-note">${insight?insight+" ":""}${v.note}</div>`;
+
+    // Fricción
+    const ct = causeTotals(state.habits, 90);
+    const total = Object.values(ct).reduce((a,b)=>a+b,0);
+    const fr = document.getElementById("frictionBox");
+    if(!total){
+      fr.innerHTML = `<div class="empty-note">Aún no hay causas registradas. Al marcar un día pasado como incumplido se te preguntará el motivo; también puedes elegirlo en el registro de cada hábito (clic en la fila).</div>`;
+      return;
+    }
+    const r=38, c=2*Math.PI*r; let acc=0;
+    const segs = Object.keys(CAUSES).filter(k=>ct[k]>0).map(k=>{
+      const len = ct[k]/total*c;
+      const seg = `<circle class="fr-seg" cx="50" cy="50" r="${r}" fill="none" stroke="${CAUSES[k].color}" stroke-width="14"
+        stroke-dasharray="${len} ${c-len}" stroke-dashoffset="${-acc}" transform="rotate(-90 50 50)" data-tip="${CAUSES[k].label}\\n${ct[k]} fallos · ${Math.round(ct[k]/total*100)}%"/>`;
+      acc += len; return seg;
+    }).join("");
+    fr.innerHTML = `<div class="fr-wrap">
+      <div style="position:relative;width:130px;height:130px;flex-shrink:0;">
+        <svg viewBox="0 0 100 100" width="130" height="130"><circle cx="50" cy="50" r="${r}" fill="none" stroke="var(--surface-3)" stroke-width="14"/>${segs}</svg>
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:20px;font-weight:700;">${total}</span><span style="font-size:10px;color:var(--text-faint);">fallos</span></div>
+      </div>
+      <div class="fr-legend">${Object.keys(CAUSES).map(k=>`<div><i style="background:${CAUSES[k].color};"></i>${CAUSES[k].short}<b>${ct[k]}</b></div>`).join("")}</div>
+    </div>`;
+  }
+
+  /* ---------------- Slide-over de hábito ---------------- */
+  let slideHabitId = null;
+  function openSlide(h){
+    slideHabitId = h.id; renderSlide();
+    document.getElementById("slideOver").classList.add("open");
+    document.getElementById("slideOverlay").classList.add("open");
+  }
+  function closeSlide(){
+    slideHabitId = null;
+    document.getElementById("slideOver").classList.remove("open");
+    document.getElementById("slideOverlay").classList.remove("open");
+  }
+  function renderSlide(){
+    const h = state.habits.find(x=>x.id===slideHabitId);
+    if(!h){ closeSlide(); return; }
+    const today = startOfToday(), tk = todayKey(today), hs = getHabitStart(h);
+    const r30 = rateLastDays(h,30), st = statusFor(r30);
+    const fmt = d=>d.toLocaleDateString("es-PE",{weekday:"short",day:"numeric",month:"short"});
+    const days30 = daysBack(30).reverse();
+    const cells = days30.map(d=>{
+      const k = todayKey(d); let cls="", txt="";
+      if(isDayDisabled(k)){ cls="off"; txt="día libre"; }
+      else if(d<hs){ cls="pre"; txt="antes del seguimiento"; }
+      else if(h.logs[k]){ cls="done"; txt="cumplido"+(h.slots&&h.slots[k]?" · "+h.slots[k].toUpperCase():""); }
+      else if(k===tk){ txt="pendiente"; }
+      else { cls="miss"; txt="fallado"+(h.causes&&h.causes[k]?" · "+causeLabel(h.causes[k]):""); }
+      return `<div class="so-cell ${cls} ${k===tk?"today":""}" data-tip="${escAttr(fmt(d)+"\\n"+txt)}"></div>`;
+    }).join("");
+
+    const tfNames = {am:"AM · Ejecución mañanera", pm:"PM · Cierre nocturno", "24h":"24H · Resultado del día"};
+    const tfv = h.timeframe || guessTimeframe(h.name);
+    const peers = state.habits.filter(x=>(x.timeframe||guessTimeframe(x.name))===tfv).map(x=>rateLastDays(x,30)).filter(r=>r!==null);
+    const peerAvg = peers.length ? Math.round(avg(peers)) : null;
+    const slotHtml = `<div class="slot-bar" style="font-size:12px;color:var(--text-dim);">${tfNames[tfv]}${tfv==="am"&&h.phase?` · Fase ${h.phase}`:""}</div>
+      <div class="so-note" style="margin-top:2px;">${r30===null||peerAvg===null?"":`Este hábito: ${r30}% · promedio de su franja: ${peerAvg}%`}</div>`;
+
+    const ct = causeTotals([h],90), ctot = Object.values(ct).reduce((a,b)=>a+b,0);
+    const causeHtml = ctot ? Object.keys(CAUSES).filter(k=>ct[k]>0).map(k=>`
+      <div class="slot-bar"><span style="width:auto;min-width:150px;">${CAUSES[k].short}</span><i style="width:${ct[k]/ctot*40}%;background:${CAUSES[k].color};"></i>${ct[k]}</div>`).join("")
+      : `<div class="empty-note">Aún sin causas. Elige el motivo al marcar un día como incumplido o en el registro.</div>`;
+
+    const rows = daysBack(14).filter(d=>{ const k=todayKey(d); return d>=hs && !isDayDisabled(k) && !(k===tk && !h.logs[k]); }).map(d=>{
+      const k = todayKey(d);
+      if(h.logs[k]){
+        const sl = h.slots && h.slots[k];
+        return `<div class="so-log-row"><span class="d">${fmt(d)}</span><span style="color:${COL.ok};font-size:11px;">cumplido</span></div>`;
+      }
+      const cu = h.causes && h.causes[k];
+      return `<div class="so-log-row"><span class="d">${fmt(d)}</span><span style="color:${COL.bad};font-size:11px;">fallado</span>
+        <select data-cause-date="${k}"><option value="">Causa…</option>${causeOptions(h).map(c=>`<option value="${c}" ${cu===c?"selected":""}>${CAUSES[c].label}</option>`).join("")}</select></div>`;
+    }).join("");
+
+    document.getElementById("slideBody").innerHTML = `
+      <div class="so-head">
+        <div><div class="so-title"><span>${h.icon}</span>${h.name}</div>
+        <div class="so-sub">${TIER_META[tierOf(h)].label}${h.pillar?" · hábito pilar":""} · <i class="dot ${(r30!==null&&(r30<20||r30>=80))?"pulse":""}" style="--c:${st.color};"></i>${st.label}</div></div>
+        <button class="so-close" id="soClose" title="Cerrar">✕</button>
+      </div>
+      <div class="so-stats">
+        <div class="so-stat"><div class="k">Racha</div><div class="v">${computeStreak(h)}d</div></div>
+        <div class="so-stat"><div class="k">30 días</div><div class="v" style="color:${r30===null?"var(--text)":progressColor(r30)};">${r30===null?"—":r30+"%"}</div></div>
+        <div class="so-stat"><div class="k">Mejor racha</div><div class="v">${computeBestStreak(h)}d</div></div>
+      </div>
+      <div class="so-sec">Últimos 30 días</div>
+      <div class="so-hm">${cells}</div>
+      <div class="so-sec">Naturaleza del hábito</div>${slotHtml}
+      <div class="so-sec">Causas de fricción</div>${causeHtml}
+      <div class="so-sec">Registro · últimos 14 días</div>
+      <div class="so-log">${rows || '<div class="empty-note">Sin días para mostrar.</div>'}</div>
+      <div class="so-note">Al marcar un día pasado como incumplido también se te preguntará la causa.</div>`;
+    document.getElementById("soClose").addEventListener("click", closeSlide);
+  }
+  document.getElementById("slideOverlay").addEventListener("click", closeSlide);
+  document.addEventListener("keydown", e=>{ if(e.key==="Escape" && slideHabitId) closeSlide(); });
+  document.getElementById("slideBody").addEventListener("click", e=>{
+    const b = e.target.closest("[data-slot]"); if(!b) return;
+    const h = state.habits.find(x=>x.id===slideHabitId); if(!h) return;
+    h.slots = h.slots || {}; const k = b.dataset.date;
+    if(h.slots[k]===b.dataset.slot) delete h.slots[k]; else h.slots[k]=b.dataset.slot;
+    save(); renderSlide(); renderInsights();
+  });
+  document.getElementById("slideBody").addEventListener("change", e=>{
+    const sel = e.target.closest("[data-cause-date]"); if(!sel) return;
+    const h = state.habits.find(x=>x.id===slideHabitId); if(!h) return;
+    h.causes = h.causes || {};
+    if(sel.value) h.causes[sel.dataset.causeDate]=sel.value; else delete h.causes[sel.dataset.causeDate];
+    save(); renderSlide(); renderInsights();
+  });
+
+  /* ---------------- Tooltips enriquecidos ---------------- */
+  (function(){
+    const tip = document.getElementById("richTip");
+    function place(e){
+      const w = tip.offsetWidth, h = tip.offsetHeight;
+      let x = e.clientX+14, y = e.clientY+16;
+      if(x+w>window.innerWidth-8) x = e.clientX-w-14;
+      if(y+h>window.innerHeight-8) y = e.clientY-h-12;
+      tip.style.left = Math.max(8,x)+"px"; tip.style.top = Math.max(8,y)+"px";
+    }
+    document.addEventListener("mouseover", e=>{
+      const t = e.target.closest && e.target.closest("[data-tip]");
+      if(!t || !t.dataset.tip){ tip.classList.remove("show"); return; }
+      tip.innerHTML = "";
+      t.dataset.tip.split("\n").filter(Boolean).forEach((line,i)=>{
+        const el = document.createElement(i===0?"b":"div"); el.textContent = line; tip.appendChild(el);
+      });
+      place(e); tip.classList.add("show");
+    });
+    document.addEventListener("mousemove", e=>{ if(tip.classList.contains("show")) place(e); });
+    document.addEventListener("mouseleave", ()=>tip.classList.remove("show"));
+    // táctil: un toque muestra el detalle y se oculta solo
+    let hideT = null;
+    document.addEventListener("click", e=>{
+      if(!window.matchMedia("(hover:none)").matches) return;
+      const t = e.target.closest && e.target.closest("[data-tip]");
+      if(!t || !t.dataset.tip){ tip.classList.remove("show"); return; }
+      tip.innerHTML = "";
+      t.dataset.tip.split("\n").filter(Boolean).forEach((line,i)=>{ const el=document.createElement(i===0?"b":"div"); el.textContent=line; tip.appendChild(el); });
+      place(e); tip.classList.add("show");
+      clearTimeout(hideT); hideT = setTimeout(()=>tip.classList.remove("show"), 2800);
+    });
+  })();
 
   function renderStatsTable(){
     const table = document.getElementById("statsTable");
@@ -1311,6 +2190,107 @@
     return { weekday: WEEKDAY_NAMES[worstIdx], rate: Math.round(worstRate) };
   }
 
+  /* ---------------- Centro de inteligencia operativa ---------------- */
+  function shortName(h){ return h.name.split("(")[0].trim(); }
+
+  // 1 · Momentum: últimos 7 días vs promedio de 30
+  function intelMomentum(){
+    const rows = state.habits.map(h=>({h, r7:rateLastDays(h,7), r30:rateLastDays(h,30)}))
+      .filter(x=>x.r7!==null && x.r30!==null).map(x=>({...x, d:x.r7-x.r30})).sort((a,b)=>a.d-b.d);
+    const body = rows.length ? rows.map(x=>{
+      let col="var(--text-dim)", arrow="→", txt="estable";
+      if(x.d>=5){ col=COL.ok; arrow="▲"; txt= x.d>=15?"aceleración fuerte":"aceleración"; }
+      else if(x.d<=-15){ col=COL.bad; arrow="▼"; txt="desaceleración crítica"; }
+      else if(x.d<=-5){ col=COL.warn; arrow="▼"; txt="desaceleración"; }
+      return `<div class="mom-row" data-tip="${escAttr(shortName(x.h)+"\n7 días: "+x.r7+"% · 30 días: "+x.r30+"%")}">
+        <span>${x.h.icon}</span><span class="nm">${shortName(x.h)}</span><span class="tx">${txt}</span>
+        <span class="dl" style="color:${col};">${arrow} ${x.d>0?"+":""}${x.d}%</span></div>`;
+    }).join("") : `<div class="empty-note">Aún no hay suficientes datos.</div>`;
+    return `<div class="intel-card"><div class="intel-h"><b>📊 Momentum</b><span>7 días vs 30 días</span></div>${body}</div>`;
+  }
+
+  // 2 · Calidad de jornada del mes
+  function intelQuality(){
+    const today = startOfToday();
+    let first = new Date(today.getFullYear(), today.getMonth(), 1);
+    let last = new Date(today); last.setDate(last.getDate()-1);
+    if(last<first){ first = new Date(today.getFullYear(), today.getMonth()-1, 1); last = new Date(today.getFullYear(), today.getMonth(), 0); }
+    const c = {elite:0, mant:0, fuga:0};
+    for(let d=new Date(first); d<=last; d.setDate(d.getDate()+1)){
+      const k = todayKey(d);
+      if(isDayDisabled(k)) continue;
+      const act = state.habits.filter(h=>getHabitStart(h)<=d);
+      if(!act.length) continue;
+      const pct = act.filter(h=>h.logs[k]).length/act.length*100;
+      if(pct>=80) c.elite++; else if(pct>=50) c.mant++; else c.fuga++;
+    }
+    const tot = c.elite+c.mant+c.fuga;
+    const cats = [
+      {k:"elite", n:"Días élite", r:"80–100%", col:COL.ok},
+      {k:"mant", n:"Mantenimiento", r:"50–79%", col:COL.warn},
+      {k:"fuga", n:"Días de fuga", r:"< 50%", col:COL.bad}
+    ];
+    const mname = first.toLocaleDateString("es-PE",{month:"long"});
+    const body = tot ? `
+      <div class="qual-bar">${cats.map(x=>c[x.k]?`<i style="flex:${c[x.k]};background:${x.col};" data-tip="${x.n}\n${c[x.k]} de ${tot} días (${Math.round(c[x.k]/tot*100)}%)"></i>`:"").join("")}</div>
+      ${cats.map(x=>`<div class="qual-row"><i style="background:${x.col};"></i>${x.n} <small>${x.r}</small><b>${c[x.k]}</b></div>`).join("")}`
+      : `<div class="empty-note">Aún no hay días completos este mes.</div>`;
+    return `<div class="intel-card"><div class="intel-h"><b>🎯 Calidad de jornada</b><span>${mname} · ${tot} días</span></div>${body}</div>`;
+  }
+
+  // 3 · Sparklines de volatilidad (14 días, promedio móvil de 3 días)
+  function intelSparklines(){
+    const W=120, H=26, pad=3;
+    const body = state.habits.map(h=>{
+      const hs = getHabitStart(h);
+      const flags = [];
+      daysBack(18).reverse().forEach(d=>{ const k=todayKey(d); if(d>=hs && !isDayDisabled(k) && todayKey(d)!==todayKey(startOfToday())) flags.push(h.logs[k]?1:0); });
+      const last = flags.slice(-16);
+      const vals = last.map((_,i)=>{ const w=last.slice(Math.max(0,i-2), i+1); return w.reduce((a,b)=>a+b,0)/w.length; }).slice(-14);
+      const r14 = rateLastDays(h,14);
+      if(vals.length<3) return `<div class="spk-row"><span>${h.icon}</span><span class="nm">${shortName(h)}</span><span style="font-size:10.5px;color:var(--text-faint);">pocos datos</span></div>`;
+      const pts = vals.map((v,i)=>({x:pad+i*(W-2*pad)/(vals.length-1), y:H-pad-v*(H-2*pad)}));
+      const col = progressColor(r14===null?0:r14);
+      const end = pts[pts.length-1];
+      return `<div class="spk-row" data-tip="${escAttr(shortName(h)+"\nÚltimos 14 días: "+(r14===null?"—":r14+"%")+"\nCurva = promedio móvil de 3 días")}">
+        <span>${h.icon}</span><span class="nm">${shortName(h)}</span>
+        <svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><path d="${smoothPath(pts)}" fill="none" stroke="${col}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="${end.x}" cy="${end.y}" r="2" fill="${col}"/></svg>
+        <b style="color:${col};">${r14===null?"—":r14+"%"}</b></div>`;
+    }).join("");
+    return `<div class="intel-card"><div class="intel-h"><b>📈 Volatilidad</b><span>últimos 14 días</span></div>${body}</div>`;
+  }
+
+  // 4 · Efecto dominó: cómo rinde un hábito cuando se cumple (o no) otro
+  function intelDomino(){
+    const drivers = state.habits.some(h=>h.pillar) ? state.habits.filter(h=>h.pillar) : state.habits;
+    const days = daysBack(91).slice(1); // sin hoy
+    const found = [];
+    drivers.forEach(P=>{
+      state.habits.forEach(H=>{
+        if(H.id===P.id) return;
+        let aDone=0,aTot=0,bDone=0,bTot=0;
+        days.forEach(d=>{
+          const k=todayKey(d);
+          if(isDayDisabled(k) || d<getHabitStart(P) || d<getHabitStart(H)) return;
+          if(P.logs[k]){ aTot++; if(H.logs[k]) aDone++; } else { bTot++; if(H.logs[k]) bDone++; }
+        });
+        if(aTot<8 || bTot<8) return;
+        const ra = Math.round(aDone/aTot*100), rb = Math.round(bDone/bTot*100);
+        found.push({P,H,ra,rb,diff:ra-rb});
+      });
+    });
+    const top = found.filter(x=>x.diff>=15).sort((a,b)=>b.diff-a.diff);
+    const used = new Set(); const picked = [];
+    top.forEach(x=>{ const key=x.P.id+"|"+x.H.id; if(picked.length<3 && !used.has(x.H.id)){ used.add(x.H.id); picked.push(x); } });
+    const body = picked.length ? picked.map(x=>`
+      <div class="dom-item" data-tip="${escAttr(shortName(x.P)+" → "+shortName(x.H)+"\nSi cumples: "+x.ra+"% · si fallas: "+x.rb+"%\nBase: últimos 90 días")}">
+        <span class="bd" style="color:${COL.ok};">+${x.diff}</span>
+        <span>Cuando cumples <b>${shortName(x.P)}</b>, <b>${shortName(x.H)}</b> sube a ${x.ra}% (vs ${x.rb}% cuando lo fallas).</span></div>`).join("")
+      : `<div class="empty-note">Aún no hay un patrón claro. Se necesitan al menos 8 días cumplidos y 8 fallados por hábito en los últimos 90 días, con una diferencia de 15 puntos o más.</div>`;
+    return `<div class="intel-card"><div class="intel-h"><b>🔗 Efecto dominó</b><span>${state.habits.some(h=>h.pillar)?"pilares → resto":"hábito → hábito"} · 90 días</span></div>${body}
+      <div class="so-note">Correlación, no causa: muestra qué hábitos suelen caer o subir juntos.</div></div>`;
+  }
+
   function renderHabitComparison(){
     const section = document.getElementById("comparisonSection");
     const box = document.getElementById("comparisonBox");
@@ -1320,29 +2300,24 @@
       return;
     }
     section.style.display = "flex"; box.style.display = "block";
-    const ranked = state.habits
-      .map(h=>({h, s:computeHabitStats(h)}))
-      .sort((a,b)=> b.s.allTimeRate - a.s.allTimeRate);
-    const medals = ["🥇","🥈","🥉"];
-    wrap.innerHTML = ranked.map((r,i)=>`
-      <div class="cmp-row">
-        <div class="cmp-rank">${medals[i] || (i+1)}</div>
-        <div class="cmp-label"><span>${r.h.icon}</span>${r.h.name}</div>
-        <div class="cmp-bar-track">
-          <div class="cmp-bar-fill" style="width:${Math.max(r.s.allTimeRate,4)}%;background:${progressColor(r.s.allTimeRate)};"></div>
-          <span class="cmp-bar-value">${r.s.allTimeRate}%</span>
-        </div>
-      </div>
-    `).join("");
+    wrap.innerHTML = `<div class="intel-grid">${intelMomentum()}${intelQuality()}${intelSparklines()}${intelDomino()}</div>`;
   }
 
-  function lastMonths(n){
+  let trendOffset = 0; // meses hacia atrás desde hoy (se mueve de a 6)
+  function lastMonths(n, offset){
+    offset = offset || 0;
     const arr = [];
     const now = new Date();
     for(let i=n-1;i>=0;i--){
-      arr.push(new Date(now.getFullYear(), now.getMonth()-i, 1));
+      arr.push(new Date(now.getFullYear(), now.getMonth()-i-offset, 1));
     }
     return arr;
+  }
+  function earliestTrackedMonth(){
+    if(!state.habits.length) return null;
+    const t = Math.min(...state.habits.map(h=>getHabitStart(h).getTime()));
+    const d = new Date(t);
+    return new Date(d.getFullYear(), d.getMonth(), 1);
   }
 
   function computeMonthlyRate(habit, monthDate){
@@ -1383,6 +2358,9 @@
     sel.value = stillExists ? prev : "__all__";
   }
   document.getElementById("trendHabitSelect").addEventListener("change", renderMonthlyTrend);
+  document.getElementById("trendPrev").addEventListener("click", ()=>{ if(document.getElementById("trendPrev").disabled) return; trendOffset += 6; renderMonthlyTrend(); });
+  document.getElementById("trendNext").addEventListener("click", ()=>{ if(trendOffset===0) return; trendOffset = Math.max(0, trendOffset-6); renderMonthlyTrend(); });
+  document.getElementById("trendRecentBtn").addEventListener("click", ()=>{ trendOffset = 0; renderMonthlyTrend(); });
 
   function smoothPath(points){
     if(points.length===0) return "";
@@ -1415,7 +2393,16 @@
 
     const sel = document.getElementById("trendHabitSelect").value || "__all__";
     const habit = sel==="__all__" ? null : state.habits.find(h=>h.id===sel);
-    const months = lastMonths(6);
+    const months = lastMonths(6, trendOffset);
+    const earliest = earliestTrackedMonth();
+    const prevBtn = document.getElementById("trendPrev"), nextBtn = document.getElementById("trendNext");
+    const canPrev = earliest && months[0] > earliest;
+    prevBtn.disabled = !canPrev; prevBtn.style.opacity = canPrev ? "1" : ".3"; prevBtn.style.cursor = canPrev ? "pointer" : "default";
+    nextBtn.disabled = trendOffset===0; nextBtn.style.opacity = trendOffset===0 ? ".3" : "1"; nextBtn.style.cursor = trendOffset===0 ? "default" : "pointer";
+    const f = months[0], l = months[months.length-1];
+    document.getElementById("trendRangeLabel").textContent = f.getFullYear()===l.getFullYear()
+      ? `${shortMonth(f)} – ${shortMonth(l)} ${l.getFullYear()}`
+      : `${shortMonth(f)} ${f.getFullYear()} – ${shortMonth(l)} ${l.getFullYear()}`;
     const points = months.map(d=>({
       date: d,
       label: d.toLocaleDateString("es-PE",{month:"short"}).replace(".",""),
@@ -1457,13 +2444,13 @@
     }).join("");
 
     const lineSvg = segments.map(seg=>
-      `<path class="trend-line-path" d="${smoothPath(seg)}" fill="none" stroke="var(--accent)" stroke-width="2.75" stroke-linejoin="round" stroke-linecap="round"/>`
+      `<path class="trend-line-path" d="${smoothPath(seg)}" fill="none" stroke="var(--accent)" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round"/>`
     ).join("");
 
     const dotsSvg = points.map((p,i)=>{
       if(p.rate===null) return "";
       const x=xAt(i), y=yAt(p.rate);
-      return `<circle class="trend-dot" cx="${x}" cy="${y}" r="4.5" fill="${progressColor(p.rate)}" stroke="var(--bg)" stroke-width="1.5"><title>${p.label} ${p.year}: ${p.rate}%</title></circle>`;
+      return `<circle class="trend-dot" cx="${x}" cy="${y}" r="9" fill="transparent" data-tip="${p.label} ${p.year}: ${p.rate}%"></circle>`;
     }).join("");
 
     const labelsSvg = points.map((p,i)=>
@@ -1503,7 +2490,7 @@
           <div class="tmd-label">${p.label}</div>
         </div>`;
       }
-      return `<div class="tmd-item ${isActive?"active":""}" data-month-idx="${i}">
+      return `<div class="tmd-item ${isActive?"active":""}" data-month-idx="${i}" data-tip="${p.label} ${p.year}: ${p.rate}%\nClic para ver por hábito">
         ${donutSVG(p.rate, progressColor(p.rate), {size:52, strokeWidth:5, wrapClass:"tmd-donut", valueClass:"tmd-donut-value"})}
         <div class="tmd-label">${p.label}</div>
       </div>`;
@@ -1567,6 +2554,152 @@
   }
   document.getElementById("closeMonthDetailBtn").addEventListener("click", closeMonthDetail);
 
+  /* ---------------- Día fuga ---------------- */
+  function computeWeekdayStats(){
+    const sums=[0,0,0,0,0,0,0], counts=[0,0,0,0,0,0,0];
+    const perHabit = [{},{},{},{},{},{},{}];
+    const today = startOfToday();
+    for(let i=1;i<=56;i++){
+      const d = new Date(today); d.setDate(d.getDate()-i);
+      const key = todayKey(d);
+      if(isDayDisabled(key)) continue;
+      const active = state.habits.filter(h=>getHabitStart(h)<=d);
+      if(!active.length) continue;
+      const wd = d.getDay();
+      const done = active.filter(h=>h.logs[key]).length;
+      sums[wd] += done/active.length; counts[wd]++;
+      active.forEach(h=>{
+        if(!perHabit[wd][h.id]) perHabit[wd][h.id] = {h, done:0, total:0};
+        perHabit[wd][h.id].total++;
+        if(h.logs[key]) perHabit[wd][h.id].done++;
+      });
+    }
+    const rates = sums.map((v,i)=> counts[i] ? Math.round(v/counts[i]*100) : null);
+    const totalCount = counts.reduce((a,b)=>a+b,0);
+    const overall = totalCount ? Math.round(sums.reduce((a,b)=>a+b,0)/totalCount*100) : null;
+    return { rates, counts, overall, perHabit };
+  }
+  function getLeakInfo(){
+    const st = computeWeekdayStats();
+    if(st.overall===null) return null;
+    const order = [1,2,3,4,5,6,0];
+    const leak = order.filter(i=> st.rates[i]!==null && st.counts[i]>=2 && st.rates[i] <= st.overall-10);
+    let worst = -1;
+    order.forEach(i=>{ if(st.rates[i]!==null && st.counts[i]>=2 && (worst===-1 || st.rates[i]<st.rates[worst])) worst = i; });
+    return { st, order, leak, worst };
+  }
+
+  function leakTip(st,i){
+    const cap = DAY_NAMES[i].charAt(0).toUpperCase()+DAY_NAMES[i].slice(1);
+    const w = Object.values(st.perHabit[i]).filter(x=>x.total>=2).map(x=>({h:x.h,r:Math.round(x.done/x.total*100)})).sort((a,b)=>a.r-b.r)[0];
+    return (`${cap}: ${st.rates[i]}% cumplimiento\n`+(w?`Hábito más afectado: ${w.h.name.split("(")[0].trim()} (${w.r}%)`:"")).replace(/"/g,"&quot;");
+  }
+  function renderDayLeak(){
+    const sec = document.getElementById("leakSection"), box = document.getElementById("leakBox");
+    const info = state.habits.length ? getLeakInfo() : null;
+    if(!info){ sec.style.display="none"; box.style.display="none"; return; }
+    sec.style.display = "flex"; box.style.display = "block";
+    const {st, order, leak, worst} = info;
+    const letters = {1:"L",2:"M",3:"X",4:"J",5:"V",6:"S",0:"D"};
+    document.getElementById("leakPlot").innerHTML =
+      (st.overall!==null ? `<div class="leak-avg" style="bottom:${st.overall*1.3}px;"><span>promedio ${st.overall}%</span></div>` : "") +
+      order.map(i=>{
+        const r = st.rates[i];
+        if(r===null) return `<div class="leak-col"><div class="leak-val" style="color:var(--text-faint);">—</div><div class="leak-bar" style="height:4px;background:var(--surface-3);"></div></div>`;
+        return `<div class="leak-col" data-tip="${leakTip(st,i)}">
+          <div class="leak-val">${r}%</div>
+          <div class="leak-bar ${leak.includes(i)?"leak":""}" style="height:${Math.max(4,r*1.3)}px;background:${leak.includes(i)?progressColor(r):COL.neutral};"></div>
+        </div>`;
+      }).join("");
+    document.getElementById("leakLabels").innerHTML = order.map(i=>`<div class="${leak.includes(i)?"leak":""}" title="${DAY_NAMES[i]}">${letters[i]}</div>`).join("");
+
+    const alertEl = document.getElementById("leakAlert");
+    if(leak.length===0){
+      alertEl.className = "leak-alert good";
+      alertEl.innerHTML = `<b>Sin fuga sistemática.</b> Tu cumplimiento es estable entre días (ningún día cae 10 puntos o más bajo tu promedio de ${st.overall}%).`;
+      return;
+    }
+    const weekend = [5,6,0];
+    const onlyWeekend = leak.every(i=>weekend.includes(i));
+    let headline;
+    if(onlyWeekend && (leak.includes(6)||leak.includes(0))) headline = "Fuga operativa detectada en fines de semana";
+    else if(leak.length===1 && leak[0]===5) headline = "Fuga operativa detectada los viernes";
+    else headline = "Fuga operativa detectada: " + leak.map(i=>DAY_NAMES[i]).join(", ");
+    let detail = `<b>${DAY_NAMES[worst]}</b> rinde ${st.rates[worst]}% frente a tu promedio de ${st.overall}% (${st.overall-st.rates[worst]} puntos por debajo).`;
+    const hs = Object.values(st.perHabit[worst]).filter(x=>x.total>=2).map(x=>({h:x.h, r:Math.round(x.done/x.total*100)})).sort((a,b)=>a.r-b.r)[0];
+    if(hs) detail += ` Hábito más afectado ese día: <b>${hs.h.icon} ${hs.h.name.split("(")[0].trim()}</b> (${hs.r}%).`;
+    alertEl.className = "leak-alert bad";
+    alertEl.innerHTML = `<b>⚠ ${headline}.</b><br>${detail}`;
+  }
+
+  /* ---------------- Diagnóstico semanal ---------------- */
+  function diagWeekKey(){ return getWeekKey(new Date()); }
+  function getDiag(){
+    const k = diagWeekKey();
+    if(!state.diagnostics[k]) state.diagnostics[k] = {bottleneck:"", action:"", target:""};
+    return state.diagnostics[k];
+  }
+  function diagSuggestions(){
+    const rows = state.habits.map(h=>({h, r:rateLastDays(h,7)})).filter(x=>x.r!==null).sort((a,b)=>a.r-b.r);
+    const worst = rows[0] || null;
+    const info = getLeakInfo();
+    const m = computeMoM();
+    const r7 = overallLastDays(7), r30 = overallLastDays(30);
+    let target = null, why = "";
+    if(m.rc!==null && m.rp!==null && m.rc<m.rp){ target = m.rp; why = `igualar ${shortMonth(m.prev)} (${m.rp}%) y salir de la tendencia roja`; }
+    else if(r30!==null){ target = Math.min(100, r30+5); why = `subir 5 puntos sobre tu promedio de 30 días (${r30}%)`; }
+    return {worst, info, r7, r30, target, why};
+  }
+  function renderDiagnosis(){
+    const sec = document.getElementById("diagSection"), box = document.getElementById("diagBox");
+    if(state.habits.length===0){ sec.style.display="none"; box.style.display="none"; return; }
+    sec.style.display = "flex"; box.style.display = "block";
+    document.getElementById("diagWeekLabel").textContent = periodLabel("week", new Date());
+    const d = getDiag();
+    const sg = diagSuggestions();
+    const bt = document.getElementById("diagBottleneck"), ac = document.getElementById("diagAction"), tg = document.getElementById("diagTarget");
+    if(document.activeElement!==bt) bt.value = d.bottleneck;
+    if(document.activeElement!==ac) ac.value = d.action;
+    if(document.activeElement!==tg) tg.value = d.target;
+
+    const s1 = document.getElementById("diagSuggest1");
+    s1.textContent = sg.worst
+      ? `Sugerencia automática: «${sg.worst.h.icon} ${sg.worst.h.name.split("(")[0].trim()}» fue tu punto más bajo (${sg.worst.r}% en los últimos 7 días).`
+      : "Aún no hay suficientes datos de los últimos 7 días.";
+    document.getElementById("diagUse1").style.display = sg.worst ? "" : "none";
+
+    const s2 = document.getElementById("diagSuggest2");
+    if(sg.info && sg.info.leak.length){
+      s2.textContent = `Patrón detectado: fuga los ${sg.info.leak.map(i=>DAY_NAMES[i]).join(", ")}. Considera mover el hábito a otra ventana horaria o prepararlo la noche anterior.`;
+    } else {
+      s2.textContent = "Define un ajuste concreto: horario, entorno o disparador del hábito que falló.";
+    }
+
+    const s3 = document.getElementById("diagSuggest3");
+    document.getElementById("diagUse3").style.display = sg.target!==null ? "" : "none";
+    s3.textContent = sg.target!==null
+      ? `Meta sugerida: ${sg.target}% (${sg.why}). Últimos 7 días: ${sg.r7===null?"—":sg.r7+"%"}.`
+      : "Aún no hay suficientes datos para sugerir una meta.";
+    const tv = parseInt(d.target);
+    document.getElementById("diagGap").textContent = (!isNaN(tv) && sg.r7!==null)
+      ? (tv>sg.r7 ? `Brecha: +${tv-sg.r7} puntos sobre tu ritmo actual` : "Meta alcanzada con tu ritmo actual")
+      : "";
+  }
+  [["diagBottleneck","bottleneck"],["diagAction","action"],["diagTarget","target"]].forEach(([id,field])=>{
+    document.getElementById(id).addEventListener("input", (e)=>{
+      const d = getDiag(); d[field] = e.target.value; save();
+      if(field==="target") renderDiagnosis();
+    });
+  });
+  document.getElementById("diagUse1").addEventListener("click", ()=>{
+    const sg = diagSuggestions(); if(!sg.worst) return;
+    const d = getDiag(); d.bottleneck = `${sg.worst.h.name.split("(")[0].trim()} cayó a ${sg.worst.r}% esta semana.`; save(); renderDiagnosis();
+  });
+  document.getElementById("diagUse3").addEventListener("click", ()=>{
+    const sg = diagSuggestions(); if(sg.target===null) return;
+    const d = getDiag(); d.target = String(sg.target); save(); renderDiagnosis();
+  });
+
   function renderHabits(){
     renderKPIs();
 
@@ -1587,12 +2720,16 @@
       renderHabitComparison();
       buildTrendHabitSelect();
       renderMonthlyTrend();
+      renderDayLeak(); renderInsights();
+      renderDiagnosis();
       return;
     }
     list.innerHTML = "";
     const days = last7Dates();
-    state.habits.forEach(h=>{
+    const renderRow = (h)=>{
       const doneToday = !!h.logs[tKey];
+      const r30 = rateLastDays(h, 30);
+      const st30 = statusFor(r30);
       const streak = computeStreak(h);
       const pct = weeklyRate(h);
       const row = document.createElement("div");
@@ -1611,8 +2748,8 @@
       row.innerHTML = `
         <div class="habit-check ${doneToday?"done":""}" data-action="toggle-today">${doneToday?"✓":""}</div>
         <div class="habit-name">
-          <div class="n"><span class="emoji">${h.icon}</span>${h.name}</div>
-          <div class="meta">meta: ${h.target}x / semana</div>
+          <div class="n"><span class="emoji">${h.icon}</span>${h.name}${h.pillar?'<span class="pillar-mark" title="Hábito pilar">◆</span>':''}</div>
+          <div class="meta">meta: ${h.target}x / sem · 30d: ${r30===null?"—":r30+"%"}<span class="status-txt"><i class="dot ${(r30!==null&&(r30<20||r30>=80))?"pulse":""}" style="--c:${st30.color};"></i>${st30.label}</span></div>
         </div>
         <div class="week-dots">${dotsHtml}</div>
         <div class="ring-wrap">${ringSVG(pct, progressColor(pct))}<span class="ring-label">${pct}%</span></div>
@@ -1624,20 +2761,43 @@
       row.querySelector('[data-action="toggle-today"]').addEventListener("click", ()=>{
         h.logs[tKey] = !h.logs[tKey]; save(); renderHabits();
       });
+      row.addEventListener("click", (e)=>{
+        if(e.target.closest("[data-action],.week-dot,.row-actions")) return;
+        openSlide(h);
+      });
       row.querySelector('[data-action="edit"]').addEventListener("click", ()=>openHabitModal(h));
       row.querySelectorAll(".week-dot").forEach(dot=>{
-        dot.addEventListener("click", ()=>{
+        dot.addEventListener("click", (e)=>{
           const key = dot.dataset.date;
-          h.logs[key] = !h.logs[key]; save(); renderHabits();
+          const was = !!h.logs[key];
+          h.logs[key] = !was; save(); renderHabits();
+          if(was) askCause(h, key, e);
         });
       });
       list.appendChild(row);
+    };
+    TIER_ORDER.forEach(tier=>{
+      const hs = state.habits.filter(h=>tierOf(h)===tier);
+      if(!hs.length) return;
+      const meta = TIER_META[tier];
+      const tAvg = avg(hs.map(h=>rateLastDays(h,30)).filter(r=>r!==null));
+      const tPct = tAvg===null ? null : Math.round(tAvg);
+      const head = document.createElement("div");
+      head.className = "tier-head";
+      head.innerHTML = `<span class="tier-dot" style="background:#3a3a3a;"></span>
+        <span class="tier-title" style="color:${meta.color};">${meta.label}</span>
+        <span class="tier-sub">${meta.sub}</span>
+        <span class="tier-avg" style="color:${tPct===null?"var(--text-faint)":progressColor(tPct)};">${tPct===null?"—":tPct+"% · 30d"}</span>`;
+      list.appendChild(head);
+      hs.forEach(renderRow);
     });
     renderHeatmap();
     renderStatsTable();
     renderHabitComparison();
     buildTrendHabitSelect();
     renderMonthlyTrend();
+    renderDayLeak(); renderInsights();
+    renderDiagnosis();
   }
 
   function renderHeatmap(){
@@ -1715,8 +2875,10 @@
           <div class="habit-check ${done?"done":""}" style="--hcolor:${h.color};width:30px;height:30px;font-size:14px;">${done?"✓":""}</div>
           <span style="font-size:13px;font-weight:600;">${h.icon} ${h.name}</span>
         `;
-        row.addEventListener("click", ()=>{
-          h.logs[dateKey] = !h.logs[dateKey]; save(); renderBackfillList(); renderHabits(); renderCalendar();
+        row.addEventListener("click", (e)=>{
+          const was = !!h.logs[dateKey];
+          h.logs[dateKey] = !was; save(); renderBackfillList(); renderHabits(); renderCalendar();
+          if(was) askCause(h, dateKey, e);
         });
         wrap.appendChild(row);
       });
@@ -1817,8 +2979,10 @@
       if(off) el.title = `Día libre: ${state.disabledDays[key]}`;
       if(done) el.style.setProperty("--hcolor", habit.color);
       if(!isFuture){
-        el.addEventListener("click", ()=>{
-          habit.logs[key] = !habit.logs[key]; save(); renderCalendar(); renderHabits();
+        el.addEventListener("click", (e)=>{
+          const was = !!habit.logs[key];
+          habit.logs[key] = !was; save(); renderCalendar(); renderHabits();
+          if(was) askCause(habit, key, e);
         });
       }
       grid.appendChild(el);
@@ -1885,6 +3049,7 @@
     hogar:{label:"Hogar", color:"#e0568c", soft:"rgba(224,86,140,.16)"},
     emprendimiento:{label:"Emprendimiento", color:"#5ec8d8", soft:"rgba(94,200,216,.16)"},
     reunion:{label:"Reunión", color:"#e8a33d", soft:"rgba(232,163,61,.16)"},
+    marca:{label:"Marca Personal", color:"#8b93f8", soft:"rgba(139,147,248,.16)"},
     otro:{label:"Otro", color:"#8f8f8f", soft:"rgba(143,143,143,.16)"}
   };
   const ACT_STATUS_META = {
@@ -1900,62 +3065,96 @@
     return state.agenda[key];
   }
 
+  function toMin(t){ const [h,m]=String(t||"0:0").split(":").map(Number); return (h||0)*60+(m||0); }
+  function fromMin(n){ n=Math.max(0,Math.min(23*60+59,n)); return String(Math.floor(n/60)).padStart(2,"0")+":"+String(n%60).padStart(2,"0"); }
+  function fmtDur(min){ const h=Math.floor(min/60), m=min%60; return h&&m?`${h} h ${m} min`:(h?`${h} h`:`${m} min`); }
+  function blocksForDay(key){ return isDayDisabled(key) ? [] : (state.routineBlocks||[]); }
+  function opBlock(){ const bl=state.routineBlocks||[]; return bl.find(b=>b.op) || bl.find(b=>/operativ|turno/i.test(b.title)) || null; }
+  function nowMin(){ const n=new Date(); return n.getHours()*60+n.getMinutes(); }
+
   function renderTimeline(){
     const key = todayKey(currentDate);
-    const list = getAgendaList(key).slice().sort((a,b)=> a.time.localeCompare(b.time));
+    const isToday = key===todayKey(new Date());
+    const items = getAgendaList(key);
+    const blocks = blocksForDay(key);
+    const log = state.blockLog[key] || {};
     const wrap = document.getElementById("timelineList");
-    document.getElementById("agendaRangeLabel").textContent =
-      `${String(state.settings.dayStart).padStart(2,"0")}:00 – ${String(state.settings.dayEnd).padStart(2,"0")}:00`;
+    document.getElementById("agendaRangeLabel").textContent = blocks.length ? `${blocks.length} bloques fijos` : "";
+
+    const merged = [
+      ...blocks.map(b=>({kind:"block", time:b.start, b})),
+      ...items.map(i=>({kind:"item", time:i.time, i}))
+    ].sort((a,b)=> a.time.localeCompare(b.time) || (a.kind==="block"?-1:1));
 
     const summaryEl = document.getElementById("agendaStatusSummary");
-    if(list.length===0){
-      summaryEl.textContent = "";
-      wrap.innerHTML = `<div class="empty-state" style="padding:30px 12px;"><div class="big">🗓️</div><p>No hay actividades para este día todavía. Van aquí tus actividades de todas las áreas de tu vida: trabajo, personal, hogar, emprendimiento, reuniones...</p></div>`;
+    if(merged.length===0){
+      summaryEl.textContent = isDayDisabled(key) ? "Día libre: sin bloques fijos." : "";
+      wrap.innerHTML = `<div class="empty-state" style="padding:30px 12px;"><div class="big">🗓️</div><p>${isDayDisabled(key)?"Día libre. Puedes agregar tareas excepcionales abajo.":"Sin bloques fijos. Define tu rutina en «⚙ Bloques fijos» o agrega tareas excepcionales."}</p></div>`;
       return;
     }
     const counts = {};
-    list.forEach(i=> counts[i.status] = (counts[i.status]||0)+1);
-    summaryEl.textContent = Object.keys(ACT_STATUS_META)
-      .filter(s=>counts[s])
-      .map(s=>`${counts[s]} ${ACT_STATUS_META[s].label.toLowerCase()}${counts[s]>1?"s":""}`)
-      .join(" · ");
+    items.forEach(i=> counts[i.status] = (counts[i.status]||0)+1);
+    const parts = [];
+    if(blocks.length) parts.push(`${blocks.filter(b=>log[b.id]).length}/${blocks.length} bloques fijos respetados`);
+    Object.keys(ACT_STATUS_META).filter(s=>counts[s]).forEach(s=>parts.push(`${counts[s]} ${ACT_STATUS_META[s].label.toLowerCase()}${counts[s]>1?"s":""}`));
+    summaryEl.textContent = parts.join(" · ");
 
     wrap.innerHTML = "";
-    list.forEach(item=>{
-      const meta = TYPE_META[item.type] || TYPE_META.otro;
-      const sMeta = ACT_STATUS_META[item.status] || ACT_STATUS_META.pendiente;
+    const nm = nowMin();
+    merged.forEach(m=>{
       const el = document.createElement("div");
-      el.className = "tl-item status-" + item.status;
-      el.style.setProperty("--tcolor", meta.color);
-      el.style.setProperty("--tsoft", meta.soft);
-      const statusOptions = Object.keys(ACT_STATUS_META).map(s=>
-        `<option value="${s}" ${s===item.status?"selected":""}>${ACT_STATUS_META[s].label}</option>`
-      ).join("");
-      el.innerHTML = `
-        <div class="tl-card">
-          <div class="tl-time mono">${item.time}</div>
-          <div class="tl-body">
-            <span class="tl-title">${item.title}</span>
-            <div><span class="tl-tag">${meta.label}</span></div>
-          </div>
-          <div class="tl-actions">
-            <select class="tl-status-select" style="color:${sMeta.color};">${statusOptions}</select>
-            <button class="icon-mini" data-action="remind" title="Recordatorio">🔔</button>
-            <button class="icon-mini" data-action="del" title="Eliminar">✕</button>
-          </div>
-        </div>`;
-      el.querySelector(".tl-status-select").addEventListener("change", (e)=>{
-        item.status = e.target.value; save(); renderTimeline();
-      });
-      el.querySelector('[data-action="remind"]').addEventListener("click", ()=>{
-        openRemindersModal({title:`${item.time} · ${item.title}`});
-      });
-      el.querySelector('[data-action="del"]').addEventListener("click", ()=>{
-        state.agenda[key] = state.agenda[key].filter(x=>x.id!==item.id); save(); renderTimeline();
-      });
+      if(m.kind==="block"){
+        const b = m.b, done = !!log[b.id];
+        const live = isToday && nm>=toMin(b.start) && nm<toMin(b.end);
+        el.className = "tl-item fixed" + (done?" respected":"") + (live?" now":"");
+        el.style.setProperty("--tcolor", done ? "#10b981" : "#3a3f55");
+        el.innerHTML = `
+          <div class="tl-card">
+            <div class="tl-range">${b.start}<br>${b.end}</div>
+            <div class="tl-body">
+              <span class="tl-title">${b.icon||""} ${escHtml(b.title)}</span>
+              <div><span class="tl-tag">Bloque fijo · ${fmtDur(toMin(b.end)-toMin(b.start))}</span>${live?' <i class="dot pulse" style="--c:#10b981;margin-left:8px;"></i><span style="font-size:10.5px;color:var(--text-faint);">en curso</span>':""}</div>
+            </div>
+            <div class="tl-actions"><button class="blk-check ${done?"on":""}" title="Marcar como respetado">${done?"✓":""}</button></div>
+          </div>`;
+        el.querySelector(".blk-check").addEventListener("click", ()=>{
+          if(!state.blockLog[key]) state.blockLog[key] = {};
+          if(state.blockLog[key][b.id]) delete state.blockLog[key][b.id]; else state.blockLog[key][b.id] = true;
+          save(); renderTimeline(); renderAgendaKPIs();
+        });
+      } else {
+        const item = m.i;
+        const meta = TYPE_META[item.type] || TYPE_META.otro;
+        const sMeta = ACT_STATUS_META[item.status] || ACT_STATUS_META.pendiente;
+        el.className = "tl-item status-" + item.status;
+        el.style.setProperty("--tcolor", meta.color);
+        el.style.setProperty("--tsoft", meta.soft);
+        const statusOptions = Object.keys(ACT_STATUS_META).map(s=>
+          `<option value="${s}" ${s===item.status?"selected":""}>${ACT_STATUS_META[s].label}</option>`).join("");
+        el.innerHTML = `
+          <div class="tl-card">
+            <input type="time" class="tl-time-input" value="${item.time}" title="Cambiar hora">
+            <div class="tl-body">
+              <span class="tl-title">${escHtml(item.title)}</span>
+              <div><span class="tl-tag">${meta.label}${item.dur?` · ${item.dur} min`:""}</span></div>
+            </div>
+            <div class="tl-actions">
+              <select class="tl-status-select" style="color:${sMeta.color};">${statusOptions}</select>
+              <button class="icon-mini" data-action="remind" title="Recordatorio">🔔</button>
+              <button class="icon-mini" data-action="del" title="Eliminar">✕</button>
+            </div>
+          </div>`;
+        el.querySelector(".tl-time-input").addEventListener("change", (e)=>{ if(e.target.value){ item.time = e.target.value; save(); renderTimeline(); } });
+        el.querySelector(".tl-status-select").addEventListener("change", (e)=>{ item.status = e.target.value; save(); renderTimeline(); renderAgendaKPIs(); });
+        el.querySelector('[data-action="remind"]').addEventListener("click", ()=>{ openRemindersModal({title:`${item.time} · ${item.title}`}); });
+        el.querySelector('[data-action="del"]').addEventListener("click", ()=>{
+          state.agenda[key] = state.agenda[key].filter(x=>x.id!==item.id); save(); renderTimeline(); renderAgendaKPIs();
+        });
+      }
       wrap.appendChild(el);
     });
   }
+  function escHtml(t){ return String(t).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
 
   document.getElementById("addActBtn").addEventListener("click", ()=>{
     const time = document.getElementById("newActTime").value;
@@ -1966,7 +3165,229 @@
     getAgendaList(key).push({ id:uid(), time, title, type, status:"pendiente" });
     save();
     document.getElementById("newActTitle").value = "";
-    renderTimeline();
+    renderTimeline(); renderAgendaKPIs();
+  });
+  document.getElementById("toggleExtraBtn").addEventListener("click", ()=>{
+    const f = document.getElementById("extraForm");
+    f.style.display = f.style.display==="none" ? "flex" : "none";
+    if(f.style.display==="flex"){
+      const t = document.getElementById("newActTime");
+      if(!t.value){ const n=Math.ceil(nowMin()/15)*15; t.value = fromMin(n); }
+      document.getElementById("newActTitle").focus();
+    }
+  });
+
+  // Captura rápida en 1 clic
+  const QUICK = {
+    carlos:{title:"Reunión con Carlos", type:"marca", dur:45},
+    prospeccion:{title:"Llamada de prospección", type:"trabajo", dur:30, op:true},
+    tramite:{title:"Trámite personal", type:"personal", dur:30}
+  };
+  document.querySelectorAll("[data-quick]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const q = QUICK[btn.dataset.quick];
+      const key = todayKey(currentDate);
+      const ob = opBlock();
+      const opStart = ob ? toMin(ob.start) : 10*60+30, opEnd = ob ? toMin(ob.end) : 19*60;
+      let t = opStart;
+      if(key===todayKey(new Date())){
+        t = Math.ceil(nowMin()/15)*15;
+        if(q.op && (t<opStart || t>=opEnd)) t = opStart;
+      }
+      const time = fromMin(t);
+      getAgendaList(key).push({ id:uid(), time, title:q.title, type:q.type, dur:q.dur, status:"pendiente" });
+      save(); renderTimeline(); renderAgendaKPIs();
+      toast(`${q.title} · ${time} (puedes cambiar la hora en la agenda)`);
+    });
+  });
+
+  /* ================= RESPALDO / IMPORTACIÓN ================= */
+  function openBackup(){
+    const lb = state.settings.lastBackup;
+    document.getElementById("backupLast").textContent = lb ? `Último respaldo: ${new Date(lb).toLocaleString("es-PE")}` : "Aún no has descargado ningún respaldo.";
+    document.getElementById("backupModal").classList.add("open");
+  }
+  document.getElementById("backupBtn").addEventListener("click", openBackup);
+  document.getElementById("closeBackupBtn").addEventListener("click", ()=>document.getElementById("backupModal").classList.remove("open"));
+
+  function doExport(){
+    state.settings.lastBackup = new Date().toISOString(); save();
+    const blob = new Blob([JSON.stringify(state,null,2)], {type:"application/json"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `panel-respaldo-${todayKey(new Date())}.json`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
+    toast("Respaldo descargado");
+  }
+  document.getElementById("exportBtn2").addEventListener("click", ()=>{ doExport(); openBackup(); });
+
+  function importJsonFile(f){
+    const rd = new FileReader();
+    rd.onload = ()=>{
+      try{
+        const data = JSON.parse(rd.result);
+        if(!data || !Array.isArray(data.habits)) throw new Error("no es un respaldo del panel");
+        const nHab = data.habits.length;
+        const nDays = data.habits.reduce((a,h)=>a+Object.keys(h.logs||{}).length,0);
+        if(!confirm(`Restaurar respaldo: ${nHab} hábitos y ${nDays} registros diarios.\n\nEsto reemplaza lo que hay ahora en este navegador. ¿Continuar?`)) return;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        location.reload();
+      }catch(err){ toast("Archivo no válido: "+err.message); }
+    };
+    rd.readAsText(f);
+  }
+  document.getElementById("importJsonFile").addEventListener("change", (e)=>{
+    const f = e.target.files[0]; if(f) importJsonFile(f); e.target.value = "";
+  });
+
+  // ---- Importar tabla (CSV/TSV/pegado) ----
+  function parseDateCell(v){
+    v = String(v||"").trim();
+    let m = v.match(/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})$/);
+    if(m) return `${m[1]}-${pad2(m[2])}-${pad2(m[3])}`;
+    m = v.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{4})$/);   // día/mes/año (formato Perú)
+    if(m) return `${m[3]}-${pad2(m[2])}-${pad2(m[1])}`;
+    return null;
+  }
+  function cellValue(v){
+    const t = String(v||"").trim().toLowerCase();
+    if(t==="") return null;
+    if(["1","x","✓","✔","☑","si","sí","true","verdadero","v","ok","hecho","100%","y","yes"].includes(t)) return true;
+    if(["0","no","false","falso","✗","✘","☐","n","0%"].includes(t)) return false;
+    const num = parseFloat(t.replace("%",""));
+    if(!isNaN(num)) return num>0;
+    return null;
+  }
+  function splitLine(line, delim){
+    const out=[]; let cur="", q=false;
+    for(let i=0;i<line.length;i++){
+      const c=line[i];
+      if(c==='"'){ if(q && line[i+1]==='"'){ cur+='"'; i++; } else q=!q; }
+      else if(c===delim && !q){ out.push(cur); cur=""; }
+      else cur+=c;
+    }
+    out.push(cur); return out;
+  }
+  function parseTable(text){
+    const lines = text.replace(/\r/g,"").split("\n").filter(l=>l.trim()!=="");
+    if(!lines.length) return null;
+    const first = lines[0];
+    const delim = [["\t",(first.match(/\t/g)||[]).length],[";",(first.match(/;/g)||[]).length],[",",(first.match(/,/g)||[]).length]].sort((a,b)=>b[1]-a[1])[0][0];
+    const rows = lines.map(l=>splitLine(l,delim));
+    // Disposición A: fechas en la primera fila
+    const headDates = rows[0].slice(1).map(parseDateCell);
+    const res = {}; // nombre -> {fecha:bool}
+    let layout = null;
+    if(headDates.filter(Boolean).length >= 3){
+      layout="hábitos en filas";
+      rows.slice(1).forEach(r=>{
+        const name = (r[0]||"").trim(); if(!name) return;
+        r.slice(1).forEach((c,i)=>{ const d=headDates[i]; if(!d) return; const v=cellValue(c); if(v===null) return; (res[name]=res[name]||{})[d]=v; });
+      });
+    } else {
+      // Disposición B: fechas en la primera columna
+      const colDates = rows.slice(1).map(r=>parseDateCell(r[0]));
+      if(colDates.filter(Boolean).length >= 3){
+        layout="fechas en filas";
+        const names = rows[0].slice(1).map(x=>(x||"").trim());
+        rows.slice(1).forEach((r,ri)=>{
+          const d = colDates[ri]; if(!d) return;
+          names.forEach((nm,i)=>{ if(!nm) return; const v=cellValue(r[i+1]); if(v===null) return; (res[nm]=res[nm]||{})[d]=v; });
+        });
+      }
+    }
+    return layout ? {layout, data:res} : null;
+  }
+  let csvParsed = null;
+  function previewCsv(text){
+    const out = document.getElementById("csvPreview"), btn = document.getElementById("csvApplyBtn");
+    csvParsed = null; btn.style.display = "none";
+    if(!text.trim()){ out.textContent=""; return; }
+    const t = parseTable(text);
+    if(!t || !Object.keys(t.data).length){ out.textContent = "No pude reconocer la tabla. Necesito una fila (o columna) con al menos 3 fechas y una columna (o fila) con los nombres de hábitos."; return; }
+    csvParsed = t;
+    const names = Object.keys(t.data);
+    const lines = names.map(n=>{
+      const ent = Object.entries(t.data[n]); const ds = ent.map(e=>e[0]).sort();
+      const ex = state.habits.find(h=>normName(h.name)===normName(n));
+      return `• ${n}${ex?"":" (nuevo)"}: ${ent.filter(e=>e[1]).length} cumplidos de ${ent.length} días · ${ds[0]} → ${ds[ds.length-1]}`;
+    });
+    out.innerHTML = `<b>Reconocido (${t.layout}):</b> ${names.length} hábitos<br>` + lines.map(escHtml).join("<br>");
+    btn.style.display = "inline-block";
+  }
+  document.getElementById("csvPaste").addEventListener("input", e=>previewCsv(e.target.value));
+  document.getElementById("csvFile").addEventListener("change", e=>{
+    const f=e.target.files[0]; if(!f) return;
+    const rd=new FileReader(); rd.onload=()=>{ document.getElementById("csvPaste").value = rd.result; previewCsv(rd.result); }; rd.readAsText(f);
+  });
+  document.getElementById("csvApplyBtn").addEventListener("click", ()=>{
+    if(!csvParsed) return;
+    let created=0, days=0;
+    Object.keys(csvParsed.data).forEach(name=>{
+      const entries = csvParsed.data[name];
+      let h = state.habits.find(x=>normName(x.name)===normName(name));
+      const dates = Object.keys(entries).sort();
+      if(!h){
+        h = { id:uid(), name, icon:"⭐", color:"#10b981", target:7, tier:guessTier(name), pillar:false, timeframe:guessTimeframe(name),
+              phase:guessTimeframe(name)==="am"?guessPhase(name):"", createdAt:dates[0], logs:{} };
+        state.habits.push(h); created++;
+      } else if(dates[0] < h.createdAt){ h.createdAt = dates[0]; }
+      dates.forEach(d=>{ h.logs[d] = entries[d]; days++; });
+    });
+    save();
+    document.getElementById("backupModal").classList.remove("open");
+    document.getElementById("csvPaste").value=""; previewCsv("");
+    renderHabits(); renderAgenda();
+    toast(`Importado: ${days} registros · ${created} hábitos nuevos`);
+  });
+
+  // Recordatorio de respaldo (cada 7 días)
+  setTimeout(()=>{
+    if(!state.habits.length) return;
+    const lb = state.settings.lastBackup ? new Date(state.settings.lastBackup) : null;
+    const days = lb ? (Date.now()-lb.getTime())/86400000 : 999;
+    if(days>=7) toast("💾 Haz tu respaldo (botón 💾 arriba): tus datos solo viven en este navegador");
+  }, 2500);
+
+  /* ================= BLOQUES FIJOS (editor) ================= */
+  let blocksDraft = [];
+  function renderBlocksEditor(){
+    const wrap = document.getElementById("blocksEditList");
+    wrap.innerHTML = "";
+    blocksDraft.forEach((b,i)=>{
+      const row = document.createElement("div");
+      row.className = "blk-row";
+      row.innerHTML = `
+        <input type="time" value="${b.start}" data-f="start">
+        <input type="time" value="${b.end}" data-f="end">
+        <input type="text" value="${escHtml(b.icon||"")}" data-f="icon" maxlength="4" style="text-align:center;">
+        <input type="text" value="${escHtml(b.title)}" data-f="title" placeholder="Nombre del bloque">
+        <label><input type="radio" name="opblk" ${b.op?"checked":""}> operativo</label>
+        <button class="icon-mini" title="Quitar">✕</button>`;
+      row.querySelectorAll("input[data-f]").forEach(inp=> inp.addEventListener("input", ()=>{ b[inp.dataset.f] = inp.value; }));
+      row.querySelector('input[type=radio]').addEventListener("change", ()=>{ blocksDraft.forEach(x=>x.op=false); b.op = true; });
+      row.querySelector("button").addEventListener("click", ()=>{ blocksDraft.splice(i,1); renderBlocksEditor(); });
+      wrap.appendChild(row);
+    });
+  }
+  document.getElementById("editBlocksBtn").addEventListener("click", ()=>{
+    blocksDraft = (state.routineBlocks||[]).map(b=>({...b}));
+    renderBlocksEditor();
+    document.getElementById("blocksModal").classList.add("open");
+  });
+  document.getElementById("addBlockRowBtn").addEventListener("click", ()=>{
+    blocksDraft.push({id:uid(), start:"12:00", end:"12:30", icon:"•", title:""}); renderBlocksEditor();
+  });
+  document.getElementById("cancelBlocksBtn").addEventListener("click", ()=>document.getElementById("blocksModal").classList.remove("open"));
+  document.getElementById("saveBlocksBtn").addEventListener("click", ()=>{
+    const clean = blocksDraft.filter(b=>b.start && b.end && String(b.title).trim() && toMin(b.end)>toMin(b.start))
+      .map(b=>({id:b.id, start:b.start, end:b.end, icon:b.icon||"", title:String(b.title).trim(), op:!!b.op}))
+      .sort((a,b)=>a.start.localeCompare(b.start));
+    state.routineBlocks = clean; save();
+    document.getElementById("blocksModal").classList.remove("open");
+    renderAgenda();
+    toast("Bloques fijos guardados");
   });
 
   /* ================= EISENHOWER (genérico: día y períodos) ================= */
@@ -2040,46 +3461,143 @@
     const habitsTotal = trackedHabits.length;
     const habitsDone = trackedHabits.filter(h=>h.logs[dateKey]).length;
 
+    // tareas: victorias del día + (histórico) tareas Eisenhower que ya existían
     const eisen = state.eisenhower[dateKey] || {q1:[],q2:[],q3:[],q4:[]};
-    const eisenTasks = [...eisen.q1,...eisen.q2,...eisen.q3,...eisen.q4];
-    const eisenTotal = eisenTasks.length, eisenDone = eisenTasks.filter(t=>t.done).length;
+    const legacy = [...eisen.q1,...eisen.q2,...eisen.q3,...eisen.q4];
+    const rocks = (state.bigRocks[dateKey]||[]).filter(r=>String(r.text||"").trim());
+    const eisenTotal = legacy.length + rocks.length;
+    const eisenDone = legacy.filter(t=>t.done).length + rocks.filter(r=>r.done).length;
 
     const totalItems = habitsTotal + eisenTotal, doneItems = habitsDone + eisenDone;
     const pct = totalItems ? Math.round((doneItems/totalItems)*100) : null;
     return {habitsTotal, habitsDone, eisenTotal, eisenDone, pct};
   }
 
+  /* ---- Las 3 victorias del día ---- */
+  function getRocks(key, create){
+    let r = state.bigRocks[key];
+    if(!r && create){ r = state.bigRocks[key] = [0,1,2].map(()=>({id:uid(), text:"", done:false})); }
+    return r || [0,1,2].map(()=>({id:null, text:"", done:false}));
+  }
+  const ROCK_HINTS = [
+    "Ej. Enviar audio de alineación de marca a Carlos",
+    "Ej. Cumplir el bloque operativo con la regla de 45 s post-llamada",
+    "Ej. Definir la compra de la laptop"
+  ];
+  function renderRocks(){
+    const key = todayKey(currentDate);
+    const rocks = getRocks(key,false);
+    const wrap = document.getElementById("rocksList");
+    wrap.innerHTML = "";
+    rocks.forEach((r,i)=>{
+      const row = document.createElement("div");
+      row.className = "rock" + (r.done?" done":"");
+      row.innerHTML = `<span class="rk-n">${i+1}</span><input type="checkbox" ${r.done?"checked":""} title="Marcar victoria"><input type="text" class="rk-in" maxlength="140" placeholder="${ROCK_HINTS[i]}">`;
+      const inp = row.querySelector(".rk-in"); inp.value = r.text;
+      row.querySelector('input[type=checkbox]').addEventListener("change", (e)=>{
+        const arr = getRocks(key,true);
+        if(!arr[i].text.trim() && e.target.checked){ e.target.checked=false; toast("Escribe primero la victoria"); return; }
+        arr[i].done = e.target.checked; save();
+        row.classList.toggle("done", arr[i].done);
+        renderAgendaKPIs(); renderProdTrend();
+      });
+      inp.addEventListener("input", ()=>{
+        const arr = getRocks(key,true); arr[i].text = inp.value;
+        if(!inp.value.trim()) arr[i].done = false;
+        save(); renderAgendaKPIs();
+      });
+      inp.addEventListener("keydown", e=>{ if(e.key==="Enter") inp.blur(); });
+      wrap.appendChild(row);
+    });
+  }
+
   function renderAgendaKPIs(){
     const key = todayKey(currentDate);
-    const s = computeDayProductivity(key);
-    const habitsPct = s.habitsTotal ? Math.round((s.habitsDone/s.habitsTotal)*100) : null;
-    const eisenPct = s.eisenTotal ? Math.round((s.eisenDone/s.eisenTotal)*100) : null;
+    const isToday = key===todayKey(new Date());
+    const rocks = getRocks(key,false);
+    const filled = rocks.filter(r=>r.text.trim()).length, doneN = rocks.filter(r=>r.done).length;
+    const focusCol = doneN===3 ? COL.ok : "var(--text)";
+    const focusSub = filled<3 ? `${3-filled} por definir` : (doneN===3 ? "Día ganado" : "en curso");
+
+    const items = getAgendaList(key).filter(i=>i.status!=="cancelado" && i.status!=="reprogramado");
+    const n = items.length;
+    const load = n<=2 ? {t:"Baja", c:COL.ok} : (n<=5 ? {t:"Media", c:COL.warn} : {t:"Alta", c:COL.bad});
+
+    const blocks = blocksForDay(key), log = state.blockLog[key]||{};
+    const bDone = blocks.filter(b=>log[b.id]).length;
+    const bPct = blocks.length ? Math.round(bDone/blocks.length*100) : null;
+
+    const ob = blocksForDay(key).length ? opBlock() : null;
+    let opVal="—", opSub="sin bloque operativo";
+    if(ob){
+      const s0=toMin(ob.start), e0=toMin(ob.end), nm=nowMin();
+      if(!isToday){ opVal = fmtDur(e0-s0); opSub = "turno planificado"; }
+      else if(nm<s0){ opVal = fmtDur(e0-s0); opSub = `inicia ${ob.start}`; }
+      else if(nm>=e0){ opVal = "Cerrado"; opSub = "turno finalizado"; }
+      else { opVal = fmtDur(e0-nm); opSub = `termina ${ob.end}`; }
+    }
     document.getElementById("agendaKpiGrid").innerHTML = `
-      <div class="kpi-card"><div class="label">Hábitos cumplidos</div><div class="value">${habitsPct===null?"—":habitsPct+"%"}</div><div class="sub">${s.habitsDone}/${s.habitsTotal} hábitos de hoy</div></div>
-      <div class="kpi-card"><div class="label">Prioridades completadas</div><div class="value">${eisenPct===null?"—":eisenPct+"%"}</div><div class="sub">${s.eisenDone}/${s.eisenTotal} tareas</div></div>
-      <div class="kpi-card"><div class="label">Productividad / disciplina</div><div class="value">${s.pct===null?"—":s.pct+"%"}</div><div class="sub">hábitos + prioridades del día</div></div>
+      <div class="kpi-card" data-tip="Enfoque del día\nVictorias cumplidas de las 3 definidas">
+        <div class="label">Enfoque del día</div><div class="value" style="color:${focusCol};">${doneN}<small>/3</small></div><div class="sub">${focusSub}</div></div>
+      <div class="kpi-card" data-tip="Carga cognitiva\nTareas excepcionales activas (sin canceladas ni reprogramadas)">
+        <div class="label">Carga cognitiva</div><div class="value" style="color:${load.c};font-size:24px;">${load.t}</div><div class="sub">${n} tarea${n===1?"":"s"} fuera de rutina</div></div>
+      <div class="kpi-card" data-tip="Bloques fijos respetados\nMarca cada bloque con ✓ al cumplirlo">
+        <div class="label">Bloques fijos respetados</div><div class="value" style="color:${bPct===null?"var(--text)":progressColor(bPct)};">${bPct===null?"—":bPct+"%"}</div><div class="sub">${blocks.length?`${bDone}/${blocks.length} bloques`:"sin bloques este día"}</div></div>
+      <div class="kpi-card">
+        <div class="label">Tiempo operativo restante</div><div class="value" style="font-size:22px;">${opVal}</div><div class="sub">${opSub}</div></div>
     `;
   }
 
+  /* ---- Heatmap semanal de capacidad operativa ---- */
   function renderProdTrend(){
     const wrap = document.getElementById("prodBars");
-    wrap.innerHTML = "";
-    for(let i=13;i>=0;i--){
-      const d = dateFromOffset(-i);
-      const key = todayKey(d);
-      const s = computeDayProductivity(key);
-      const pct = s.pct===null ? 0 : s.pct;
-      const bar = document.createElement("div");
-      bar.className = "prod-bar" + (s.pct!==null ? " has-data" : "");
-      bar.style.height = Math.max(4, pct*0.6) + "px";
-      bar.title = `${d.toLocaleDateString("es-PE",{day:"numeric",month:"short"})}: ${s.pct===null?"sin datos":pct+"%"}`;
-      wrap.appendChild(bar);
+    const today = startOfToday();
+    const mon0 = getWeekStart(today);
+    const order = [1,2,3,4,5,6,0], letters = ["L","M","X","J","V","S","D"];
+    const sums=[0,0,0,0,0,0,0], cnt=[0,0,0,0,0,0,0];
+    const rows = [];
+    for(let w=7; w>=0; w--){
+      const start = new Date(mon0); start.setDate(start.getDate()-7*w);
+      const cells = [];
+      for(let i=0;i<7;i++){
+        const d = new Date(start); d.setDate(d.getDate()+i);
+        const key = todayKey(d);
+        const future = d>today;
+        const sc = future ? {pct:null} : computeDayProductivity(key);
+        if(!future && sc.pct!==null && key!==todayKey(today)){ sums[d.getDay()]+=sc.pct; cnt[d.getDay()]++; }
+        cells.push({d, key, future, pct:sc.pct});
+      }
+      rows.push({start, cells});
     }
-    const hardest = computeHardestWeekdayProductivity();
+    const tot = cnt.reduce((a,b)=>a+b,0);
+    const overall = tot ? sums.reduce((a,b)=>a+b,0)/tot : null;
+    const avgs = sums.map((v,i)=>cnt[i]? Math.round(v/cnt[i]) : null);
+    const warnDays = [];
+    order.forEach(i=>{ if(avgs[i]!==null && cnt[i]>=2 && overall!==null && avgs[i] <= overall-10) warnDays.push(i); });
+
+    let html = `<div class="cap-grid"><span></span>${order.map((d,i)=>`<div class="cap-h ${warnDays.includes(d)?"warn":""}">${letters[i]}</div>`).join("")}`;
+    rows.forEach(r=>{
+      html += `<span class="cap-wk">${r.start.toLocaleDateString("es-PE",{day:"numeric",month:"short"})}</span>`;
+      order.forEach(wd=>{
+        const c = r.cells.find(x=>x.d.getDay()===wd);
+        const warn = warnDays.includes(wd) ? " warn" : "";
+        const lbl = c.d.toLocaleDateString("es-PE",{weekday:"long",day:"numeric",month:"short"});
+        if(c.future) { html += `<div class="cap-cell empty${warn}" style="outline-style:none;"></div>`; return; }
+        if(c.pct===null){ html += `<div class="cap-cell${warn}" style="opacity:.4;" data-tip="${lbl}\nsin datos"></div>`; return; }
+        html += `<div class="cap-cell${warn}" style="background:${progressColor(c.pct)};opacity:${(.35+.65*c.pct/100).toFixed(2)};" data-tip="${lbl}\nCapacidad: ${c.pct}%">${c.pct}</div>`;
+      });
+    });
+    html += `<span class="cap-wk cap-avg">prom.</span>${order.map(wd=>`<div class="cap-h cap-avg ${warnDays.includes(wd)?"warn":""}">${avgs[wd]===null?"—":avgs[wd]+"%"}</div>`).join("")}</div>`;
+    wrap.innerHTML = html;
+
     const line = document.getElementById("prodInsightLine");
-    line.textContent = hardest
-      ? `📉 Sueles rendir menos los ${hardest.weekday} — ${hardest.rate}% de productividad promedio (últimas 8 semanas).`
-      : "";
+    if(warnDays.length){
+      const names = warnDays.map(d=>WEEKDAY_NAMES[d]).join(" y ");
+      const worst = warnDays.slice().sort((a,b)=>avgs[a]-avgs[b])[0];
+      line.innerHTML = `<span style="color:#f59e0b;">⚠</span> Caída de capacidad los <b style="color:var(--text);">${names}</b>: ${avgs[worst]}% de promedio (${WEEKDAY_NAMES[worst]}) frente a ${Math.round(overall)}% general.`;
+    } else {
+      line.textContent = overall!==null ? `Capacidad estable entre días · promedio ${Math.round(overall)}%.` : "";
+    }
   }
 
   /* ================= PERÍODOS: SEMANA / MES / TRIMESTRE / AÑO ================= */
@@ -2541,7 +4059,7 @@
   function renderAgenda(){
     document.getElementById("dateLabel").textContent = fmtDateLabel(currentDate);
     renderTimeline();
-    renderEisen();
+    renderRocks();
     renderAgendaKPIs();
     renderProdTrend();
   }
@@ -2625,10 +4143,316 @@
     renderJournalView();
   }
 
+  /* ================= CUENTA Y SINCRONIZACIÓN ================= */
+  const SYNC_UI = {
+    local:   {t:"Solo este dispositivo", c:"#8f8f8f"},
+    signedout:{t:"Sin sesión", c:"#8f8f8f"},
+    pending: {t:"Cambios por enviar", c:"#f59e0b"},
+    syncing: {t:"Sincronizando…", c:"#f59e0b"},
+    ok:      {t:"Sincronizado", c:"#10b981"},
+    offline: {t:"Sin conexión", c:"#f59e0b"},
+    error:   {t:"Error de sincronización", c:"#ef4444"}
+  };
+  function setSync(st){
+    cloud.status = st;
+    const u = SYNC_UI[st] || SYNC_UI.local;
+    document.getElementById("syncText").textContent = u.t;
+    document.getElementById("syncDot").style.setProperty("--c", u.c);
+    document.getElementById("syncDot").className = "dot" + (st==="syncing" ? " pulse" : "");
+  }
+  function metaKey(){ return "panel_cloud_"+(cloud.user?cloud.user.uid:"x"); }
+  function loadMeta(){ try{ const m=JSON.parse(localStorage.getItem(metaKey())||"null"); cloud.baseRev = m && typeof m.baseRev==="number" ? m.baseRev : -1; cloud.dirty = !!(m&&m.dirty); }catch(e){ cloud.baseRev=-1; cloud.dirty=false; } }
+  function saveMeta(){ try{ localStorage.setItem(metaKey(), JSON.stringify({baseRev:cloud.baseRev, dirty:cloud.dirty})); }catch(e){} }
+
+  function isObjV(x){ return x && typeof x==="object" && !Array.isArray(x); }
+  // Combina nube y local: une claves; en conflicto de valores simples gana lo local; listas con id se unen por id
+  function mergeVal(r, l){
+    if(isObjV(r) && isObjV(l)){
+      const o = Object.assign({}, r);
+      Object.keys(l).forEach(k=>{ o[k] = (k in r) ? mergeVal(r[k], l[k]) : l[k]; });
+      return o;
+    }
+    if(Array.isArray(r) && Array.isArray(l)){
+      const hasId = a=>a.length>0 && a.every(x=>isObjV(x) && x.id!==undefined);
+      if(hasId(r) && hasId(l)){
+        const out = r.slice();
+        l.forEach(x=>{ const i = out.findIndex(y=>y.id===x.id); if(i>=0) out[i] = mergeVal(out[i], x); else out.push(x); });
+        return out;
+      }
+      return l.length>=r.length ? l : r;
+    }
+    return l===undefined ? r : l;
+  }
+  function stateHasData(st){
+    return (st.habits&&st.habits.length>0) || Object.keys(st.journal||{}).length>0 || Object.keys(st.agenda||{}).length>0
+      || Object.keys(st.bigRocks||{}).length>0;
+  }
+  function applyRemoteState(obj){
+    cloud.applying = true;
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
+      state = load();
+      applyAccent(); applyBackground(); buildSettingsUI(); renderAll();
+    } finally { cloud.applying = false; }
+  }
+  function isEditing(){
+    const a = document.activeElement;
+    return !!(a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) && !a.closest("#authScreen"));
+  }
+
+  function cloudTouch(){
+    if(!cloud.on || !cloud.user || cloud.applying) return;
+    cloud.dirty = true; cloud.seq++; saveMeta();
+    setSync(navigator.onLine ? "pending" : "offline");
+    clearTimeout(cloud.timer);
+    cloud.timer = setTimeout(cloudPush, 1500);
+  }
+  async function cloudPush(){
+    if(!cloud.on || !cloud.user || !cloud.ref) return;
+    if(cloud.pushing){ cloud.again = true; return; }
+    if(!navigator.onLine){ setSync("offline"); scheduleRetry(); return; }
+    cloud.pushing = true; setSync("syncing");
+    const seqAtStart = cloud.seq;
+    try{
+      let out = {};
+      await cloud.db.runTransaction(async (tx)=>{
+        const snap = await tx.get(cloud.ref);
+        const remote = snap.exists ? snap.data() : null;
+        let toWrite = state, rev = 1; out = {};
+        if(remote){
+          rev = (remote.rev||0) + 1;
+          if((remote.rev||0) !== cloud.baseRev){
+            toWrite = mergeVal(JSON.parse(remote.json), state);
+            out.merged = toWrite;
+          }
+        }
+        const json = JSON.stringify(toWrite);
+        if(json.length > 900000) throw new Error("Tus datos superan el límite de la nube (1 MB). Haz un respaldo y limpia registros antiguos.");
+        tx.set(cloud.ref, {json, rev, device:cloud.deviceId, updatedAt:Date.now()});
+        out.rev = rev;
+      });
+      cloud.baseRev = out.rev;
+      if(out.merged) applyRemoteState(out.merged);
+      if(cloud.seq===seqAtStart) cloud.dirty = false;
+      saveMeta();
+      setSync(cloud.dirty ? "pending" : "ok");
+    }catch(e){
+      console.error("sync", e);
+      setSync(navigator.onLine ? "error" : "offline");
+      if(e && /1 MB/.test(e.message||"")) toast(e.message);
+      scheduleRetry();
+    } finally {
+      cloud.pushing = false;
+      if(cloud.again || (cloud.dirty && cloud.status==="pending")){ cloud.again=false; clearTimeout(cloud.timer); cloud.timer=setTimeout(cloudPush,800); }
+    }
+  }
+  function scheduleRetry(){
+    clearTimeout(cloud.retry);
+    cloud.retry = setTimeout(()=>{ if(cloud.user && cloud.dirty) cloudPush(); else if(cloud.user) cloudCheck(); }, 15000);
+  }
+
+  function incomingRemote(r){
+    if(isEditing()){ cloud.pendingRemote = r; return; }
+    cloud.pendingRemote = null;
+    const rs = JSON.parse(r.json);
+    cloud.baseRev = r.rev;
+    if(cloud.dirty){
+      applyRemoteState(mergeVal(rs, state));
+      cloud.dirty = false; cloudTouch();
+    } else {
+      saveMeta(); applyRemoteState(rs); setSync("ok");
+    }
+    toast("☁ Actualizado desde tu otro dispositivo");
+  }
+  document.addEventListener("focusout", ()=>{
+    if(cloud.pendingRemote) setTimeout(()=>{ if(cloud.pendingRemote && !isEditing()) incomingRemote(cloud.pendingRemote); }, 400);
+  });
+
+  async function cloudCheck(){
+    if(!cloud.on || !cloud.user || !cloud.ref || !navigator.onLine) return;
+    try{
+      const snap = await cloud.ref.get({source:"server"});
+      if(snap.exists){ const r = snap.data(); if((r.rev||0) > cloud.baseRev) incomingRemote(r); else if(!cloud.dirty) setSync("ok"); }
+    }catch(e){ setSync("offline"); }
+  }
+
+  async function cloudInitialSync(){
+    setSync("syncing");
+    let snap;
+    try{ snap = await cloud.ref.get({source:"server"}); }
+    catch(e){ setSync(navigator.onLine ? "error" : "offline"); scheduleRetry(); return; }
+    if(!snap.exists){
+      cloud.baseRev = 0; cloud.dirty = true; cloudPush(); return;   // cuenta nueva: sube los datos de este dispositivo
+    }
+    const r = snap.data(), rs = JSON.parse(r.json);
+    const neverSynced = cloud.baseRev === -1;
+    if(neverSynced && stateHasData(state) && stateHasData(rs)){
+      const combine = confirm("Este dispositivo ya tiene datos y tu cuenta también.\n\nAceptar = COMBINAR ambos.\nCancelar = usar SOLO los de tu cuenta (se descartan los de este dispositivo).");
+      cloud.baseRev = r.rev;
+      if(combine){ applyRemoteState(mergeVal(rs, state)); cloud.dirty=false; cloudTouch(); }
+      else { applyRemoteState(rs); cloud.dirty=false; saveMeta(); setSync("ok"); }
+      return;
+    }
+    if(neverSynced && stateHasData(state) && !stateHasData(rs)){
+      cloud.baseRev = r.rev; cloud.dirty = true; cloudPush(); return;
+    }
+    if(r.rev > cloud.baseRev){
+      if(cloud.dirty){ cloud.baseRev = r.rev; applyRemoteState(mergeVal(rs, state)); cloud.dirty=false; cloudTouch(); }
+      else { cloud.baseRev = r.rev; applyRemoteState(rs); saveMeta(); setSync("ok"); }
+      return;
+    }
+    if(cloud.dirty){ cloudPush(); } else setSync("ok");
+  }
+  function attachListener(){
+    if(cloud.unsub) cloud.unsub();
+    cloud.unsub = cloud.ref.onSnapshot(snap=>{
+      if(!snap.exists || (snap.metadata && snap.metadata.hasPendingWrites)) return;
+      const r = snap.data();
+      if((r.rev||0) <= cloud.baseRev) return;
+      incomingRemote(r);
+    }, err=>{ console.error(err); setSync("error"); });
+  }
+
+  /* ---- Pantalla de acceso ---- */
+  let authMode = "in";
+  const AUTH_ERR = {
+    "auth/invalid-email":"El correo no es válido.",
+    "auth/missing-password":"Escribe tu contraseña.",
+    "auth/invalid-credential":"Correo o contraseña incorrectos.",
+    "auth/wrong-password":"Correo o contraseña incorrectos.",
+    "auth/user-not-found":"Correo o contraseña incorrectos.",
+    "auth/email-already-in-use":"Ese correo ya tiene una cuenta. Inicia sesión.",
+    "auth/weak-password":"La contraseña es muy corta (mínimo 6 caracteres).",
+    "auth/too-many-requests":"Demasiados intentos. Espera unos minutos.",
+    "auth/network-request-failed":"Sin conexión a internet.",
+    "auth/operation-not-supported-in-this-environment":"Abre el panel desde su dirección web (https), no como archivo."
+  };
+  function authMsg(text, ok){ const e=document.getElementById("authErr"); e.textContent=text||""; e.className="auth-err"+(ok?" ok":""); }
+  function setAuthMode(m){
+    authMode = m;
+    document.getElementById("authTabIn").classList.toggle("on", m==="in");
+    document.getElementById("authTabUp").classList.toggle("on", m==="up");
+    document.getElementById("authSubmit").textContent = m==="in" ? "Entrar" : "Crear mi cuenta";
+    document.getElementById("authPw").autocomplete = m==="in" ? "current-password" : "new-password";
+    authMsg("");
+  }
+  document.getElementById("authTabIn").addEventListener("click", ()=>setAuthMode("in"));
+  document.getElementById("authTabUp").addEventListener("click", ()=>setAuthMode("up"));
+  document.getElementById("authPwToggle").addEventListener("click", ()=>{
+    const i = document.getElementById("authPw"); i.type = i.type==="password" ? "text" : "password";
+  });
+  async function authSubmit(){
+    if(!cloud.on) return;
+    const email = document.getElementById("authEmail").value.trim(), pw = document.getElementById("authPw").value;
+    if(!email || !pw){ authMsg("Escribe tu correo y contraseña."); return; }
+    const btn = document.getElementById("authSubmit"); btn.disabled = true; authMsg("");
+    try{
+      if(authMode==="in") await cloud.auth.signInWithEmailAndPassword(email, pw);
+      else await cloud.auth.createUserWithEmailAndPassword(email, pw);
+    }catch(e){ authMsg(AUTH_ERR[e.code] || ("No se pudo continuar: "+(e.message||e.code))); }
+    finally{ btn.disabled = false; }
+  }
+  document.getElementById("authSubmit").addEventListener("click", authSubmit);
+  ["authEmail","authPw"].forEach(id=>document.getElementById(id).addEventListener("keydown", e=>{ if(e.key==="Enter") authSubmit(); }));
+  document.getElementById("authForgot").addEventListener("click", async (e)=>{
+    e.preventDefault();
+    const email = document.getElementById("authEmail").value.trim();
+    if(!email){ authMsg("Escribe tu correo arriba y vuelve a pulsar «¿Olvidaste tu contraseña?»."); return; }
+    try{ await cloud.auth.sendPasswordResetEmail(email); authMsg("Te enviamos un correo para restablecer tu contraseña (revisa spam).", true); }
+    catch(err){ authMsg(AUTH_ERR[err.code] || "No se pudo enviar el correo."); }
+  });
+  document.getElementById("authSkip").addEventListener("click", (e)=>{
+    e.preventDefault(); document.getElementById("authScreen").style.display = "none"; setSync("local");
+  });
+
+  async function onAuth(user){
+    cloud.user = user;
+    if(!user){
+      if(cloud.unsub){ cloud.unsub(); cloud.unsub = null; }
+      cloud.ref = null; setSync("signedout");
+      document.getElementById("accountBox").style.display = "none";
+      document.getElementById("authScreen").style.display = "flex";
+      return;
+    }
+    document.getElementById("authScreen").style.display = "none";
+    document.getElementById("authPw").value = "";
+    cloud.ref = cloud.db.doc(`users/${user.uid}/app/state`);
+    loadMeta();
+    document.getElementById("accountBox").style.display = "block";
+    document.getElementById("accountEmail").textContent = user.email || "";
+    await cloudInitialSync();
+    attachListener();
+  }
+  document.getElementById("syncPill").addEventListener("click", ()=>{
+    if(!cloud.on){ toast(FIREBASE_CONFIG.apiKey ? "No se pudo conectar con la nube. Revisa tu conexión." : "Modo local: configura Firebase para activar la cuenta (ver guía)."); return; }
+    if(!cloud.user){ document.getElementById("authScreen").style.display="flex"; return; }
+    cloudCheck().then(()=>{ if(cloud.dirty) cloudPush(); });
+  });
+  document.getElementById("syncNowBtn").addEventListener("click", ()=>{ cloudCheck().then(()=>{ cloudPush(); }); toast("Sincronizando…"); });
+  document.getElementById("resetPwBtn").addEventListener("click", async ()=>{
+    if(!cloud.user || !cloud.user.email) return;
+    try{ await cloud.auth.sendPasswordResetEmail(cloud.user.email); toast("Te enviamos un correo para cambiar tu contraseña"); }
+    catch(e){ toast("No se pudo enviar el correo"); }
+  });
+  document.getElementById("logoutBtn").addEventListener("click", async ()=>{
+    if(cloud.dirty && !navigator.onLine){ if(!confirm("Tienes cambios sin enviar y no hay conexión: se perderían al cerrar sesión. ¿Cerrar igualmente?")) return; }
+    else if(cloud.dirty){ await cloudPush(); }
+    if(!confirm("Se cerrará la sesión y se borrará la copia de datos de este dispositivo (siguen guardados en tu cuenta). ¿Continuar?")) return;
+    try{ await cloud.auth.signOut(); }catch(e){}
+    try{ localStorage.removeItem(STORAGE_KEY); localStorage.removeItem(metaKey()); }catch(e){}
+    location.reload();
+  });
+  window.addEventListener("online", ()=>{ if(cloud.user){ if(cloud.dirty) cloudPush(); else cloudCheck(); } });
+  window.addEventListener("offline", ()=>{ if(cloud.user) setSync("offline"); });
+  document.addEventListener("visibilitychange", ()=>{ if(!document.hidden && cloud.user) cloudCheck(); });
+
+  function loadScript(src){
+    return new Promise((res,rej)=>{ const s=document.createElement("script"); s.src=src; s.onload=res; s.onerror=()=>rej(new Error("No se pudo cargar "+src)); document.head.appendChild(s); });
+  }
+  async function initCloud(){
+    if(!FIREBASE_CONFIG.apiKey){ setSync("local"); return; }
+    try{
+      const base = "https://www.gstatic.com/firebasejs/10.12.2/";
+      await loadScript(base+"firebase-app-compat.js");
+      await loadScript(base+"firebase-auth-compat.js");
+      await loadScript(base+"firebase-firestore-compat.js");
+      firebase.initializeApp(FIREBASE_CONFIG);
+      cloud.auth = firebase.auth(); cloud.db = firebase.firestore();
+      cloud.on = true;
+      cloud.auth.onAuthStateChanged(onAuth);
+    }catch(e){
+      console.error(e); setSync("offline");
+    }
+  }
+
+  /* ---- Instalable en el celular (ícono y manifiesto generados) ---- */
+  function setupPWA(){
+    try{
+      const draw = (size)=>{
+        const c = document.createElement("canvas"); c.width = c.height = size; const g = c.getContext("2d");
+        g.fillStyle = "#0a0b0e"; g.fillRect(0,0,size,size);
+        g.fillStyle = state.settings.accent || "#ef4444"; g.beginPath(); g.arc(size/2, size/2, size*0.34, 0, Math.PI*2); g.fill();
+        g.fillStyle = "#fff"; g.font = `700 ${size*0.36}px sans-serif`; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText("P", size/2, size/2+size*0.02);
+        return c.toDataURL("image/png");
+      };
+      const i180 = draw(180);
+      document.getElementById("appIcon").href = i180;
+      document.getElementById("appleIcon").href = i180;
+      const manifest = { name:"Panel TDHA", short_name:"Panel", display:"standalone", background_color:"#0a0b0e", theme_color:"#0a0b0e",
+        start_url: location.href.split("#")[0],
+        icons:[ {src:draw(192), sizes:"192x192", type:"image/png"}, {src:draw(512), sizes:"512x512", type:"image/png"} ] };
+      const l = document.createElement("link"); l.rel = "manifest";
+      l.href = URL.createObjectURL(new Blob([JSON.stringify(manifest)], {type:"application/manifest+json"}));
+      document.head.appendChild(l);
+    }catch(e){}
+  }
+
   applyAccent();
   applyBackground();
   buildSettingsUI();
   renderAll();
+  setupPWA();
+  initCloud();
 
 })();
 </script>
