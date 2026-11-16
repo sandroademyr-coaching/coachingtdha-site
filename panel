@@ -4239,10 +4239,11 @@
     offline: {t:"Sin conexión", c:"#f59e0b"},
     error:   {t:"Error de sincronización", c:"#ef4444"}
   };
+  function syncErr(e){ try{ if(e){ console.error("sync-detalle", e); const t = (e.code||"") + (e.message?": "+e.message:""); const el = document.getElementById("syncText"); el.title = t; cloud.lastErr = e.code || ""; } }catch(_){} }
   function setSync(st){
     cloud.status = st;
     const u = SYNC_UI[st] || SYNC_UI.local;
-    document.getElementById("syncText").textContent = u.t;
+    document.getElementById("syncText").textContent = u.t + ((st==="error" && cloud.lastErr) ? " · "+cloud.lastErr.replace("firestore/","").replace("auth/","") : "");
     document.getElementById("syncDot").style.setProperty("--c", u.c);
     document.getElementById("syncDot").className = "dot" + (st==="syncing" ? " pulse" : "");
   }
@@ -4323,7 +4324,7 @@
       saveMeta();
       setSync(cloud.dirty ? "pending" : "ok");
     }catch(e){
-      console.error("sync", e);
+      console.error("sync", e); syncErr(e);
       setSync(navigator.onLine ? "error" : "offline");
       if(e && /1 MB/.test(e.message||"")) toast(e.message);
       scheduleRetry();
@@ -4366,7 +4367,7 @@
     setSync("syncing");
     let snap;
     try{ snap = await cloud.ref.get({source:"server"}); }
-    catch(e){ setSync(navigator.onLine ? "error" : "offline"); scheduleRetry(); return; }
+    catch(e){ syncErr(e); setSync(navigator.onLine ? "error" : "offline"); scheduleRetry(); return; }
     if(!snap.exists){
       cloud.baseRev = 0; cloud.dirty = true; cloudPush(); return;   // cuenta nueva: sube los datos de este dispositivo
     }
@@ -4396,7 +4397,7 @@
       const r = snap.data();
       if((r.rev||0) <= cloud.baseRev) return;
       incomingRemote(r);
-    }, err=>{ console.error(err); setSync("error"); });
+    }, err=>{ syncErr(err); setSync("error"); });
   }
 
   /* ---- Pantalla de acceso ---- */
