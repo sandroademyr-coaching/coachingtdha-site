@@ -4243,7 +4243,7 @@
   function setSync(st){
     cloud.status = st;
     const u = SYNC_UI[st] || SYNC_UI.local;
-    document.getElementById("syncText").textContent = u.t + ((st==="error" && cloud.lastErr) ? " · "+cloud.lastErr.replace("firestore/","").replace("auth/","") : "");
+    document.getElementById("syncText").textContent = u.t + (((st==="error"||st==="offline") && cloud.lastErr) ? " · "+cloud.lastErr.replace("firestore/","").replace("auth/","") : "");
     document.getElementById("syncDot").style.setProperty("--c", u.c);
     document.getElementById("syncDot").className = "dot" + (st==="syncing" ? " pulse" : "");
   }
@@ -4506,10 +4506,12 @@
       await loadScript(base+"firebase-firestore-compat.js");
       firebase.initializeApp(FIREBASE_CONFIG);
       cloud.auth = firebase.auth(); cloud.db = firebase.firestore();
+      // Redes, antivirus o proveedores que cortan el streaming de Firestore: usar long-polling (más compatible)
+      try{ cloud.db.settings({ experimentalForceLongPolling: true, useFetchStreams: false, merge: true }); }catch(e){ console.warn("settings", e); }
       cloud.on = true;
       cloud.auth.onAuthStateChanged(onAuth);
     }catch(e){
-      console.error(e); setSync("offline");
+      console.error(e); cloud.lastErr = "no carga Firebase"; setSync("offline");
     }
   }
 
