@@ -1192,6 +1192,10 @@
       </div>
     </div>
     <div class="field">
+      <label>Días de descanso (no cuentan como falla)</label>
+      <div id="habitRestInput" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+    </div>
+    <div class="field">
       <label>Meta semanal (días)</label>
       <select id="habitTargetInput">
         <option value="1">1 día</option><option value="2">2 días</option><option value="3">3 días</option>
@@ -1666,6 +1670,16 @@
     document.getElementById("habitPhaseField").style.display = am ? "" : "none";
   }
   document.getElementById("habitTimeframeInput").addEventListener("change", togglePhaseField);
+  let restSel = [];
+  function buildRestChips(){
+    const g=document.getElementById("habitRestInput"); g.innerHTML="";
+    [["L",1],["M",2],["X",3],["J",4],["V",5],["S",6],["D",0]].forEach(([n,i])=>{
+      const b=document.createElement("button"); b.type="button";
+      b.className="jtag"+(restSel.indexOf(i)>=0?" sel":""); b.textContent=n;
+      b.addEventListener("click",()=>{ const p=restSel.indexOf(i); if(p>=0) restSel.splice(p,1); else restSel.push(i); buildRestChips(); });
+      g.appendChild(b);
+    });
+  }
   function openHabitModal(habit){
     editingHabitId = habit ? habit.id : null;
     document.getElementById("habitModalTitle").textContent = habit ? "Editar hábito" : "Nuevo hábito";
@@ -1676,6 +1690,7 @@
     document.getElementById("habitTimeframeInput").value = habit ? (habit.timeframe || guessTimeframe(habit.name)) : "am";
     document.getElementById("habitPhaseInput").value = habit ? (habit.phase || "") : "";
     togglePhaseField();
+    restSel = habit ? restDaysOf(habit).slice() : []; buildRestChips();
     selectedEmoji = habit ? habit.icon : EMOJIS[0];
     selectedColor = habit ? habit.color : ACCENTS[0];
     document.getElementById("deleteHabitBtn").style.display = habit ? "inline-flex" : "none";
@@ -1721,9 +1736,9 @@
     if(pillar && otherPillars>=3){ toast("Ya tienes 3 hábitos pilar. Quita uno para marcar este."); return; }
     if(editingHabitId){
       const h = state.habits.find(x=>x.id===editingHabitId);
-      h.name=name; h.icon=selectedEmoji; h.color=selectedColor; h.target=target; h.tier=tier; h.pillar=pillar; h.timeframe=timeframe; h.phase=phase;
+      h.name=name; h.icon=selectedEmoji; h.color=selectedColor; h.target=target; h.tier=tier; h.pillar=pillar; h.timeframe=timeframe; h.phase=phase; h.restDays=restSel.slice();
     } else {
-      state.habits.push({ id:uid(), name, icon:selectedEmoji, color:selectedColor, target, tier, pillar, timeframe, phase, createdAt:todayKey(), logs:{} });
+      state.habits.push({ id:uid(), name, icon:selectedEmoji, color:selectedColor, target, tier, pillar, timeframe, phase, restDays:restSel.slice(), createdAt:todayKey(), logs:{} });
     }
     save(); closeHabitModal(); renderHabits();
   });
@@ -1742,6 +1757,11 @@
     return arr;
   }
   function isDayDisabled(key){ return !!state.disabledDays[key]; }
+  // Días de descanso por hábito (0=domingo…6=sábado). Ejercicios: domingo por defecto.
+  function restDaysOf(h){ return Array.isArray(h.restDays) ? h.restDays : (/ejercic/i.test(h.name||"") ? [0] : []); }
+  function isRest(h,key){ const rd=restDaysOf(h); return rd.length>0 && !h.logs[key] && rd.indexOf(new Date(key+"T00:00:00").getDay())>=0; }
+  function isOffFor(h,key){ return isDayDisabled(key) || isRest(h,key); }
+  function countRestInRange(h,start,end){ let c=0; for(let d=new Date(start); d<=end; d.setDate(d.getDate()+1)){ const k=todayKey(d); if(!isDayDisabled(k) && isRest(h,k)) c++; } return c; }
   function countDisabledInRange(start, end){
     let count=0;
     for(let d=new Date(start); d<=end; d.setDate(d.getDate()+1)){
@@ -1768,12 +1788,12 @@
     const start = getHabitStart(habit);
     const tKey = todayKey(d);
     // si hoy no está registrado y no es día libre, empezamos a contar desde ayer (todavía tiene tiempo hoy)
-    if(!habit.logs[tKey] && !isDayDisabled(tKey)){ d.setDate(d.getDate()-1); }
+    if(!habit.logs[tKey] && !isOffFor(habit,tKey)){ d.setDate(d.getDate()-1); }
     let guard = 0;
     while(d>=start && guard<3660){
       const key = todayKey(d);
       if(habit.logs[key]){ streak++; d.setDate(d.getDate()-1); guard++; continue; }
-      if(isDayDisabled(key)){ d.setDate(d.getDate()-1); guard++; continue; } // día libre: no rompe la racha
+      if(isOffFor(habit,key)){ d.setDate(d.getDate()-1); guard++; continue; } // día libre: no rompe la racha
       break;
     }
     return streak;
@@ -1785,13 +1805,13 @@
     for(let d=new Date(start); d<=now; d.setDate(d.getDate()+1)){
       const key = todayKey(d);
       if(habit.logs[key]){ cur++; best=Math.max(best,cur); }
-      else if(!isDayDisabled(key)){ cur=0; }
+      else if(!isOffFor(habit,key)){ cur=0; }
       // si es día libre, la racha se mantiene (no suma ni se rompe)
     }
     return best;
   }
   function weeklyRate(habit){
-    const days = last7Dates().filter(d=>!isDayDisabled(todayKey(d)));
+    const days = last7Dates().filter(d=>!isOffFor(habit,todayKey(d)));
     const done = days.filter(d=>habit.logs[todayKey(d)]).length;
     const denom = Math.max(1, Math.min(habit.target, days.length || habit.target));
     return Math.min(100, Math.round((done / denom) * 100));
@@ -1841,7 +1861,7 @@
     const y=now.getFullYear(), m=now.getMonth();
     const monthStart = new Date(y,m,1);
     const rawDaysInMonth = now.getDate();
-    const daysInMonthSoFar = Math.max(1, rawDaysInMonth - countDisabledInRange(monthStart, now));
+    const daysInMonthSoFar = Math.max(1, rawDaysInMonth - countDisabledInRange(monthStart, now) - countRestInRange(h, monthStart, now));
     let monthDone=0;
     Object.keys(h.logs).forEach(k=>{
       if(h.logs[k]){
@@ -1883,7 +1903,7 @@
     let total=0, done=0;
     for(let d=new Date(from); d<=end; d.setDate(d.getDate()+1)){
       const key = todayKey(d);
-      if(isDayDisabled(key)) continue;
+      if(isOffFor(habit,key)) continue;
       total++;
       if(habit.logs[key]) done++;
     }
@@ -1923,7 +1943,7 @@
       let run = 0;
       for(let d=new Date(from); d<today; d.setDate(d.getDate()+1)){
         const key = todayKey(d);
-        if(isDayDisabled(key)) continue;
+        if(isOffFor(h,key)) continue;
         if(h.logs[key]){ run++; continue; }
         if(run>=3 && d>=winStart){ events.push({habit:h, len:run, date:new Date(d)}); perWeekday[d.getDay()]++; }
         run = 0;
@@ -1944,10 +1964,10 @@
         const d = new Date(today); d.setDate(d.getDate()-i);
         if(d<hs) break;
         const k = todayKey(d);
-        if(isDayDisabled(k) || h.logs[k]) continue;
+        if(isOffFor(h,k) || h.logs[k]) continue;
         const n = new Date(d); n.setDate(n.getDate()+1);
         let nk = todayKey(n), guard=0;
-        while(isDayDisabled(nk) && guard<4){ n.setDate(n.getDate()+1); nk=todayKey(n); guard++; }
+        while(isOffFor(h,nk) && guard<4){ n.setDate(n.getDate()+1); nk=todayKey(n); guard++; }
         misses++; if(h.logs[nk]) bounces++;
       }
     });
@@ -1963,7 +1983,7 @@
       const k = todayKey(d);
       if(isDayDisabled(k)) continue;
       const isToday = k===todayKey(today);
-      const all = pillars.every(h=>h.logs[k]);
+      const all = pillars.every(h=>h.logs[k] || isRest(h,k));
       if(all) count++;
       if(!isToday || all) elapsed++;
     }
@@ -2064,12 +2084,12 @@
   }
   function causeTotals(habits, n){
     const c={dopamina:0,energia:0,multitasking:0,tiempo:0};
-    habits.forEach(h=>{ if(!h.causes) return; daysBack(n).forEach(d=>{ const k=todayKey(d); if(!h.logs[k] && c[h.causes[k]]!==undefined) c[h.causes[k]]++; }); });
+    habits.forEach(h=>{ if(!h.causes) return; daysBack(n).forEach(d=>{ const k=todayKey(d); if(!h.logs[k] && !isRest(h,k) && c[h.causes[k]]!==undefined) c[h.causes[k]]++; }); });
     return c;
   }
   function askCause(h, key, evt){
     const tKey = todayKey(startOfToday());
-    if(key>=tKey || isDayDisabled(key)) return;
+    if(key>=tKey || isOffFor(h,key)) return;
     closeCausePop();
     const pop = document.createElement("div");
     pop.className = "cause-pop"; pop.id = "causePop";
@@ -2183,6 +2203,7 @@
     const cells = days30.map(d=>{
       const k = todayKey(d); let cls="", txt="";
       if(isDayDisabled(k)){ cls="off"; txt="día libre"; }
+      else if(isRest(h,k)){ cls="off"; txt="descanso"; }
       else if(d<hs){ cls="pre"; txt="antes del seguimiento"; }
       else if(h.logs[k]){ cls="done"; txt="cumplido"+(h.slots&&h.slots[k]?" · "+h.slots[k].toUpperCase():""); }
       else if(k===tk){ txt="pendiente"; }
@@ -2202,7 +2223,7 @@
       <div class="slot-bar"><span style="width:auto;min-width:150px;">${CAUSES[k].short}</span><i style="width:${ct[k]/ctot*40}%;background:${CAUSES[k].color};"></i>${ct[k]}</div>`).join("")
       : `<div class="empty-note">Aún sin causas. Elige el motivo al marcar un día como incumplido o en el registro.</div>`;
 
-    const rows = daysBack(14).filter(d=>{ const k=todayKey(d); return d>=hs && !isDayDisabled(k) && !(k===tk && !h.logs[k]); }).map(d=>{
+    const rows = daysBack(14).filter(d=>{ const k=todayKey(d); return d>=hs && !isDayDisabled(k) && !isRest(h,k) && !(k===tk && !h.logs[k]); }).map(d=>{
       const k = todayKey(d);
       if(h.logs[k]){
         const sl = h.slots && h.slots[k];
@@ -2363,7 +2384,7 @@
     for(let d=new Date(first); d<=last; d.setDate(d.getDate()+1)){
       const k = todayKey(d);
       if(isDayDisabled(k)) continue;
-      const act = state.habits.filter(h=>getHabitStart(h)<=d);
+      const act = state.habits.filter(h=>getHabitStart(h)<=d && !isRest(h,k));
       if(!act.length) continue;
       const pct = act.filter(h=>h.logs[k]).length/act.length*100;
       if(pct>=80) c.elite++; else if(pct>=50) c.mant++; else c.fuga++;
@@ -2388,7 +2409,7 @@
     const body = state.habits.map(h=>{
       const hs = getHabitStart(h);
       const flags = [];
-      daysBack(18).reverse().forEach(d=>{ const k=todayKey(d); if(d>=hs && !isDayDisabled(k) && todayKey(d)!==todayKey(startOfToday())) flags.push(h.logs[k]?1:0); });
+      daysBack(18).reverse().forEach(d=>{ const k=todayKey(d); if(d>=hs && !isOffFor(h,k) && todayKey(d)!==todayKey(startOfToday())) flags.push(h.logs[k]?1:0); });
       const last = flags.slice(-16);
       const vals = last.map((_,i)=>{ const w=last.slice(Math.max(0,i-2), i+1); return w.reduce((a,b)=>a+b,0)/w.length; }).slice(-14);
       const r14 = rateLastDays(h,14);
@@ -2415,7 +2436,7 @@
         let aDone=0,aTot=0,bDone=0,bTot=0;
         days.forEach(d=>{
           const k=todayKey(d);
-          if(isDayDisabled(k) || d<getHabitStart(P) || d<getHabitStart(H)) return;
+          if(isOffFor(P,k) || isOffFor(H,k) || d<getHabitStart(P) || d<getHabitStart(H)) return;
           if(P.logs[k]){ aTot++; if(H.logs[k]) aDone++; } else { bTot++; if(H.logs[k]) bDone++; }
         });
         if(aTot<8 || bTot<8) return;
@@ -2479,7 +2500,7 @@
       let total=0, done=0;
       for(let d=new Date(rangeStart); d<=effectiveEnd; d.setDate(d.getDate()+1)){
         const key = todayKey(d);
-        if(isDayDisabled(key)) continue;
+        if(isOffFor(habit,key)) continue;
         total++;
         if(habit.logs[key]) done++;
       }
@@ -2707,7 +2728,7 @@
       const d = new Date(today); d.setDate(d.getDate()-i);
       const key = todayKey(d);
       if(isDayDisabled(key)) continue;
-      const active = state.habits.filter(h=>getHabitStart(h)<=d);
+      const active = state.habits.filter(h=>getHabitStart(h)<=d && !isRest(h,key));
       if(!active.length) continue;
       const wd = d.getDay();
       const done = active.filter(h=>h.logs[key]).length;
@@ -2884,8 +2905,8 @@
         const key = todayKey(d);
         const isToday = key===tKey;
         const done = !!h.logs[key];
-        const off = isDayDisabled(key);
-        const title = off ? `${d.toLocaleDateString('es-PE',{weekday:'short',day:'numeric'})} · día libre` : d.toLocaleDateString('es-PE',{weekday:'short',day:'numeric'});
+        const off = isOffFor(h,key);
+        const title = off ? `${d.toLocaleDateString('es-PE',{weekday:'short',day:'numeric'})} · ${isDayDisabled(key)?"día libre":"descanso"}` : d.toLocaleDateString('es-PE',{weekday:'short',day:'numeric'});
         return `<div class="week-dot ${done?"done":""} ${isToday?"today":""} ${off?"off":""}" data-date="${key}" title="${title}"></div>`;
       }).join("");
 
@@ -2954,8 +2975,9 @@
       const key = todayKey(d);
       const off = isDayDisabled(key);
       let done=0;
-      state.habits.forEach(h=>{ if(h.logs[key]) done++; });
-      const ratio = state.habits.length ? done/state.habits.length : 0;
+      const hmAct = state.habits.filter(h=>!isRest(h,key));
+      hmAct.forEach(h=>{ if(h.logs[key]) done++; });
+      const ratio = hmAct.length ? done/hmAct.length : 0;
       const cell = document.createElement("div");
       cell.className = "hm-cell" + (off ? " off" : "");
       cell.title = off
@@ -3601,7 +3623,7 @@
 
   function computeDayProductivity(dateKey){
     const dayOff = isDayDisabled(dateKey);
-    const trackedHabits = dayOff ? [] : state.habits;
+    const trackedHabits = dayOff ? [] : state.habits.filter(h=>!isRest(h,dateKey));
     const habitsTotal = trackedHabits.length;
     const habitsDone = trackedHabits.filter(h=>h.logs[dateKey]).length;
 
@@ -4228,13 +4250,13 @@
     const pct = Math.round(p.habitsDone/p.habitsTotal*100);
     const hab = re => state.habits.find(h=>re.test(normName(h.name)));
     const est = hab(/estudi/), abs = hab(/abstin/), mov = hab(/movil|celular|pantalla/);
-    const pillars = state.habits.filter(h=>h.pillar), pDone = pillars.filter(h=>h.logs[key]).length;
+    const pillars = state.habits.filter(h=>h.pillar), pDone = pillars.filter(h=>h.logs[key]||isRest(h,key)).length;
     const pAll = pillars.length>0 && pDone===pillars.length;
     const p23 = pillars.length===0 || pDone/pillars.length >= 2/3 - 1e-9;
     const rocks = (state.bigRocks[key]||[]).filter(r=>String(r.text||"").trim()), rDone = rocks.filter(r=>r.done).length;
     // estado
     let status;
-    if(pct<50 || (est && abs && !est.logs[key] && !abs.logs[key])) status = "fuga";
+    if(pct<50 || (est && abs && !est.logs[key] && !abs.logs[key] && !isRest(est,key) && !isRest(abs,key))) status = "fuga";
     else if(pct<60) status = "disperso";
     else if(rocks.length>0 && rDone===0) status = "disperso";         // fallaste las prioridades pese a cumplir hábitos
     else if(pct>=80 && pAll && rDone>=2) status = "flujo";
@@ -4242,11 +4264,11 @@
     else status = "disperso";
     // fugas
     const tags = [];
-    if(est && !est.logs[key]) tags.push("Bloque Estudio");
-    if(abs && !abs.logs[key]) tags.push("Ventana 7:30–9:00 AM");
-    if(mov && !mov.logs[key]) tags.push("Celular / Pantalla");
+    if(est && !est.logs[key] && !isRest(est,key)) tags.push("Bloque Estudio");
+    if(abs && !abs.logs[key] && !isRest(abs,key)) tags.push("Ventana 7:30–9:00 AM");
+    if(mov && !mov.logs[key] && !isRest(mov,key)) tags.push("Celular / Pantalla");
     if(!rocks.length) tags.push("Sin Big Rocks");
-    if(!tags.length && pAll && (!abs || abs.logs[key])) tags.push(J_NOLEAK);
+    if(!tags.length && pAll && (!abs || abs.logs[key] || isRest(abs,key))) tags.push(J_NOLEAK);
     // logros para sugerir en "lo que movió la aguja"
     const wins = rocks.filter(r=>r.done).map(r=>String(r.text).trim()).concat(pillars.filter(h=>h.logs[key]).map(h=>h.name+" ✓"));
     return { status, tags, wins,
@@ -4260,7 +4282,7 @@
 
   /* ---- KPIs ---- */
   function jAmRate(key){
-    const am = state.habits.filter(h=>h.timeframe==="am");
+    const am = state.habits.filter(h=>h.timeframe==="am" && !isRest(h,key));
     if(!am.length || isDayDisabled(key)) return null;
     return am.filter(h=>h.logs[key]).length / am.length * 100;
   }
