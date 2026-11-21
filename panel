@@ -765,6 +765,11 @@
   .rule-banner button{background:transparent;border:none;color:var(--text-dim);cursor:pointer;font-size:15px;}
   .jd-sec{margin-top:16px;} .jd-sec .k{font-size:11px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;color:var(--text-dim);margin-bottom:5px;}
   .jd-sec .v{font-size:13.5px;line-height:1.55;white-space:pre-wrap;}
+  .jauto{font-size:11.5px;color:var(--text-dim);margin-top:8px;line-height:1.5;display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+  .jauto:empty{display:none;}
+  .jmanual{font-size:10.5px;border:1px solid rgba(245,158,11,.5);color:#f5c26b;border-radius:999px;padding:1px 8px;}
+  .jchip{background:transparent;border:1px dashed var(--border);color:var(--text-dim);border-radius:999px;padding:4px 11px;font-size:11.5px;cursor:pointer;font-family:inherit;}
+  .jchip:hover{border-color:var(--accent);color:var(--accent);}
   @media(max-width:920px){.jpills{grid-template-columns:repeat(2,1fr);}}
 </style>
 </head>
@@ -1102,14 +1107,17 @@
 
       <div class="aar-label">Estado ejecutivo del día</div>
       <div class="jpills" id="jStatus"></div>
+      <div class="jauto" id="jAutoHint"></div>
 
       <div class="aar-label">Auditoría de fuga · la verdad sin filtro</div>
       <div class="aar-q">¿Dónde cedí el control o evadí lo incómodo hoy?</div>
       <div class="jtags" id="jLeakTags"></div>
+      <div class="jauto" id="jTagHint"></div>
       <textarea class="journal-textarea" id="jLeak" rows="2" placeholder="Una o dos líneas. Sin justificaciones."></textarea>
 
       <div class="aar-label">Apalancamiento real · evidencia de ejecución</div>
       <div class="aar-q">¿Qué acción concreta sí movió la aguja hoy?</div>
+      <div class="jtags" id="jWinSuggest"></div>
       <textarea class="journal-textarea" id="jWin" rows="2" placeholder="Ej. Cerré la llamada con Carlos y envié la propuesta."></textarea>
 
       <div class="aar-label">Regla innegociable para mañana · 05:30 AM</div>
@@ -1554,6 +1562,7 @@
       document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
       btn.classList.add("active");
       document.getElementById("view-"+btn.dataset.view).classList.add("active");
+      if(btn.dataset.view==="journal") journalOnShow();
     });
   });
 
@@ -4207,9 +4216,42 @@
     disperso:  {icon:"⚠️", label:"Disperso",  hint:"Multitasking, baja energía",             score:2.5, col:"#f59e0b"},
     fuga:      {icon:"🛑",  label:"En Fuga",   hint:"Recaída o sabotaje en hábitos pilar",    score:1,   col:"#ef4444"}
   };
-  const J_TAGS = ["Ventana 7:30–9:00 AM","Bloque Estudio","Celular / Pantalla","Cero fugas"];
+  const J_TAGS = ["Ventana 7:30–9:00 AM","Bloque Estudio","Celular / Pantalla","Sin Big Rocks","Cero fugas"];
   const J_NOLEAK = "Cero fugas";
-  let jStatus = null, jTags = [], jFilter = "todos";
+  let jStatus = null, jTags = [], jFilter = "todos", jAuto = null, jDirty = false;
+
+  /* ---- autodiagnóstico: el estado y las fugas salen de tus datos del día ---- */
+  function jSuggest(key){
+    if(key > todayKey(new Date())) return null;                       // días futuros: sin sugerencia
+    const p = computeDayProductivity(key);
+    if(!p.habitsTotal) return null;                                   // día libre o sin hábitos
+    const pct = Math.round(p.habitsDone/p.habitsTotal*100);
+    const hab = re => state.habits.find(h=>re.test(normName(h.name)));
+    const est = hab(/estudi/), abs = hab(/abstin/), mov = hab(/movil|celular|pantalla/);
+    const pillars = state.habits.filter(h=>h.pillar), pDone = pillars.filter(h=>h.logs[key]).length;
+    const pAll = pillars.length>0 && pDone===pillars.length;
+    const p23 = pillars.length===0 || pDone/pillars.length >= 2/3 - 1e-9;
+    const rocks = (state.bigRocks[key]||[]).filter(r=>String(r.text||"").trim()), rDone = rocks.filter(r=>r.done).length;
+    // estado
+    let status;
+    if(pct<50 || (est && abs && !est.logs[key] && !abs.logs[key])) status = "fuga";
+    else if(pct<60) status = "disperso";
+    else if(rocks.length>0 && rDone===0) status = "disperso";         // fallaste las prioridades pese a cumplir hábitos
+    else if(pct>=80 && pAll && rDone>=2) status = "flujo";
+    else if(p23) status = "operativo";
+    else status = "disperso";
+    // fugas
+    const tags = [];
+    if(est && !est.logs[key]) tags.push("Bloque Estudio");
+    if(abs && !abs.logs[key]) tags.push("Ventana 7:30–9:00 AM");
+    if(mov && !mov.logs[key]) tags.push("Celular / Pantalla");
+    if(!rocks.length) tags.push("Sin Big Rocks");
+    if(!tags.length && pAll && (!abs || abs.logs[key])) tags.push(J_NOLEAK);
+    // logros para sugerir en "lo que movió la aguja"
+    const wins = rocks.filter(r=>r.done).map(r=>String(r.text).trim()).concat(pillars.filter(h=>h.logs[key]).map(h=>h.name+" ✓"));
+    return { status, tags, wins,
+      why: `${pct}% hábitos${pillars.length?` · ${pDone}/${pillars.length} pilares`:""} · ${rDone}/${rocks.length} victorias` };
+  }
 
   function journalKey(){ return todayKey(journalDate); }
   const jDay = (key, off) => { const d = new Date(key+"T00:00:00"); d.setDate(d.getDate()+off); return todayKey(d); };
@@ -4290,10 +4332,18 @@
       return `<button type="button" class="jpill ${jStatus===k?"sel":""}" data-st="${k}">${s.icon} ${s.label}<small>${s.hint}</small></button>`;
     }).join("");
     document.getElementById("jLeakTags").innerHTML = J_TAGS.map(t=>`<button type="button" class="jtag ${jTags.indexOf(t)>=0?"sel":""}" data-tag="${escHtml(t)}">${escHtml(t)}</button>`).join("");
+    const hint = document.getElementById("jAutoHint"), th = document.getElementById("jTagHint"), ws = document.getElementById("jWinSuggest");
+    if(jAuto){
+      const S = J_STATUS[jAuto.status], manual = jStatus && jStatus!==jAuto.status;
+      hint.innerHTML = `<span>Sugerido por tus datos: <b style="color:${S.col}">${S.icon} ${S.label}</b> · ${jAuto.why}</span>` +
+        (manual ? `<span class="jmanual">ajustado manualmente</span><button type="button" class="fin-mini" data-useauto>↺ usar sugerencia</button>` : "");
+      th.textContent = "Etiquetas encendidas según lo que marcaste hoy en Hábitos y Agenda. Si falta marcar algo, corrígelo allá y vuelve.";
+      ws.innerHTML = jAuto.wins.length ? `<span class="hint" style="align-self:center;">Sugerido:</span>` + jAuto.wins.map(w=>`<button type="button" class="jchip" data-win="${escHtml(w)}">+ ${escHtml(w.length>40?w.slice(0,38)+"…":w)}</button>`).join("") : "";
+    } else { hint.innerHTML = ""; th.textContent = ""; ws.innerHTML = ""; }
   }
   document.getElementById("jStatus").addEventListener("click", e=>{
     const b = e.target.closest("[data-st]"); if(!b) return;
-    jStatus = (jStatus===b.dataset.st) ? null : b.dataset.st; renderJournalForm();
+    jStatus = (jStatus===b.dataset.st) ? null : b.dataset.st; jDirty = true; renderJournalForm();
   });
   document.getElementById("jLeakTags").addEventListener("click", e=>{
     const b = e.target.closest("[data-tag]"); if(!b) return;
@@ -4301,11 +4351,23 @@
     if(i>=0) jTags.splice(i,1);
     else if(t===J_NOLEAK) jTags = [J_NOLEAK];
     else { jTags = jTags.filter(x=>x!==J_NOLEAK); jTags.push(t); }
-    renderJournalForm();
+    jDirty = true; renderJournalForm();
   });
+  document.getElementById("jAutoHint").addEventListener("click", e=>{
+    if(e.target.closest("[data-useauto]") && jAuto){ jStatus = jAuto.status; jDirty = true; renderJournalForm(); }
+  });
+  document.getElementById("jWinSuggest").addEventListener("click", e=>{
+    const c = e.target.closest("[data-win]"); if(!c) return;
+    const ta = document.getElementById("jWin"), line = "• " + c.dataset.win;
+    if(ta.value.indexOf(line)<0) ta.value = (ta.value.trim()? ta.value.trim()+"\n":"") + line;
+    jDirty = true;
+  });
+  ["jLeak","jWin","jRule"].forEach(id=>document.getElementById(id).addEventListener("input", ()=>{ jDirty = true; }));
   function loadJournalEntry(){
     const e = state.journal[journalKey()] || {};
-    jStatus = e.status || null; jTags = (e.leakTags||[]).slice();
+    jAuto = jSuggest(journalKey()); jDirty = false;
+    if(e.status){ jStatus = e.status; jTags = (e.leakTags||[]).slice(); }
+    else { jStatus = jAuto ? jAuto.status : null; jTags = jAuto ? jAuto.tags.slice() : []; }
     document.getElementById("jLeak").value = e.leak || "";
     document.getElementById("jWin").value = e.win || "";
     document.getElementById("jRule").value = e.rule || "";
@@ -4317,7 +4379,7 @@
     const leak = document.getElementById("jLeak").value.trim(), win = document.getElementById("jWin").value.trim(), rule = document.getElementById("jRule").value.trim();
     if(!jStatus && !leak && !win && !rule && !jTags.length){ toast("Elige tu estado o escribe algo antes de guardar"); return; }
     if(!jStatus){ toast("Elige tu estado del día (En Flujo, Operativo, Disperso o En Fuga)"); return; }
-    state.journal[key] = Object.assign({}, old, { status:jStatus, leakTags:jTags.slice(), leak, win, rule, updatedAt:new Date().toISOString() });
+    state.journal[key] = Object.assign({}, old, { status:jStatus, manual: !!(jAuto && jStatus!==jAuto.status), autoStatus: jAuto?jAuto.status:null, leakTags:jTags.slice(), leak, win, rule, updatedAt:new Date().toISOString() });
     save(); toast("Cierre guardado"); renderJournalView();
   });
   document.getElementById("journalPrevDay").addEventListener("click", ()=>{ journalDate.setDate(journalDate.getDate()-1); renderJournalView(); });
@@ -4341,7 +4403,7 @@
       const d = new Date(key+"T00:00:00");
       return `<div class="jcard" data-key="${key}">
         <div class="top"><div class="jc-date">${d.toLocaleDateString("es-PE",{weekday:"short",day:"numeric",month:"short"})}</div>
-          <div class="jc-st" style="${s?`color:${s.col};border-color:${s.col}55`:""}">${s?s.icon+" "+s.label:"📝 Nota"}</div></div>
+          <div class="jc-st" style="${s?`color:${s.col};border-color:${s.col}55`:""}">${s?s.icon+" "+s.label+(e.manual?" ✎":""):"📝 Nota"}</div></div>
         <div class="jc-pct">${pct===null?"—":pct+"% hábitos"}</div>
         ${e.rule?`<div class="jc-rule">→ ${escHtml(e.rule)}</div>`:""}
         <div class="jc-prev">${escHtml((e.leak||e.win||e.text||e.gratitude||"").slice(0,160))}</div></div>`;
@@ -4358,7 +4420,7 @@
     const sec = (k, v) => v ? `<div class="jd-sec"><div class="k">${k}</div><div class="v">${escHtml(v)}</div></div>` : "";
     document.getElementById("jDrawerBody").innerHTML = `
       <div class="so-head"><div><div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.03em;text-transform:capitalize;">${new Date(key+"T00:00:00").toLocaleDateString("es-PE",{weekday:"long",day:"numeric",month:"long"})}</div>
-        <div style="margin-top:4px;color:${s?s.col:"var(--text-dim)"};font-weight:600;">${s?s.icon+" "+s.label:"📝 Nota anterior"}</div></div>
+        <div style="margin-top:4px;color:${s?s.col:"var(--text-dim)"};font-weight:600;">${s?s.icon+" "+s.label:"📝 Nota anterior"}${e.manual?` <span class="jmanual">ajustado manualmente</span>`:""}</div></div>
         <button class="fin-mini" id="jDrawerClose">✕</button></div>
       <div class="aar-context"><span><b style="color:${pct===null?"var(--text-faint)":progressColor(pct)}">${pct===null?"—":pct+"%"}</b> hábitos (${p.habitsDone}/${p.habitsTotal})</span>
         ${rocks.length?`<span class="sep">·</span><span><b>${rocks.filter(r=>r.done).length}/${rocks.length}</b> victorias</span>`:""}</div>
@@ -4389,6 +4451,7 @@
     el.querySelector("button").onclick = ()=>{ try{ localStorage.setItem("panel_rule_hidden", today); }catch(e){} el.classList.remove("show"); };
   }
 
+  function journalOnShow(){ if(jDirty){ renderJournalKpis(); renderJournalContext(); } else renderJournalView(); }
   function renderJournalView(){
     document.getElementById("journalDateLabel").textContent = fmtDateLabel(journalDate);
     renderJournalKpis(); renderJournalContext(); loadJournalEntry(); renderJournalHistory(); renderRuleBanner();
