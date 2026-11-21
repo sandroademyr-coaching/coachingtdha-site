@@ -728,6 +728,44 @@
     .fin-kpis{grid-template-columns:repeat(2,1fr);}
     .fin-two{grid-template-columns:1fr;}
   }
+
+  /* ---------- Journal · bitácora AAR ---------- */
+  .j-kpis .kpi-card .value{font-size:24px;}
+  .j-kpis .kpi-card .sub{font-size:11.5px;color:var(--text-dim);margin-top:6px;line-height:1.4;}
+  .aar-card{margin-top:16px;border-radius:14px;padding:20px;background:linear-gradient(180deg,#171714,#131313);border:1px solid var(--border);box-shadow:0 18px 40px -22px rgba(0,0,0,.7);}
+  .aar-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.03em;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;}
+  .aar-title span{font-family:'IBM Plex Sans',sans-serif;font-size:11.5px;color:var(--text-faint);letter-spacing:0;}
+  .aar-context{margin:12px 0 4px;padding:10px 14px;border-radius:10px;background:var(--surface-2);border:1px solid var(--border);font-size:13px;display:flex;gap:6px 14px;flex-wrap:wrap;align-items:center;}
+  .aar-context b{color:var(--accent);} .aar-context .sep{color:var(--text-faint);}
+  .aar-label{margin:18px 0 6px;font-size:11px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;color:var(--text-dim);}
+  .aar-q{font-size:13.5px;margin-bottom:8px;}
+  .aar-card input[type=text]{width:100%;background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px 12px;font-size:13.5px;font-family:inherit;}
+  .aar-card input[type=text]:focus,.aar-card textarea:focus{outline:none;border-color:var(--accent);}
+  .jpills{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+  .jpill{background:transparent;border:1px solid var(--border);color:var(--text-dim);border-radius:10px;padding:10px 8px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;text-align:center;transition:.18s;}
+  .jpill small{display:block;font-weight:400;font-size:10.5px;color:var(--text-faint);margin-top:3px;line-height:1.3;}
+  .jpill:hover{border-color:var(--text-faint);color:var(--text);}
+  .jpill.sel{border-color:var(--accent);color:var(--text);background:var(--accent-soft);box-shadow:0 0 0 1px var(--accent),0 0 20px var(--accent-soft-2);}
+  .jtags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
+  .jtag{background:transparent;border:1px solid var(--border);color:var(--text-dim);border-radius:999px;padding:5px 12px;font-size:12px;cursor:pointer;font-family:inherit;transition:.15s;}
+  .jtag:hover{color:var(--text);border-color:var(--text-faint);}
+  .jtag.sel{border-color:var(--accent);color:var(--accent);background:var(--accent-soft);}
+  .jfilters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+  .jfeed{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px;perspective:900px;}
+  .jcard{background:linear-gradient(180deg,#171714,#131313);border:1px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;transition:transform .2s,box-shadow .2s,border-color .2s;}
+  .jcard:hover{transform:translateY(-4px) rotateX(2deg);border-color:rgba(255,255,255,.18);box-shadow:0 18px 30px -16px rgba(0,0,0,.8);}
+  .jcard .top{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+  .jcard .jc-date{font-size:12.5px;font-weight:600;text-transform:capitalize;}
+  .jcard .jc-st{font-size:11.5px;border:1px solid var(--border);border-radius:999px;padding:2px 9px;white-space:nowrap;}
+  .jcard .jc-pct{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-dim);margin-top:8px;}
+  .jcard .jc-rule{margin-top:8px;font-size:12.5px;line-height:1.45;color:var(--accent);}
+  .jcard .jc-prev{margin-top:6px;font-size:12px;color:var(--text-dim);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+  .rule-banner{margin:0 0 14px;padding:10px 14px;border-radius:11px;border:1px solid rgba(201,162,39,.4);background:var(--accent-soft);font-size:13px;display:none;align-items:center;gap:10px;}
+  .rule-banner.show{display:flex;} .rule-banner b{color:var(--accent);} .rule-banner span{flex:1;}
+  .rule-banner button{background:transparent;border:none;color:var(--text-dim);cursor:pointer;font-size:15px;}
+  .jd-sec{margin-top:16px;} .jd-sec .k{font-size:11px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;color:var(--text-dim);margin-bottom:5px;}
+  .jd-sec .v{font-size:13.5px;line-height:1.55;white-space:pre-wrap;}
+  @media(max-width:920px){.jpills{grid-template-columns:repeat(2,1fr);}}
 </style>
 </head>
 <body>
@@ -815,6 +853,7 @@
 </div>
 
 <main>
+  <div class="rule-banner" id="ruleBanner"></div>
 
   <!-- ============ VISTA HÁBITOS ============ -->
   <section class="view active" id="view-habitos">
@@ -1055,31 +1094,40 @@
       <button class="today-btn" id="journalGotoToday">Hoy</button>
     </div>
 
-    <div class="panel-box" style="margin-top:16px;">
-      <h3>Reflexión del día</h3>
-      <div class="field">
-        <label>¿Cómo te sientes hoy?</label>
-        <div class="emoji-grid" id="moodGrid"></div>
-      </div>
-      <div class="field">
-        <label>Reflexión / notas del día</label>
-        <textarea class="journal-textarea" id="journalText" rows="6"
-          placeholder="¿Qué pasó hoy? ¿Qué lograste, qué aprendiste, qué podrías mejorar mañana?"></textarea>
-      </div>
-      <div class="field" style="margin-bottom:0;">
-        <label>Gratitud del día</label>
-        <input type="text" id="journalGratitude" placeholder="Algo positivo o por lo que estás agradecido hoy">
-      </div>
-      <div style="display:flex;justify-content:flex-end;margin-top:16px;">
-        <button class="btn" id="saveJournalBtn">Guardar entrada</button>
+    <div class="kpi-grid j-kpis" id="jKpis" style="margin-top:16px;"></div>
+
+    <div class="aar-card">
+      <div class="aar-title">Bitácora de auditoría diaria <span>AAR · 90 segundos</span></div>
+      <div class="aar-context" id="jContext"></div>
+
+      <div class="aar-label">Estado ejecutivo del día</div>
+      <div class="jpills" id="jStatus"></div>
+
+      <div class="aar-label">Auditoría de fuga · la verdad sin filtro</div>
+      <div class="aar-q">¿Dónde cedí el control o evadí lo incómodo hoy?</div>
+      <div class="jtags" id="jLeakTags"></div>
+      <textarea class="journal-textarea" id="jLeak" rows="2" placeholder="Una o dos líneas. Sin justificaciones."></textarea>
+
+      <div class="aar-label">Apalancamiento real · evidencia de ejecución</div>
+      <div class="aar-q">¿Qué acción concreta sí movió la aguja hoy?</div>
+      <textarea class="journal-textarea" id="jWin" rows="2" placeholder="Ej. Cerré la llamada con Carlos y envié la propuesta."></textarea>
+
+      <div class="aar-label">Regla innegociable para mañana · 05:30 AM</div>
+      <div class="aar-q">¿Cuál es el único ajuste operativo al despertar?</div>
+      <input type="text" id="jRule" placeholder="Ej. Pies al piso al primer timbre, sin celular hasta terminar el estudio.">
+
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:16px;flex-wrap:wrap;">
+        <span class="hint" id="jSavedHint"></span>
+        <button class="btn" id="saveJournalBtn">Guardar cierre</button>
       </div>
     </div>
 
     <div class="section-title">
-      <h2>Entradas recientes</h2>
-      <span class="hint">toca una para abrirla</span>
+      <h2>Historial de patrones</h2>
+      <span class="hint">toca una tarjeta para ver el detalle</span>
     </div>
-    <div id="journalHistory" style="display:flex;flex-direction:column;gap:8px;"></div>
+    <div class="jfilters" id="jFilters"></div>
+    <div class="jfeed" id="journalHistory"></div>
   </section>
 
 </main>
@@ -1323,6 +1371,8 @@
 
 <div class="slide-overlay" id="slideOverlay"></div>
 <aside class="slide-over" id="slideOver" aria-label="Detalle del hábito"><div id="slideBody"></div></aside>
+<div class="slide-overlay" id="jOverlay"></div>
+<aside class="slide-over" id="jDrawer" aria-label="Detalle del cierre"><div id="jDrawerBody"></div></aside>
 <div class="rich-tip" id="richTip"></div>
 <div class="modal-overlay" id="backupModal">
   <div class="modal" style="max-width:560px;max-height:88vh;overflow-y:auto;">
@@ -4149,76 +4199,199 @@
     renderProdTrend();
   }
 
-  /* ================= JOURNAL ================= */
+  /* ================= JOURNAL · Bitácora de auditoría (AAR) ================= */
   let journalDate = new Date();
-  const MOODS = ["😀","🙂","😐","😕","😣","🔥","😴","🤩"];
-  let selectedMood = null;
+  const J_STATUS = {
+    flujo:     {icon:"⚡",  label:"En Flujo",  hint:"Control total, cero evasión",            score:5,   col:"#10b981"},
+    operativo: {icon:"⚙️", label:"Operativo", hint:"Cumplimiento estándar, sin extras",      score:4,   col:"#c9a227"},
+    disperso:  {icon:"⚠️", label:"Disperso",  hint:"Multitasking, baja energía",             score:2.5, col:"#f59e0b"},
+    fuga:      {icon:"🛑",  label:"En Fuga",   hint:"Recaída o sabotaje en hábitos pilar",    score:1,   col:"#ef4444"}
+  };
+  const J_TAGS = ["Ventana 7:30–9:00 AM","Bloque Estudio","Celular / Pantalla","Cero fugas"];
+  const J_NOLEAK = "Cero fugas";
+  let jStatus = null, jTags = [], jFilter = "todos";
 
   function journalKey(){ return todayKey(journalDate); }
+  const jDay = (key, off) => { const d = new Date(key+"T00:00:00"); d.setDate(d.getDate()+off); return todayKey(d); };
+  const jHas = key => !!(state.journal[key] && state.journal[key].status);
+  const jDayPct = key => { const p = computeDayProductivity(key); return p.habitsTotal ? Math.round(p.habitsDone/p.habitsTotal*100) : null; };
 
-  function buildMoodGrid(){
-    const g = document.getElementById("moodGrid");
-    g.innerHTML = "";
-    MOODS.forEach(m=>{
-      const el = document.createElement("div");
-      el.className = "emoji-opt" + (m===selectedMood ? " sel":"");
-      el.textContent = m;
-      el.addEventListener("click", ()=>{ selectedMood = m; buildMoodGrid(); });
-      g.appendChild(el);
-    });
+  /* ---- KPIs ---- */
+  function jAmRate(key){
+    const am = state.habits.filter(h=>h.timeframe==="am");
+    if(!am.length || isDayDisabled(key)) return null;
+    return am.filter(h=>h.logs[key]).length / am.length * 100;
+  }
+  function renderJournalKpis(){
+    const base = new Date(); base.setHours(0,0,0,0);
+    // 1) estado operativo promedio 7D
+    const sc = [];
+    for(let i=0;i<7;i++){ const k = jDay(todayKey(base), -i); if(jHas(k)) sc.push(J_STATUS[state.journal[k].status].score); }
+    const avgSc = sc.length ? sc.reduce((a,b)=>a+b,0)/sc.length : null;
+    // 2) racha de cierre nocturno
+    let streak = 0, k = todayKey(base); if(!jHas(k)) k = jDay(k,-1);
+    while(jHas(k)){ streak++; k = jDay(k,-1); }
+    // 3) fricción dominante del mes
+    const ym = journalKey().slice(0,7), tally = {};
+    Object.keys(state.journal).forEach(d=>{ if(d.slice(0,7)!==ym) return; (state.journal[d].leakTags||[]).forEach(t=>{ if(t!==J_NOLEAK) tally[t] = (tally[t]||0)+1; }); });
+    state.habits.forEach(h=>{ Object.keys(h.causes||{}).forEach(d=>{ if(d.slice(0,7)===ym && !h.logs[d] && CAUSES[h.causes[d]]){ const l = CAUSES[h.causes[d]].short; tally[l] = (tally[l]||0)+1; } }); });
+    const top = Object.keys(tally).sort((a,b)=>tally[b]-tally[a])[0];
+    // 4) impacto en el día siguiente (hábitos AM con / sin cierre la noche anterior)
+    const withC = [], without = [];
+    for(let i=1;i<=90;i++){
+      const d = jDay(todayKey(base), -i), r = jAmRate(d); if(r===null) continue;
+      (jHas(jDay(d,-1)) ? withC : without).push(r);
+    }
+    const mean = a => a.reduce((x,y)=>x+y,0)/a.length;
+    const enough = withC.length>=3 && without.length>=3;
+    const delta = enough ? Math.round(mean(withC)-mean(without)) : null;
+    const col = p => progressColor(p);
+    document.getElementById("jKpis").innerHTML = `
+      <div class="kpi-card" data-tip="Estado operativo promedio\\nEn Flujo=5 · Operativo=4 · Disperso=2.5 · En Fuga=1\\nPromedio de tus cierres de los últimos 7 días">
+        <div class="label">Estado operativo (7D)</div>
+        <div class="value" style="color:${avgSc===null?"var(--text-faint)":col(avgSc/5*100)}">${avgSc===null?"—":avgSc.toFixed(1)}<small> / 5</small></div>
+        <div class="sub">${sc.length?sc.length+" cierre"+(sc.length>1?"s":"")+" esta semana":"Aún sin cierres esta semana"}</div></div>
+      <div class="kpi-card" data-tip="Racha de cierre nocturno\\nDías seguidos con tu auditoría guardada">
+        <div class="label">Racha de cierre</div>
+        <div class="value" style="color:${streak>0?"var(--accent)":"var(--text-faint)"}">${streak>0?"🔥 "+streak:"0"}<small> día${streak===1?"":"s"}</small></div>
+        <div class="sub">Auditoría al terminar tu turno</div></div>
+      <div class="kpi-card" data-tip="Fricción dominante\\nEl sabotaje más repetido este mes (etiquetas de tus cierres + causas de hábitos fallados)">
+        <div class="label">Fricción dominante</div>
+        <div class="value" style="font-size:${top&&top.length>16?"15":"18"}px;line-height:1.25;color:${top?"#f59e0b":"var(--text-faint)"}">${top?escHtml(top):"—"}</div>
+        <div class="sub">${top?tally[top]+" vez"+(tally[top]>1?"es":"")+" en el mes":"Sin fricciones registradas este mes"}</div></div>
+      <div class="kpi-card" data-tip="Impacto en el día siguiente\\nDiferencia de cumplimiento de tus hábitos AM cuando cerraste la bitácora la noche anterior (últimos 90 días)">
+        <div class="label">Impacto día siguiente</div>
+        <div class="value" style="color:${delta===null?"var(--text-faint)":delta>=0?"#10b981":"#ef4444"}">${delta===null?"—":(delta>=0?"+":"")+delta}<small>${delta===null?"":" pts"}</small></div>
+        <div class="sub">${enough?"AM con cierre previo "+Math.round(mean(withC))+"% vs "+Math.round(mean(without))+"% sin cierre":"Necesita ≥3 días con y sin cierre"}</div></div>`;
   }
 
-  function loadJournalEntry(){
-    const entry = state.journal[journalKey()];
-    selectedMood = entry ? entry.mood : null;
-    document.getElementById("journalText").value = entry ? entry.text : "";
-    document.getElementById("journalGratitude").value = entry ? entry.gratitude : "";
-    buildMoodGrid();
+  /* ---- contexto automático (espejo de realidad) ---- */
+  function renderJournalContext(){
+    const key = journalKey(), p = computeDayProductivity(key);
+    const pct = p.habitsTotal ? Math.round(p.habitsDone/p.habitsTotal*100) : null;
+    const find = re => state.habits.find(h=>re.test(normName(h.name)));
+    const est = find(/estudi/), des = find(/descans/);
+    const mark = h => !h ? null : (h.logs[key] ? `<b style="color:#10b981">✓</b>` : `<b style="color:#ef4444">✗</b>`);
+    const rocks = (state.bigRocks[key]||[]).filter(r=>String(r.text||"").trim());
+    const parts = [
+      `<span>Resumen del día:</span>`,
+      `<span><b style="color:${pct===null?"var(--text-faint)":progressColor(pct)}">${pct===null?"—":pct+"%"}</b> hábitos</span>`
+    ];
+    if(est) parts.push(`<span class="sep">·</span><span>Estudio: ${mark(est)}</span>`);
+    if(des) parts.push(`<span class="sep">·</span><span>Descanso: ${mark(des)}</span>`);
+    parts.push(`<span class="sep">·</span><span>${rocks.length?`<b>${rocks.filter(r=>r.done).length}/${rocks.length}</b> victorias`:"sin victorias definidas"}</span>`);
+    document.getElementById("jContext").innerHTML = parts.join(" ");
   }
 
-  document.getElementById("saveJournalBtn").addEventListener("click", ()=>{
-    const key = journalKey();
-    const text = document.getElementById("journalText").value.trim();
-    const gratitude = document.getElementById("journalGratitude").value.trim();
-    if(!text && !gratitude && !selectedMood){ toast("Escribe algo antes de guardar"); return; }
-    state.journal[key] = { mood: selectedMood, text, gratitude, updatedAt: new Date().toISOString() };
-    save();
-    toast("Entrada guardada");
-    renderJournalHistory();
+  /* ---- formulario ---- */
+  function renderJournalForm(){
+    document.getElementById("jStatus").innerHTML = Object.keys(J_STATUS).map(k=>{
+      const s = J_STATUS[k];
+      return `<button type="button" class="jpill ${jStatus===k?"sel":""}" data-st="${k}">${s.icon} ${s.label}<small>${s.hint}</small></button>`;
+    }).join("");
+    document.getElementById("jLeakTags").innerHTML = J_TAGS.map(t=>`<button type="button" class="jtag ${jTags.indexOf(t)>=0?"sel":""}" data-tag="${escHtml(t)}">${escHtml(t)}</button>`).join("");
+  }
+  document.getElementById("jStatus").addEventListener("click", e=>{
+    const b = e.target.closest("[data-st]"); if(!b) return;
+    jStatus = (jStatus===b.dataset.st) ? null : b.dataset.st; renderJournalForm();
   });
-
+  document.getElementById("jLeakTags").addEventListener("click", e=>{
+    const b = e.target.closest("[data-tag]"); if(!b) return;
+    const t = b.dataset.tag, i = jTags.indexOf(t);
+    if(i>=0) jTags.splice(i,1);
+    else if(t===J_NOLEAK) jTags = [J_NOLEAK];
+    else { jTags = jTags.filter(x=>x!==J_NOLEAK); jTags.push(t); }
+    renderJournalForm();
+  });
+  function loadJournalEntry(){
+    const e = state.journal[journalKey()] || {};
+    jStatus = e.status || null; jTags = (e.leakTags||[]).slice();
+    document.getElementById("jLeak").value = e.leak || "";
+    document.getElementById("jWin").value = e.win || "";
+    document.getElementById("jRule").value = e.rule || "";
+    document.getElementById("jSavedHint").textContent = e.updatedAt ? "Guardado " + new Date(e.updatedAt).toLocaleString("es-PE",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}) : "";
+    renderJournalForm();
+  }
+  document.getElementById("saveJournalBtn").addEventListener("click", ()=>{
+    const key = journalKey(), old = state.journal[key] || {};
+    const leak = document.getElementById("jLeak").value.trim(), win = document.getElementById("jWin").value.trim(), rule = document.getElementById("jRule").value.trim();
+    if(!jStatus && !leak && !win && !rule && !jTags.length){ toast("Elige tu estado o escribe algo antes de guardar"); return; }
+    if(!jStatus){ toast("Elige tu estado del día (En Flujo, Operativo, Disperso o En Fuga)"); return; }
+    state.journal[key] = Object.assign({}, old, { status:jStatus, leakTags:jTags.slice(), leak, win, rule, updatedAt:new Date().toISOString() });
+    save(); toast("Cierre guardado"); renderJournalView();
+  });
   document.getElementById("journalPrevDay").addEventListener("click", ()=>{ journalDate.setDate(journalDate.getDate()-1); renderJournalView(); });
   document.getElementById("journalNextDay").addEventListener("click", ()=>{ journalDate.setDate(journalDate.getDate()+1); renderJournalView(); });
   document.getElementById("journalGotoToday").addEventListener("click", ()=>{ journalDate = new Date(); renderJournalView(); });
 
+  /* ---- historial de patrones ---- */
   function renderJournalHistory(){
+    const keys = Object.keys(state.journal).sort().reverse();
+    const fl = document.getElementById("jFilters");
+    fl.innerHTML = [["todos","Todos"]].concat(Object.keys(J_STATUS).map(k=>[k, J_STATUS[k].icon+" "+J_STATUS[k].label]))
+      .map(f=>`<button type="button" class="jtag ${jFilter===f[0]?"sel":""}" data-f="${f[0]}">${f[1]}</button>`).join("");
     const wrap = document.getElementById("journalHistory");
-    const keys = Object.keys(state.journal).sort().reverse().slice(0,14);
-    if(keys.length===0){
-      wrap.innerHTML = `<div class="empty-state" style="padding:34px 16px;"><div class="big">📔</div><p>Aún no tienes entradas de journal.</p></div>`;
+    const list = keys.filter(k=> jFilter==="todos" || state.journal[k].status===jFilter).slice(0,40);
+    if(!list.length){
+      wrap.innerHTML = `<div class="empty-state" style="padding:34px 16px;grid-column:1/-1;"><div class="big">📔</div><p>${keys.length?"Ningún día con este estado.":"Aún no tienes cierres guardados. El primero lo haces hoy en 90 segundos."}</p></div>`;
       return;
     }
-    wrap.innerHTML = "";
-    keys.forEach(key=>{
-      const e = state.journal[key];
+    wrap.innerHTML = list.map(key=>{
+      const e = state.journal[key], s = e.status && J_STATUS[e.status], pct = jDayPct(key);
       const d = new Date(key+"T00:00:00");
-      const card = document.createElement("div");
-      card.className = "journal-card";
-      card.innerHTML = `
-        <div class="mood">${e.mood || "📝"}</div>
-        <div style="flex:1;min-width:0;">
-          <div class="jc-date">${d.toLocaleDateString('es-PE',{weekday:'short',day:'numeric',month:'short'})}</div>
-          <div class="jc-preview">${(e.text || e.gratitude || "Sin notas").slice(0,140)}</div>
-        </div>`;
-      card.addEventListener("click", ()=>{ journalDate = new Date(key+"T00:00:00"); renderJournalView(); });
-      wrap.appendChild(card);
-    });
+      return `<div class="jcard" data-key="${key}">
+        <div class="top"><div class="jc-date">${d.toLocaleDateString("es-PE",{weekday:"short",day:"numeric",month:"short"})}</div>
+          <div class="jc-st" style="${s?`color:${s.col};border-color:${s.col}55`:""}">${s?s.icon+" "+s.label:"📝 Nota"}</div></div>
+        <div class="jc-pct">${pct===null?"—":pct+"% hábitos"}</div>
+        ${e.rule?`<div class="jc-rule">→ ${escHtml(e.rule)}</div>`:""}
+        <div class="jc-prev">${escHtml((e.leak||e.win||e.text||e.gratitude||"").slice(0,160))}</div></div>`;
+    }).join("");
+  }
+  document.getElementById("jFilters").addEventListener("click", e=>{ const b = e.target.closest("[data-f]"); if(!b) return; jFilter = b.dataset.f; renderJournalHistory(); });
+  document.getElementById("journalHistory").addEventListener("click", e=>{ const c = e.target.closest("[data-key]"); if(c) openJournalDrawer(c.dataset.key); });
+
+  /* ---- drawer de detalle ---- */
+  function openJournalDrawer(key){
+    const e = state.journal[key]; if(!e) return;
+    const s = e.status && J_STATUS[e.status], p = computeDayProductivity(key), pct = jDayPct(key);
+    const rocks = (state.bigRocks[key]||[]).filter(r=>String(r.text||"").trim());
+    const sec = (k, v) => v ? `<div class="jd-sec"><div class="k">${k}</div><div class="v">${escHtml(v)}</div></div>` : "";
+    document.getElementById("jDrawerBody").innerHTML = `
+      <div class="so-head"><div><div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.03em;text-transform:capitalize;">${new Date(key+"T00:00:00").toLocaleDateString("es-PE",{weekday:"long",day:"numeric",month:"long"})}</div>
+        <div style="margin-top:4px;color:${s?s.col:"var(--text-dim)"};font-weight:600;">${s?s.icon+" "+s.label:"📝 Nota anterior"}</div></div>
+        <button class="fin-mini" id="jDrawerClose">✕</button></div>
+      <div class="aar-context"><span><b style="color:${pct===null?"var(--text-faint)":progressColor(pct)}">${pct===null?"—":pct+"%"}</b> hábitos (${p.habitsDone}/${p.habitsTotal})</span>
+        ${rocks.length?`<span class="sep">·</span><span><b>${rocks.filter(r=>r.done).length}/${rocks.length}</b> victorias</span>`:""}</div>
+      ${(e.leakTags&&e.leakTags.length)?`<div class="jd-sec"><div class="k">Fugas marcadas</div><div class="jtags">${e.leakTags.map(t=>`<span class="jtag sel">${escHtml(t)}</span>`).join("")}</div></div>`:""}
+      ${sec("¿Dónde cedí el control?", e.leak)}${sec("Lo que movió la aguja", e.win)}
+      ${e.rule?`<div class="jd-sec"><div class="k">Regla para el día siguiente · 05:30 AM</div><div class="v" style="color:var(--accent);font-weight:600;">${escHtml(e.rule)}</div></div>`:""}
+      ${sec("Nota anterior", e.text)}${sec("Gratitud anterior", e.gratitude)}
+      <div style="display:flex;gap:8px;margin-top:22px;flex-wrap:wrap;">
+        <button class="btn" id="jDrawerEdit">Editar este día</button>
+        <button class="btn ghost" id="jDrawerDel">Eliminar</button></div>`;
+    document.getElementById("jDrawer").classList.add("open"); document.getElementById("jOverlay").classList.add("open");
+    document.getElementById("jDrawerClose").onclick = closeJournalDrawer;
+    document.getElementById("jDrawerEdit").onclick = ()=>{ journalDate = new Date(key+"T00:00:00"); closeJournalDrawer(); renderJournalView(); window.scrollTo({top:0,behavior:"smooth"}); };
+    document.getElementById("jDrawerDel").onclick = ()=>{ if(confirm("¿Eliminar esta entrada del journal?")){ delete state.journal[key]; save(); closeJournalDrawer(); renderJournalView(); } };
+  }
+  function closeJournalDrawer(){ document.getElementById("jDrawer").classList.remove("open"); document.getElementById("jOverlay").classList.remove("open"); }
+  document.getElementById("jOverlay").addEventListener("click", closeJournalDrawer);
+  document.addEventListener("keydown", e=>{ if(e.key==="Escape") closeJournalDrawer(); });
+
+  /* ---- recordatorio: la regla de ayer, visible al abrir el panel ---- */
+  function renderRuleBanner(){
+    const el = document.getElementById("ruleBanner"); if(!el) return;
+    const today = todayKey(new Date()), y = jDay(today,-1), rule = state.journal[y] && state.journal[y].rule;
+    let hidden = false; try{ hidden = localStorage.getItem("panel_rule_hidden") === today; }catch(e){}
+    if(!rule || hidden){ el.classList.remove("show"); return; }
+    el.innerHTML = `<span>🔔 <b>Tu regla de hoy · 05:30 AM:</b> ${escHtml(rule)}</span><button type="button" title="Ocultar por hoy">✕</button>`;
+    el.classList.add("show");
+    el.querySelector("button").onclick = ()=>{ try{ localStorage.setItem("panel_rule_hidden", today); }catch(e){} el.classList.remove("show"); };
   }
 
   function renderJournalView(){
     document.getElementById("journalDateLabel").textContent = fmtDateLabel(journalDate);
-    loadJournalEntry();
-    renderJournalHistory();
+    renderJournalKpis(); renderJournalContext(); loadJournalEntry(); renderJournalHistory(); renderRuleBanner();
   }
 
   /* ================= INIT ================= */
