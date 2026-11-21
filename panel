@@ -770,6 +770,17 @@
   .jmanual{font-size:10.5px;border:1px solid rgba(245,158,11,.5);color:#f5c26b;border-radius:999px;padding:1px 8px;}
   .jchip{background:transparent;border:1px dashed var(--border);color:var(--text-dim);border-radius:999px;padding:4px 11px;font-size:11.5px;cursor:pointer;font-family:inherit;}
   .jchip:hover{border-color:var(--accent);color:var(--accent);}
+  .jdump{margin-top:18px;border:1px dashed var(--border);border-radius:10px;background:rgba(255,255,255,.015);}
+  .jdump summary{cursor:pointer;padding:10px 14px;font-size:12.5px;color:var(--text-dim);list-style:none;display:flex;justify-content:space-between;gap:8px;}
+  .jdump summary::-webkit-details-marker{display:none;}
+  .jdump summary:hover{color:var(--text);} .jdump[open] summary{color:var(--accent);}
+  .jdump summary i{font-style:normal;font-size:11px;color:var(--text-faint);}
+  .jdump .jd-in{padding:0 14px 14px;}
+  .jdump textarea{min-height:0;}
+  .jcl{display:inline-flex;align-items:center;gap:4px;font-size:11px;border:1px solid rgba(201,162,39,.45);color:var(--accent);border-radius:999px;padding:1px 9px;}
+  .jpat{margin-top:10px;padding:9px 12px;border-radius:9px;background:var(--accent-soft);border:1px solid rgba(201,162,39,.35);font-size:12.5px;line-height:1.5;}
+  .jpat b{color:var(--accent);}
+  .jpat.soft{background:transparent;border-style:dashed;color:var(--text-dim);}
   @media(max-width:920px){.jpills{grid-template-columns:repeat(2,1fr);}}
 </style>
 </head>
@@ -1123,6 +1134,15 @@
       <div class="aar-label">Regla innegociable para mañana · 05:30 AM</div>
       <div class="aar-q">¿Cuál es el único ajuste operativo al despertar?</div>
       <input type="text" id="jRule" placeholder="Ej. Pies al piso al primer timbre, sin celular hasta terminar el estudio.">
+
+      <details class="jdump" id="jDump">
+        <summary><span>Contexto o descarga libre del día</span><i>Opcional · solo si pasó algo fuera de lo común</i></summary>
+        <div class="jd-in">
+          <textarea class="journal-textarea" id="jDumpText" rows="3" placeholder="Una pelea, una mala noticia, un pico de estrés, un gran logro… suéltalo sin filtro."></textarea>
+          <div class="jauto" id="jDumpTags"></div>
+          <div id="jDumpPattern"></div>
+        </div>
+      </details>
 
       <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:16px;flex-wrap:wrap;">
         <span class="hint" id="jSavedHint"></span>
@@ -2453,6 +2473,13 @@
         <span>Cuando cumples <b>${shortName(x.P)}</b>, <b>${shortName(x.H)}</b> sube a ${x.ra}% (vs ${x.rb}% cuando lo fallas).</span></div>`).join("")
       : `<div class="empty-note">Aún no hay un patrón claro. Se necesitan al menos 8 días cumplidos y 8 fallados por hábito en los últimos 90 días, con una diferencia de 15 puntos o más.</div>`;
     return `<div class="intel-card"><div class="intel-h"><b>🔗 Efecto dominó</b><span>${state.habits.some(h=>h.pillar)?"pilares → resto":"hábito → hábito"} · 90 días</span></div>${body}
+      ${(function(){
+        const pats = jClusters().map(c=>({c, r:jCross(c.id,60)})).filter(x=>x.r.n>=2).map(x=>({c:x.c, n:x.r.n, top:x.r.rows.filter(y=>y.drop>=15).slice(0,2)})).filter(x=>x.top.length);
+        if(!pats.length) return "";
+        return `<div class="so-note" style="margin-top:12px;color:var(--accent);font-weight:600;">Desde tu bitácora · 60 días</div>`+pats.map(x=>`
+          <div class="dom-item"><span class="bd" style="color:${COL.bad};">${x.c.icon}</span>
+          <span>Cuando registras <b>${x.c.label}</b> (${x.n}×): ${x.top.map(y=>`<b>${escHtml(shortName(y.h))}</b> ${y.er===0?"baja a 0%":"cae "+y.drop+" pts"}`).join(" y ")} en las siguientes 24 h.</span></div>`).join("");
+      })()}
       <div class="so-note">Correlación, no causa: muestra qué hábitos suelen caer o subir juntos.</div></div>`;
   }
 
@@ -4242,6 +4269,58 @@
   const J_NOLEAK = "Cero fugas";
   let jStatus = null, jTags = [], jFilter = "todos", jAuto = null, jDirty = false;
 
+  /* ---- clústeres de palabras clave (análisis local, sin APIs) ---- */
+  function jClusters(){ return [
+    {id:"rel",  tag:"#Relación", label:"Relación / Pareja",   icon:"💬", w:["pele","discusi","discut","pareja","molest","tension","distanci","reclam","novia","novio","esposa","esposo"], ph:[]},
+    {id:"trab", tag:"#Trabajo",  label:"Carga Laboral",       icon:"💼", w:["estres","llamada","turno","saturad","cliente","presion","jefe","reunion"], ph:[]},
+    {id:"fis",  tag:"#Físico",   label:"Físico / Biología",   icon:"🫀", w:["dolor","enferm","agotad","pesad","insomni","cansad","migrana","fiebre"], ph:["mal dormid","dormi mal","no dormi","poco sueno"]},
+    {id:"ent",  tag:"#Entorno",  label:"Entorno / Desorden",  icon:"🌀", w:["visita","sali","desorden","celular","redes","ruido","tiktok","instagram"], ph:[]}
+  ]; }
+  function jDetect(text){
+    const n = normName(text); if(!n.trim()) return [];
+    const toks = n.split(/[^a-z0-9ñ]+/).filter(Boolean);
+    return jClusters().filter(c=> c.w.some(st=>toks.some(t=>t.indexOf(st)===0)) || c.ph.some(p=>n.indexOf(p)>=0)).map(c=>c.id);
+  }
+  function jCluster(id){ return jClusters().find(c=>c.id===id); }
+  function jEntryCtx(e){ return e ? jDetect((e.dump||"")+" "+(e.leak||"")) : []; }
+  // cruce: hábitos del día del evento y del siguiente vs. tu línea base de 60 días
+  function jCross(cid, days){
+    days = days||60;
+    const today = startOfToday(), tk = todayKey(today);
+    const lo = new Date(today); lo.setDate(lo.getDate()-days);
+    const loK = todayKey(lo);
+    const evDays = Object.keys(state.journal).filter(k=>k>=loK && k<tk && jEntryCtx(state.journal[k]).indexOf(cid)>=0);
+    if(evDays.length<2) return {n:evDays.length, rows:[]};
+    const obs = new Set();
+    evDays.forEach(k=>{ obs.add(k); const nk=jDay(k,1); if(nk<tk) obs.add(nk); });
+    const rows = [];
+    state.habits.forEach(h=>{
+      let ea=0,et=0,ba=0,bt=0;
+      for(let d=new Date(lo); d<today; d.setDate(d.getDate()+1)){
+        const k=todayKey(d); if(d<getHabitStart(h) || isOffFor(h,k)) continue;
+        if(obs.has(k)){ et++; if(h.logs[k]) ea++; } else { bt++; if(h.logs[k]) ba++; }
+      }
+      if(et<3 || bt<7) return;
+      const er=Math.round(ea/et*100), br=Math.round(ba/bt*100);
+      rows.push({h, er, br, drop:br-er});
+    });
+    rows.sort((a,b)=>b.drop-a.drop);
+    return {n:evDays.length, rows};
+  }
+  function jPatternHtml(cid){
+    const c = jCluster(cid), r = jCross(cid,60);
+    if(r.n<2) return `<div class="jpat soft">${c.icon} <b>${c.label}</b>: aún ${r.n} de 2 registros previos en 60 días para cruzarlo con tus hábitos.</div>`;
+    const top = r.rows.filter(x=>x.drop>=15).slice(0,2);
+    if(!top.length) return `<div class="jpat soft">${c.icon} <b>${c.label}</b>: ${r.n} registros en 60 días y tus hábitos no muestran una caída clara (≥15 pts) en ese día ni al siguiente.</div>`;
+    const txt = top.map(x=>`<b>${escHtml(shortName(x.h))}</b> ${x.er===0?"baja a 0%":"cae "+x.drop+" pts"}${x.er===0?"":" ("+x.br+"% → "+x.er+"%)"}`).join(" y ");
+    return `<div class="jpat">🔎 <b>Patrón detectado:</b> en los últimos 60 días, cuando registras <b>${c.label}</b> (${r.n} veces), ${txt} ese día y el siguiente.</div>`;
+  }
+  function renderDumpLive(){
+    const ids = jDetect(document.getElementById("jDumpText").value+" "+document.getElementById("jLeak").value);
+    document.getElementById("jDumpTags").innerHTML = ids.length ? `<span class="hint">Detectado:</span>`+ids.map(i=>{const c=jCluster(i);return `<span class="jcl">${c.icon} ${c.tag}</span>`;}).join("") : "";
+    document.getElementById("jDumpPattern").innerHTML = ids.map(jPatternHtml).join("");
+  }
+
   /* ---- autodiagnóstico: el estado y las fugas salen de tus datos del día ---- */
   function jSuggest(key){
     if(key > todayKey(new Date())) return null;                       // días futuros: sin sugerencia
@@ -4384,7 +4463,7 @@
     if(ta.value.indexOf(line)<0) ta.value = (ta.value.trim()? ta.value.trim()+"\n":"") + line;
     jDirty = true;
   });
-  ["jLeak","jWin","jRule"].forEach(id=>document.getElementById(id).addEventListener("input", ()=>{ jDirty = true; }));
+  ["jLeak","jWin","jRule","jDumpText"].forEach(id=>document.getElementById(id).addEventListener("input", ()=>{ jDirty = true; if(id==="jLeak"||id==="jDumpText") renderDumpLive(); }));
   function loadJournalEntry(){
     const e = state.journal[journalKey()] || {};
     jAuto = jSuggest(journalKey()); jDirty = false;
@@ -4393,15 +4472,19 @@
     document.getElementById("jLeak").value = e.leak || "";
     document.getElementById("jWin").value = e.win || "";
     document.getElementById("jRule").value = e.rule || "";
+    document.getElementById("jDumpText").value = e.dump || "";
+    document.getElementById("jDump").open = !!e.dump;
+    renderDumpLive();
     document.getElementById("jSavedHint").textContent = e.updatedAt ? "Guardado " + new Date(e.updatedAt).toLocaleString("es-PE",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}) : "";
     renderJournalForm();
   }
   document.getElementById("saveJournalBtn").addEventListener("click", ()=>{
     const key = journalKey(), old = state.journal[key] || {};
     const leak = document.getElementById("jLeak").value.trim(), win = document.getElementById("jWin").value.trim(), rule = document.getElementById("jRule").value.trim();
-    if(!jStatus && !leak && !win && !rule && !jTags.length){ toast("Elige tu estado o escribe algo antes de guardar"); return; }
+    const dump = document.getElementById("jDumpText").value.trim();
+    if(!jStatus && !leak && !win && !rule && !dump && !jTags.length){ toast("Elige tu estado o escribe algo antes de guardar"); return; }
     if(!jStatus){ toast("Elige tu estado del día (En Flujo, Operativo, Disperso o En Fuga)"); return; }
-    state.journal[key] = Object.assign({}, old, { status:jStatus, manual: !!(jAuto && jStatus!==jAuto.status), autoStatus: jAuto?jAuto.status:null, leakTags:jTags.slice(), leak, win, rule, updatedAt:new Date().toISOString() });
+    state.journal[key] = Object.assign({}, old, { status:jStatus, manual: !!(jAuto && jStatus!==jAuto.status), autoStatus: jAuto?jAuto.status:null, leakTags:jTags.slice(), leak, win, rule, dump, ctx:jDetect(dump+" "+leak), updatedAt:new Date().toISOString() });
     save(); toast("Cierre guardado"); renderJournalView();
   });
   document.getElementById("journalPrevDay").addEventListener("click", ()=>{ journalDate.setDate(journalDate.getDate()-1); renderJournalView(); });
@@ -4412,12 +4495,14 @@
   function renderJournalHistory(){
     const keys = Object.keys(state.journal).sort().reverse();
     const fl = document.getElementById("jFilters");
+    const ctxCount = {}; keys.forEach(k=>jEntryCtx(state.journal[k]).forEach(c=>{ ctxCount[c]=(ctxCount[c]||0)+1; }));
     fl.innerHTML = [["todos","Todos"]].concat(Object.keys(J_STATUS).map(k=>[k, J_STATUS[k].icon+" "+J_STATUS[k].label]))
+      .concat(jClusters().filter(c=>ctxCount[c.id]).map(c=>["c:"+c.id, c.tag+" · "+ctxCount[c.id]]))
       .map(f=>`<button type="button" class="jtag ${jFilter===f[0]?"sel":""}" data-f="${f[0]}">${f[1]}</button>`).join("");
     const wrap = document.getElementById("journalHistory");
-    const list = keys.filter(k=> jFilter==="todos" || state.journal[k].status===jFilter).slice(0,40);
+    const list = keys.filter(k=> jFilter==="todos" || (jFilter.indexOf("c:")===0 ? jEntryCtx(state.journal[k]).indexOf(jFilter.slice(2))>=0 : state.journal[k].status===jFilter)).slice(0,40);
     if(!list.length){
-      wrap.innerHTML = `<div class="empty-state" style="padding:34px 16px;grid-column:1/-1;"><div class="big">📔</div><p>${keys.length?"Ningún día con este estado.":"Aún no tienes cierres guardados. El primero lo haces hoy en 90 segundos."}</p></div>`;
+      wrap.innerHTML = `<div class="empty-state" style="padding:34px 16px;grid-column:1/-1;"><div class="big">📔</div><p>${keys.length?"Ningún día con este filtro.":"Aún no tienes cierres guardados. El primero lo haces hoy en 90 segundos."}</p></div>`;
       return;
     }
     wrap.innerHTML = list.map(key=>{
@@ -4427,8 +4512,9 @@
         <div class="top"><div class="jc-date">${d.toLocaleDateString("es-PE",{weekday:"short",day:"numeric",month:"short"})}</div>
           <div class="jc-st" style="${s?`color:${s.col};border-color:${s.col}55`:""}">${s?s.icon+" "+s.label+(e.manual?" ✎":""):"📝 Nota"}</div></div>
         <div class="jc-pct">${pct===null?"—":pct+"% hábitos"}</div>
+        ${jEntryCtx(e).length?`<div class="jtags" style="margin:8px 0 0;">${jEntryCtx(e).map(i=>`<span class="jcl">${jCluster(i).tag}</span>`).join("")}</div>`:""}
         ${e.rule?`<div class="jc-rule">→ ${escHtml(e.rule)}</div>`:""}
-        <div class="jc-prev">${escHtml((e.leak||e.win||e.text||e.gratitude||"").slice(0,160))}</div></div>`;
+        <div class="jc-prev">${escHtml((e.dump||e.leak||e.win||e.text||e.gratitude||"").slice(0,160))}</div></div>`;
     }).join("");
   }
   document.getElementById("jFilters").addEventListener("click", e=>{ const b = e.target.closest("[data-f]"); if(!b) return; jFilter = b.dataset.f; renderJournalHistory(); });
@@ -4448,6 +4534,8 @@
         ${rocks.length?`<span class="sep">·</span><span><b>${rocks.filter(r=>r.done).length}/${rocks.length}</b> victorias</span>`:""}</div>
       ${(e.leakTags&&e.leakTags.length)?`<div class="jd-sec"><div class="k">Fugas marcadas</div><div class="jtags">${e.leakTags.map(t=>`<span class="jtag sel">${escHtml(t)}</span>`).join("")}</div></div>`:""}
       ${sec("¿Dónde cedí el control?", e.leak)}${sec("Lo que movió la aguja", e.win)}
+      ${sec("Contexto / descarga libre", e.dump)}
+      ${jEntryCtx(e).length?`<div class="jd-sec"><div class="k">Contexto detectado</div><div class="jtags">${jEntryCtx(e).map(i=>`<span class="jcl">${jCluster(i).icon} ${jCluster(i).tag}</span>`).join("")}</div>${jEntryCtx(e).map(jPatternHtml).join("")}</div>`:""}
       ${e.rule?`<div class="jd-sec"><div class="k">Regla para el día siguiente · 05:30 AM</div><div class="v" style="color:var(--accent);font-weight:600;">${escHtml(e.rule)}</div></div>`:""}
       ${sec("Nota anterior", e.text)}${sec("Gratitud anterior", e.gratitude)}
       <div style="display:flex;gap:8px;margin-top:22px;flex-wrap:wrap;">
