@@ -1137,6 +1137,8 @@
     <div class="fin-head">
       <div class="month"><button id="finPrev" title="Mes anterior">‹</button><b id="finMonthLabel">—</b><button id="finNext" title="Mes siguiente">›</button></div>
       <div class="sp"></div>
+      <button class="btn secondary small" id="finImportBtn" title="Cargar un archivo de movimientos (.json)">📥 Importar</button>
+      <input type="file" id="finImportFile" accept=".json,application/json" style="display:none">
       <button class="btn secondary small" id="finBudgetBtn">⚙ Presupuesto y alertas</button>
     </div>
     <form class="fin-quick" id="finQuick" autocomplete="off">
@@ -5212,6 +5214,35 @@
         finCfgChanged(); finQuickType(); renderFin();
       });
   }
+  /* ---- importar movimientos (respaldo de Finanzas) ---- */
+  document.getElementById("finImportBtn").addEventListener("click", ()=>document.getElementById("finImportFile").click());
+  document.getElementById("finImportFile").addEventListener("change", e=>{
+    const f = e.target.files[0]; e.target.value = ""; if(!f) return;
+    const rd = new FileReader();
+    rd.onload = ()=>{
+      try{
+        const d = JSON.parse(rd.result);
+        const list = Array.isArray(d) ? d : d.tx;
+        if(!Array.isArray(list)) throw new Error("no es un archivo de movimientos");
+        const have = new Set(fin.tx.map(t=>t.id));
+        const fresh = list.filter(t=>t && t.id && t.date && t.amount>0 && !have.has(t.id));
+        if(!fresh.length){ toast("Nada nuevo: esos movimientos ya estaban cargados"); return; }
+        if(!confirm("Importar "+fresh.length+" movimientos nuevos ("+(list.length-fresh.length)+" ya existían). ¿Continuar?")) return;
+        fresh.forEach(t=>{ t.createdAt = t.createdAt || Date.now(); fin.tx.push(t); });
+        finSaveLocal();
+        if(cloud.user && cloud.db){
+          for(let i=0;i<fresh.length;i+=400){
+            const b = cloud.db.batch(), part = fresh.slice(i,i+400);
+            part.forEach(t=>b.set(cloud.db.doc(`users/${cloud.user.uid}/fin_tx/${t.id}`), finTxClean(t)));
+            b.commit().catch(er=>console.error(er));
+          }
+        }
+        const ds = fresh.map(t=>t.date).sort(); finMonth = ds[ds.length-1].slice(0,7);
+        renderFin(); toast("Importados "+fresh.length+" movimientos");
+      }catch(err){ toast("Archivo no válido: "+err.message); }
+    };
+    rd.readAsText(f);
+  });
   document.getElementById("finBudgetBtn").addEventListener("click", finBudgetModal);
   document.getElementById("finPrev").addEventListener("click", ()=>{ finMonth = finShift(finMonth,-1); renderFin(); });
   document.getElementById("finNext").addEventListener("click", ()=>{ finMonth = finShift(finMonth,1); renderFin(); });
