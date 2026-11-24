@@ -819,6 +819,14 @@
   .fin-row .orig{display:inline-block;font-size:9.5px;padding:1px 6px;border-radius:6px;margin-left:6px;background:rgba(255,255,255,.07);color:var(--text-dim);letter-spacing:.3px;} .fin-row .orig.sav{background:rgba(234,179,8,.15);color:#EAB308;}
   .fin-row .acts{display:flex;gap:2px;opacity:0;transition:opacity .15s;} .fin-row:hover .acts,.fin-row:focus-within .acts{opacity:1;} .fin-row .acts .x{background:transparent;border:none;color:var(--text-dim);cursor:pointer;font-size:13px;padding:4px 6px;border-radius:6px;} .fin-row .acts .x:hover{background:rgba(255,255,255,.08);color:var(--text);}
   @media(hover:none){.fin-row .acts{opacity:1;}}
+  .fin-cc .amt.big{font-size:20px;font-weight:700;margin-top:6px;} .fin-cc .amt.big small{font-size:11px;font-weight:400;color:var(--text-dim);margin-left:3px;}
+  .fin-cc .sub{font-size:11.5px;color:var(--text-faint);margin-top:1px;font-family:ui-monospace,Menlo,monospace;}
+  .fin-cc{padding:11px 13px;} .fin-cc .bar{height:4px;margin-top:8px;} .fin-cc.zero .bar i{background:#6f7684;} .fin-cc.zero .amt.big{color:var(--text-dim);} .fin-cc.hot .amt.big{color:#f87171;}
+  .fin-kpis.hg3{grid-template-columns:repeat(3,1fr) !important;} @media(max-width:720px){.fin-kpis.hg3{grid-template-columns:1fr !important;}}
+  #finSpaceSeg{margin-left:10px;} #finSpaceSeg button{font-size:12px;padding:6px 11px;}
+  .hg-form{display:grid;grid-template-columns:110px 1fr 140px 130px 140px 140px auto;gap:8px;margin-top:14px;padding:12px;border:1px solid var(--border);border-radius:14px;background:#12141C;}
+  .hg-form input,.hg-form select{background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:9px;padding:10px;font-size:14px;font-family:inherit;min-width:0;width:100%;} .hg-form input:focus,.hg-form select:focus{outline:none;border-color:var(--accent);}
+  @media(max-width:920px){.hg-form{grid-template-columns:1fr 1fr;}}
   .fin-seg{display:inline-flex;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:9px;padding:2px;gap:2px;}
   .fin-seg button{background:transparent;border:none;color:var(--text-dim);font-size:11px;padding:4px 9px;border-radius:7px;cursor:pointer;font-family:inherit;}
   .fin-seg button.on{background:rgba(234,179,8,.16);color:#EAB308;font-weight:600;}
@@ -1176,7 +1184,9 @@
   <section class="view" id="view-finanzas">
     <div class="fin-head">
       <div class="month"><button id="finPrev" title="Mes anterior">‹</button><b id="finMonthLabel">—</b><button id="finNext" title="Mes siguiente">›</button></div>
+      <div class="fin-seg" id="finSpaceSeg"><button data-act="space-p">👤 Personal</button><button data-act="space-h">🏠 Hogar compartido</button></div>
       <div class="sp"></div>
+      <input type="file" id="hogarFile" accept=".json,application/json" style="display:none">
       <button class="btn secondary small" id="finImportBtn" title="Cargar un archivo de movimientos (.json)">📥 Importar</button>
       <input type="file" id="finImportFile" accept=".json,application/json" style="display:none">
       <button class="btn secondary small" id="finBudgetBtn">⚙ Presupuesto y alertas</button>
@@ -1184,7 +1194,7 @@
     <form class="fin-quick" id="finQuick" autocomplete="off">
       <div class="fq-amt"><input id="fqAmount" type="number" inputmode="decimal" step="0.01" min="0" placeholder="Monto" required><select id="fqCur" title="Moneda"><option value="PEN">S/</option><option value="USD">$</option></select></div>
       <input id="fqDesc" type="text" placeholder="Descripción (pollo, arroz, taxi…)">
-      <select id="fqType"><option value="gasto">Gasto</option><option value="ingreso">Ingreso</option><option value="ahorro">Ahorro</option><option value="inversion">Inversión</option></select>
+      <select id="fqType"><option value="gasto">Gasto</option><option value="ingreso">Ingreso</option><option value="ahorro">Ahorro</option><option value="inversion">Inversión</option><option value="hogar">Aporte a Fondo Hogar</option></select>
       <select id="fqCat"></select>
       <select id="fqFund" title="¿De dónde sale el dinero?"><option value="sueldo">💳 Sueldo base</option><option value="ahorro">🏦 Fondo de ahorro</option></select>
       <select id="fqTarget" style="display:none"></select>
@@ -4688,7 +4698,7 @@
     let cap = null;
     try{
       const capTo = k => fin.tx.filter(t=>(t.type==="ahorro"||t.type==="inversion") && t.date<=k).reduce((a,t)=>a+t.amount,0);
-      const vr = (a,b) => fin.tx.filter(t=>t.type==="gasto" && finIsSalary(t) && !finIsFixedTx(t) && inW(t.date,a,b)).reduce((x,t)=>x+t.amount,0);
+      const vr = (a,b) => fin.tx.filter(t=>t.type==="gasto" && t.space!=="hogar" && finIsSalary(t) && !finIsFixedTx(t) && inW(t.date,a,b)).reduce((x,t)=>x+t.amount,0);
       const hB = capTo(kbT), hC = capTo(kcT), vB = vr(kbF,kbT), vC = vr(kcF,kcT);
       if(hC>0 || vB>0 || vC>0) cap = {hB, hC, vB, vC};
     }catch(e){}
@@ -5071,7 +5081,7 @@
     "Ropa":["polo","boxers","media","workout","ropa"],
     "Mascotas":["luna","mascota","veterinaria"]
   };
-  const FIN_TYPES = {gasto:"Gasto", ingreso:"Ingreso", ahorro:"Ahorro", inversion:"Inversión"};
+  const FIN_TYPES = {gasto:"Gasto", ingreso:"Ingreso", ahorro:"Ahorro", inversion:"Inversión", hogar:"Fondo Hogar"};
   function finCfgDefault(){ return { budgetMonth:0, catBudgets:{}, alertPct:80, alertEmail:"", cats:FIN_CATS.slice(), fx:3.75, fixed:[], essCats:["Alimentación","Vivienda","Servicios","Salud","Transporte","Deudas"], cycleStart:"", execAdj:0 }; }
   const FIN_PILLS = [
     {l:"Mercado / Comida", e:"🛒", type:"gasto", cat:"Alimentación", alt:["Mercado","Comida"]},
@@ -5082,7 +5092,7 @@
   ];
   let fin = { cfg:finCfgDefault(), goals:[], invest:[], tx:[] };
   let finMonth = todayKey().slice(0,7);
-  let finFilter = "todos", finCatFilter = "todas", finChartMode = "total", finSearch = "";
+  let finFilter = "todos", finCatFilter = "todas", finChartMode = "total", finSearch = "", finShowInactive = false, finSpace = (function(){ try{ return localStorage.getItem("panel_fin_space")==="hogar" ? "hogar" : "personal"; }catch(e){ return "personal"; } })();
   let finUnsubs = [], finCfgTimer = null, finCatManual = false;
 
   function finLoad(){
@@ -5206,7 +5216,7 @@
     const origAmt = amount; if(usd) amount = Math.round(amount*fx*100)/100;
     const type = document.getElementById("fqType").value;
     const t = { id: "p"+Date.now().toString(36)+uid(), date: document.getElementById("fqDate").value || todayKey(), amount: Math.round(amount*100)/100,
-      type, cat: type==="gasto" ? document.getElementById("fqCat").value : (type==="ingreso" ? "Ingreso" : type==="ahorro" ? "Ahorro" : "Inversión"),
+      type, cat: type==="gasto" ? document.getElementById("fqCat").value : (type==="ingreso" ? "Ingreso" : type==="ahorro" ? "Ahorro" : type==="hogar" ? "Fondo Hogar" : "Inversión"),
       desc: document.getElementById("fqDesc").value.trim(), src:"panel", createdAt: Date.now(), pending:true };
     const tgt = document.getElementById("fqTarget").value;
     if(usd) t.orig = {cur:"USD", amt:origAmt, fx};
@@ -5359,6 +5369,9 @@
           if(Array.isArray(d.cfg.cats) && d.cfg.cats.length){ c.cats = d.cfg.cats.slice(); cfgMsg += " Categorías: "+c.cats.length+"."; }
           if(Array.isArray(d.cfg.essCats)) c.essCats = d.cfg.essCats.slice();
           if(typeof d.cfg.cycleStart==="string") c.cycleStart = d.cfg.cycleStart;
+          if(Array.isArray(d.cfg.cardCats)) c.cardCats = d.cfg.cardCats.slice();
+          if(d.cfg.catBudgets && typeof d.cfg.catBudgets==="object") c.catBudgets = Object.assign({}, d.cfg.catBudgets);
+          if(typeof d.cfg.hogarName==="string") c.hogarName = d.cfg.hogarName;
           if(Array.isArray(d.cfg.fixed)){ c.fixed = d.cfg.fixed.map(f=>Object.assign({}, f)); cfgMsg += " Gastos fijos: "+c.fixed.length+"."; }
           finCfgChanged(); try{ finFillQuick(); finPillsUi(); }catch(e){}
         }
@@ -5387,7 +5400,7 @@
 
   /* ---- render ---- */
   const FIN_PAL = ["#EAB308","#c9a227","#b98b2f","#8f7a52","#6f7684","#9aa0ab","#4f5663","#cfc9b8"];
-  function finPrevMonthTx(){ const pm = finShift(finMonth,-1); return fin.tx.filter(t=>t.date && t.date.slice(0,7)===pm); }
+  function finPrevMonthTx(){ const pm = finShift(finMonth,-1); return fin.tx.filter(t=>t.space!=="hogar" && t.date && t.date.slice(0,7)===pm); }
   function finFixedPaid(f, month){ return fin.tx.find(t=>t.fixedId===f.id && t.date && t.date.slice(0,7)===month); }
   function finConfirmFixed(f){
     const [y,mo] = finMonth.split("-").map(Number), N = new Date(y,mo,0).getDate();
@@ -5450,7 +5463,7 @@
   function finJournalCross(){
     const today = todayKey(), lo = new Date(); lo.setDate(lo.getDate()-90); const loK = todayKey(lo);
     const ess = fin.cfg.essCats||[]; const spend = {};
-    fin.tx.forEach(t=>{ if(t.type==="gasto" && t.date>=loK && t.date<today && ess.indexOf(t.cat)<0) spend[t.date]=(spend[t.date]||0)+t.amount; });
+    fin.tx.forEach(t=>{ if(t.type==="gasto" && t.space!=="hogar" && t.date>=loK && t.date<today && ess.indexOf(t.cat)<0) spend[t.date]=(spend[t.date]||0)+t.amount; });
     const bad=[], good=[];
     Object.keys(state.journal).forEach(k=>{ if(k<loK || k>=today) return; const s = state.journal[k].status; if(!s) return; ((s==="disperso"||s==="fuga")?bad:good).push(spend[k]||0); });
     const mean = a => a.reduce((x,y)=>x+y,0)/a.length;
@@ -5460,12 +5473,94 @@
       : `Tus gastos variables no cambian con tu estado del día: <b>${finMoney(b)}</b> los días Disperso / En Fuga y <b>${finMoney(g)}</b> los días Flujo / Operativo.`;
     return `<div style="font-size:13.5px;line-height:1.55;">${msg}</div><div class="so-note" style="margin-top:6px;">Últimos 90 días · ${bad.length} días Disperso/En Fuga vs ${good.length} Flujo/Operativo.</div>`;
   }
+  /* ---- Espacio Hogar compartido ---- */
+  const HOGAR_CATS = ["Alquiler","Servicios","Compras casa","Mantenimiento","Otros"];
+  function finSpaceUi(){
+    const seg = document.getElementById("finSpaceSeg"); if(!seg) return;
+    const h = finSpace==="hogar";
+    seg.children[0].className = h ? "" : "on"; seg.children[1].className = h ? "on" : "";
+    const q = document.getElementById("finQuick"); if(q) q.style.display = h ? "none" : "";
+    ["finImportBtn","finBudgetBtn"].forEach(id=>{ const b = document.getElementById(id); if(b) b.style.display = h ? "none" : ""; });
+  }
+  function renderHogar(){
+    const root = document.getElementById("finBody");
+    const nm = fin.cfg.hogarName || "Yo";
+    const hs = fin.tx.filter(t=>t.space==="hogar"), mine = fin.tx.filter(t=>t.type==="hogar" && t.space!=="hogar");
+    const inM = t=>t.date && t.date.slice(0,7)===finMonth, upto = t=>t.date && t.date.slice(0,7)<=finMonth;
+    const sum = l=>l.reduce((a,t)=>a+t.amount,0);
+    const fundM = sum(mine.filter(inM)) + sum(hs.filter(t=>t.type==="ingreso" && inM(t)));
+    const spentM = sum(hs.filter(t=>t.type==="gasto" && inM(t)));
+    const saldo = sum(mine.filter(upto)) + sum(hs.filter(t=>t.type==="ingreso" && upto(t))) - sum(hs.filter(t=>t.type==="gasto" && upto(t)));
+    const pay = {};
+    mine.filter(inM).forEach(t=>{ const o = pay[nm] = pay[nm]||{ap:0,ga:0}; o.ap += t.amount; });
+    hs.filter(inM).forEach(t=>{ const k = (t.payer && t.payer!=="Yo") ? t.payer : nm, o = pay[k] = pay[k]||{ap:0,ga:0}; if(t.type==="ingreso") o.ap += t.amount; else o.ga += t.amount; });
+    const payHtml = Object.keys(pay).length ? Object.keys(pay).map(k=>`<div class="fin-fx"><div class="n">${escHtml(k)}<small>aportó ${finMoney(pay[k].ap)} · pagó ${finMoney(pay[k].ga)}</small></div><div class="mono" style="font-size:13px;">${pay[k].ga>0?"−"+finMoney(pay[k].ga):"—"}</div></div>`).join("") : `<div class="fin-empty">Aún no hay movimientos del hogar este mes.</div>`;
+    const rows = mine.filter(inM).map(t=>({t, mine:true})).concat(hs.filter(inM).map(t=>({t, mine:false}))).sort((a,b)=> b.t.date.localeCompare(a.t.date) || (b.t.createdAt||0)-(a.t.createdAt||0));
+    const days = {}; rows.forEach(r=>{ (days[r.t.date] = days[r.t.date]||[]).push(r); });
+    const MES = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+    const feed = Object.keys(days).sort().reverse().map(d=>`<div class="fin-day"><div class="dh"><span>${parseInt(d.slice(8,10))} ${MES[parseInt(d.slice(5,7))-1]}</span></div>${days[d].map(({t,mine:m})=>{
+      const act = `<span class="acts"><button class="x" data-act="tx-edit" data-id="${t.id}" title="Editar">✎</button><button class="x" data-act="tx-del" data-id="${t.id}" title="Eliminar">✕</button></span>`;
+      const inflow = m || t.type==="ingreso", who = m ? nm : ((t.payer && t.payer!=="Yo") ? t.payer : nm);
+      return `<div class="fin-row ${inflow?"xfer":""}"><div class="ds"><b>${escHtml(t.desc || (inflow?"Aporte al fondo":t.cat||"Gasto"))}</b><small>${inflow?"Aporte":escHtml(t.cat||"")} · <span class="orig ${inflow?"sav":""}">${escHtml(who)}</span></small></div><div class="am ${inflow?"gold":""}">${inflow?"↗ +":"−"}${finMoney(t.amount)}</div>${act}</div>`;
+    }).join("")}</div>`).join("");
+    root.innerHTML = `
+      <form class="hg-form" id="hogarForm">
+        <input type="number" step="0.01" min="0" id="hgAmt" placeholder="Monto" required>
+        <input type="text" id="hgDesc" placeholder="Descripción (alquiler, gas, compras de la casa…)">
+        <select id="hgKind"><option value="gasto">Gasto compartido</option><option value="ingreso">Aporte al fondo</option></select>
+        <select id="hgCat">${HOGAR_CATS.map(k=>`<option>${k}</option>`).join("")}</select>
+        <input type="text" id="hgPayer" list="hgPayers" value="${escAttr(nm)}" placeholder="¿Quién pagó?">
+        <datalist id="hgPayers">${Object.keys(pay).map(k=>`<option value="${escAttr(k)}">`).join("")}</datalist>
+        <input type="date" id="hgDate" value="${todayKey()}">
+        <button class="btn" type="submit">Registrar</button>
+      </form>
+      <div class="fin-kpis hg3" style="margin-top:14px;">
+        <div class="kpi-card"><div class="label">Fondo ingresado · mes</div><div class="value">${finMoney(fundM)}</div><div class="sub">Tu aporte + aportes de otros</div></div>
+        <div class="kpi-card"><div class="label">Gastado en la casa · mes</div><div class="value">${finMoney(spentM)}</div><div class="sub">Gastos compartidos registrados</div></div>
+        <div class="kpi-card"><div class="label">Saldo común acumulado</div><div class="value" style="color:${saldo<0?"#f87171":"#EAB308"}">${finMoney(saldo)}</div><div class="sub">Todo lo aportado − todo lo gastado</div></div>
+      </div>
+      <div class="fin-two" style="margin-top:14px;">
+        <div class="fin-card"><div class="fin-card-h"><b>Quién pagó</b><span>este mes</span></div>${payHtml}</div>
+        <div class="fin-card"><div class="fin-card-h"><b>Compartir el hogar</b><span>solo datos de la casa</span></div>
+          <div style="font-size:12.5px;color:var(--text-dim);line-height:1.55;margin-bottom:10px;">Exporta un paquete con <b>únicamente</b> los movimientos del hogar (tus hábitos, bitácora y finanzas personales no salen). La otra persona lo abre en su panel, registra gastos y te devuelve el archivo.</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;"><button class="btn secondary small" data-act="hogar-export">📤 Exportar paquete Hogar</button><button class="btn secondary small" data-act="hogar-import">📥 Importar paquete Hogar</button></div>
+          <div style="font-size:11.5px;color:var(--text-faint);margin-top:8px;">Tu nombre en los paquetes: <b>${escHtml(nm)}</b> · <a href="#" data-act="hogar-name" style="color:#EAB308">cambiar</a></div></div>
+      </div>
+      <div class="fin-sec" id="finMovs"><div class="fin-sec-h"><h3>Movimientos del hogar</h3></div>${feed || `<div class="fin-empty">Sin movimientos este mes.</div>`}</div>`;
+  }
+  function hogarExport(){
+    let owner = fin.cfg.hogarName; if(!owner){ owner = (prompt("Tu nombre para este paquete (ej. Sandro):","")||"").trim(); if(!owner) return; fin.cfg.hogarName = owner; finCfgChanged(); }
+    const hs = fin.tx.filter(t=>t.space==="hogar").map(t=>{ const o = finTxClean(t); o.id = t.id; if(!o.payer || o.payer==="Yo") o.payer = owner; return o; });
+    const aportes = fin.tx.filter(t=>t.type==="hogar" && t.space!=="hogar").map(t=>({id:"ap-"+t.id, date:t.date, amount:t.amount, desc:t.desc||"Aporte casa", payer:owner}));
+    const pk = {format:"panel-hogar-v1", owner, exportedAt:new Date().toISOString(), tx:hs, aportes};
+    const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(pk,null,1)],{type:"application/json"}));
+    a.download = "paquete-hogar-"+todayKey()+".json"; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+    toast("Paquete Hogar exportado ("+(hs.length+aportes.length)+" movimientos)");
+  }
+  function hogarImport(file){
+    const rd = new FileReader();
+    rd.onload = ()=>{
+      try{
+        const d = JSON.parse(rd.result); if(d.format!=="panel-hogar-v1") throw new Error("no es un paquete Hogar");
+        const have = new Set(fin.tx.map(t=>t.id)), mineIds = new Set(fin.tx.filter(t=>t.type==="hogar").map(t=>t.id));
+        const add = [];
+        (d.tx||[]).forEach(t=>{ if(t && t.id && t.amount>0 && !have.has(t.id) && !(t.id.indexOf("ap-")===0 && mineIds.has(t.id.slice(3)))) add.push(Object.assign({}, t, {space:"hogar", createdAt:t.createdAt||Date.now()})); });
+        (d.aportes||[]).forEach(a=>{ if(a && a.id && a.amount>0 && !have.has(a.id) && !mineIds.has(a.id.slice(3)) && !add.some(x=>x.id===a.id)) add.push({id:a.id, date:a.date, amount:a.amount, type:"ingreso", cat:"Fondo", desc:a.desc, payer:a.payer||d.owner, space:"hogar", src:"hogar", createdAt:Date.now()}); });
+        if(!add.length){ toast("Nada nuevo en ese paquete"); return; }
+        if(!confirm("Importar "+add.length+" movimientos del hogar de "+(d.owner||"otra persona")+"?")) return;
+        add.forEach(t=>{ fin.tx.push(t); finPushTx(t); }); finSaveLocal(); renderFin(); toast("Importados "+add.length+" movimientos del hogar");
+      }catch(err){ toast("Paquete no válido: "+err.message); }
+    };
+    rd.readAsText(file);
+  }
   function renderFin(){
     const root = document.getElementById("finBody"); if(!root) return;
     document.getElementById("finMonthLabel").textContent = finMonthLabel(finMonth);
+    finSpaceUi();
+    if(finSpace==="hogar"){ renderHogar(); return; }
     const c = fin.cfg;
-    const mtx = fin.tx.filter(t=>t.date && t.date.slice(0,7)===finMonth);
-    const inc = finSum(mtx,"ingreso"), exp = finSum(mtx.filter(finIsSalary),"gasto"), sav = finSum(mtx,"ahorro"), inv = finSum(mtx,"inversion");
+    const mtx = fin.tx.filter(t=>t.space!=="hogar" && t.date && t.date.slice(0,7)===finMonth);
+    const inc = finSum(mtx,"ingreso"), exp = finSum(mtx.filter(finIsSalary),"gasto"), sav = finSum(mtx,"ahorro"), inv = finSum(mtx,"inversion"), hog = finSum(mtx,"hogar");
     const {weeks, N} = finWeeks(finMonth);
     const nowM = todayKey().slice(0,7), isCur = finMonth===nowM, todayD = parseInt(todayKey().slice(8,10));
     const daysEl = isCur ? todayD : (finMonth<nowM ? N : 0);
@@ -5501,7 +5596,7 @@
     const pendFixedGasto = fixedRows.filter(r=>!r.paid && (r.f.type||"gasto")==="gasto").reduce((a,r)=>a+(Number(r.f.amount)||0),0);
     // KPI 1 · disponible real
     const base = inc>0 ? inc : (c.budgetMonth||0);
-    const dispReal = base - exp - sav - inv - pendFixed;
+    const dispReal = base - exp - sav - inv - hog - pendFixed;
     const k1 = (base>0 || exp>0)
       ? `<div class="value">${finMoney(dispReal)}</div><div class="sub">${inc>0?"Sobre tus ingresos":"Sobre tu presupuesto"} · ${pendFixed>0?"descuenta "+finMoney(pendFixed)+" de fijos pendientes":"sin fijos pendientes"}</div>`
       : `<div class="value dim">—</div><div class="sub">Registra ingresos o define tu presupuesto</div>`;
@@ -5538,8 +5633,8 @@
     if(vMode) chartNote += `<br><span style="color:var(--text-faint)">Excluye fijos, alquiler, servicios y deudas.${budC>0?" Ideal = presupuesto − fijos ("+finMoney(c.budgetMonth-budC)+").":""}</span>`;
     // dona
     const cats = Object.keys(byCat).sort((a,b)=>byCat[b]-byCat[a]);
-    let entries = cats.slice(0,6).map(k=>({k, v:byCat[k]}));
-    if(cats.length>6) entries.push({k:"Otras categorías", v:cats.slice(6).reduce((a,k)=>a+byCat[k],0)});
+    let entries = cats.slice(0,5).map(k=>({k, v:byCat[k]}));
+    if(cats.length>5) entries.push({k:"Otras ("+(cats.length-5)+")", v:cats.slice(5).reduce((a,k)=>a+byCat[k],0)});
     const ess = c.essCats||[]; const essV = gastoTx.filter(t=>ess.indexOf(t.cat)>=0).reduce((a,t)=>a+t.amount,0), varV = exp-essV;
     const essP = exp>0 ? Math.round(essV/exp*100) : 0;
     const legend = entries.map((e,i)=>{ const lim = c.catBudgets[e.k], pct = lim>0 ? e.v/lim*100 : 0;
@@ -5572,17 +5667,26 @@
         <div class="fin-inv"><div><small>Capital invertido</small><b class="mono">${finMoney(put)}</b></div><div><small>Valor actual</small><b class="mono">${g.value?finMoney(g.value):"—"}</b></div><div><small>ROI</small><b class="mono">${ret===null?"—":(ret>=0?"+":"")+ret.toFixed(1)+"%"}</b></div></div></div>`;
     }).join("") : `<div class="fin-empty">Registra dónde inviertes (fondo mutuo, acciones, negocio) y actualiza su valor para ver tu ROI.</div>`;
     // cards de categoría
-    const catCards = cats.slice(0,6).map(k=>{
-      const v = byCat[k], cap = c.catBudgets[k]||0, share = exp>0 ? Math.round(v/exp*100) : 0, pv = prevBy[k]||0;
+    const useSet = Array.isArray(c.cardCats) && c.cardCats.length;
+    const cardKeys = useSet ? c.cardCats.slice() : cats.slice(0,6);
+    const inactiveKeys = useSet ? c.cats.filter(k=>cardKeys.indexOf(k)<0 && ["Servicios","Vivienda","Deudas"].indexOf(k)<0) : [];
+    const mkCard = k => {
+      const v = byCat[k]||0, cap = c.catBudgets[k]||0, pv = prevBy[k]||0;
       const gr = pv>0 ? Math.round((v-pv)/pv*100) : null;
-      const hot = cap>0 ? v>cap : (gr!==null && gr>=100);
-      const w = cap>0 ? Math.min(100, v/cap*100) : share;
-      return `<div class="fin-cc ${hot?"hot":""} ${finCatFilter===k?"sel":""}" data-act="cat-pick" data-k="${escAttr(k)}" data-tip="${escAttr(k+"\nClic: ver solo estos movimientos"+(gr!==null?"\n"+(gr>=0?"+":"")+gr+"% vs mes anterior":""))}">
+      const over = cap>0 && v>cap+0.004, zero = cap>0 && !over && Math.abs(cap-v)<0.005;
+      const hot = cap>0 ? over : (gr!==null && gr>=100);
+      const avail = cap>0 ? Math.max(0, cap-v) : v;
+      const w = cap>0 ? Math.min(100, v/cap*100) : (exp>0 ? v/exp*100 : 0);
+      const big = cap>0 ? (over ? "−"+finMoney(v-cap) : finMoney(avail)) : finMoney(v);
+      const lab = cap>0 ? (over ? "excedido" : zero ? "cerrado" : "libres") : "gastado";
+      return `<div class="fin-cc ${hot?"hot":""} ${zero?"zero":""} ${finCatFilter===k?"sel":""}" data-act="cat-pick" data-k="${escAttr(k)}" data-tip="${escAttr(k+"\nClic: ver solo estos movimientos"+(gr!==null?"\n"+(gr>=0?"+":"")+gr+"% vs mes anterior":""))}">
         <div class="h"><span class="ic">${FIN_ICONS[k]||"📦"}</span><span>${escHtml(k)}</span><button class="ed" data-act="cat-cap" data-k="${escAttr(k)}" title="Editar tope">✎</button></div>
-        <div class="amt">${finMoney(v)} <small>${cap>0?"/ "+finMoney(cap):"· sin tope"}</small></div>
-        <div class="bar"><i style="width:${w}%"></i></div>
-        <div class="ft"><span>${share}% del gasto</span><span class="${gr!==null&&gr>0?"up":""}">${gr===null?"—":(gr>=0?"+":"")+gr+"% vs mes ant."}</span></div></div>`;
-    }).join("");
+        <div class="amt big">${big} <small>${lab}</small></div>
+        <div class="sub">${cap>0?finMoney(v)+" de "+finMoney(cap):"sin tope definido"}</div>
+        <div class="bar"><i style="width:${w}%"></i></div></div>`;
+    };
+    const catCards = cardKeys.map(mkCard).join("");
+    const inactiveHtml = inactiveKeys.length ? `<div style="margin-top:10px;"><button class="fin-mini" data-act="toggle-inactive">${finShowInactive?"− Ocultar":"+ Ver"} categorías sin presupuesto (${inactiveKeys.length})</button></div>${finShowInactive?`<div class="fin-cats">${inactiveKeys.map(mkCard).join("")}</div>`:""}` : "";
     const sv = finSavings();
     const savHtml = `<div class="fin-sav-grid">
       <div class="hist"><small>Ahorro histórico logrado</small><b class="mono">${finMoney(sv.hist)}</b><em>Nunca baja: es tu capacidad de producir y retener capital.</em></div>
@@ -5607,7 +5711,7 @@
             <div class="rb"><i style="width:${essP}%" data-tip="${escAttr("Esenciales\n"+finMoney(essV))}"></i><i class="v" style="width:${100-essP}%" data-tip="${escAttr("Variables / Deseo\n"+finMoney(varV))}"></i></div></div>`
           : `<div class="fin-empty">Aún no hay gastos este mes.</div>`}</div>
       </div>
-      ${catCards?`<div class="fin-sec" style="margin-top:14px;"><div class="fin-sec-h"><h3>Categorías de gasto</h3><span style="font-size:11px;color:var(--text-faint)">Clic en una card para filtrar los movimientos · ✎ para fijar su tope</span></div><div class="fin-cats">${catCards}</div></div>`:""}
+      ${catCards?`<div class="fin-sec" style="margin-top:14px;"><div class="fin-sec-h"><h3>Categorías de gasto</h3><span style="font-size:11px;color:var(--text-faint)">Clic en una card para filtrar los movimientos · ✎ para fijar su tope</span></div><div class="fin-cats">${catCards}</div>${inactiveHtml}</div>`:""}
       <div class="fin-two">
         <div class="fin-card"><div class="fin-card-h"><b>Gastos fijos del mes</b><span><button class="fin-mini" data-act="fixed-edit">✎ Plantilla</button>${pendFixed>0?` <button class="fin-mini gold" data-act="fixed-all">Pagar todos</button>`:""}</span></div>${fixedHtml}</div>
         <div class="fin-card"><div class="fin-card-h"><b>Cruce con tu bitácora</b><span>gastos variables × estado del día</span></div>${finJournalCross()}</div>
@@ -5627,16 +5731,18 @@
     const catSel = `<select id="feCat">${fin.cfg.cats.map(k=>`<option ${k===t.cat?"selected":""}>${escHtml(k)}</option>`).join("")}</select>`;
     finModal("Editar movimiento", `<div class="field-row"><div class="field"><label>Monto (S/)</label><input type="number" step="0.01" min="0" id="feAmt" value="${t.amount}"></div><div class="field"><label>Fecha</label><input type="date" id="feDate" value="${t.date}"></div></div>
       <div class="field"><label>Descripción</label><input type="text" id="feDesc" value="${escAttr(t.desc||"")}"></div>
-      ${t.type==="gasto"?`<div class="field-row"><div class="field"><label>Categoría</label>${catSel}</div><div class="field"><label>Origen</label><select id="feFund"><option value="sueldo" ${t.fund!=="ahorro"?"selected":""}>💳 Sueldo base</option><option value="ahorro" ${t.fund==="ahorro"?"selected":""}>🏦 Fondo de ahorro</option></select></div></div>`:""}`,
+      ${t.space==="hogar"?`<div class="field"><label>¿Quién pagó / aportó?</label><input type="text" id="fePayer" value="${escAttr(t.payer||"")}"></div>`:""}
+      ${t.type==="gasto" && t.space!=="hogar"?`<div class="field-row"><div class="field"><label>Categoría</label>${catSel}</div><div class="field"><label>Origen</label><select id="feFund"><option value="sueldo" ${t.fund!=="ahorro"?"selected":""}>💳 Sueldo base</option><option value="ahorro" ${t.fund==="ahorro"?"selected":""}>🏦 Fondo de ahorro</option></select></div></div>`:""}`,
       ov=>{
         const a = finNum(ov.querySelector("#feAmt").value); if(!(a>0)){ toast("Monto inválido"); return false; }
         t.amount = Math.round(a*100)/100; t.date = ov.querySelector("#feDate").value || t.date; t.desc = ov.querySelector("#feDesc").value.trim();
-        if(t.type==="gasto"){ t.cat = ov.querySelector("#feCat").value; if(ov.querySelector("#feFund").value==="ahorro") t.fund="ahorro"; else delete t.fund; }
+        if(t.space==="hogar"){ t.payer = ov.querySelector("#fePayer").value.trim() || t.payer; }
+        if(t.type==="gasto" && t.space!=="hogar"){ t.cat = ov.querySelector("#feCat").value; if(ov.querySelector("#feFund").value==="ahorro") t.fund="ahorro"; else delete t.fund; }
         finSaveLocal(); finPushTx(t); renderFin(); toast("Movimiento actualizado");
       });
   }
   function finFeedHtml(){
-    let list = fin.tx.filter(t=>t.date && t.date.slice(0,7)===finMonth).sort((a,b)=> b.date.localeCompare(a.date) || (b.createdAt||0)-(a.createdAt||0));
+    let list = fin.tx.filter(t=>t.space!=="hogar" && t.date && t.date.slice(0,7)===finMonth).sort((a,b)=> b.date.localeCompare(a.date) || (b.createdAt||0)-(a.createdAt||0));
     if(finFilter!=="todos") list = list.filter(t=>t.type===finFilter);
     if(finCatFilter!=="todas") list = list.filter(t=>t.cat===finCatFilter);
     const q = normName(finSearch).trim();
@@ -5651,6 +5757,9 @@
         const usd = t.orig && t.orig.cur==="USD" ? ` <span class="usd">US$ ${t.orig.amt}</span>` : "";
         const tag = t.src==="form" ? " · 📲" : t.src==="fijo" ? " · fijo" : "";
         const act = `<span class="acts"><button class="x" data-act="tx-edit" data-id="${t.id}" title="Editar">✎</button><button class="x" data-act="tx-del" data-id="${t.id}" title="Eliminar">✕</button></span>`;
+        if(t.type==="hogar"){
+          return `<div class="fin-row xfer"><div class="ds"><b>${escHtml(t.desc||"Aporte casa")}</b><small>Transferencia a Fondo Hogar${tag}</small></div><div class="am gold">↗ ${finMoney(t.amount)} <small>→ Hogar</small></div>${act}</div>`;
+        }
         if(t.type==="ahorro" || t.type==="inversion"){
           return `<div class="fin-row xfer"><div class="ds"><b>${escHtml(t.desc||FIN_TYPES[t.type])}</b><small>${t.type==="ahorro"?"Transferencia a ahorro":"Aporte a inversión"}${goal?" · "+escHtml(goal):""}${tag}</small></div><div class="am gold">↗ ${finMoney(t.amount)} <small>→ ${t.type==="ahorro"?"Capital":"Inversión"}</small>${usd}</div>${act}</div>`;
         }
@@ -5660,6 +5769,14 @@
       return `<div class="fin-day"><div class="dh"><span>${parseInt(d.slice(8,10))} ${MES[parseInt(d.slice(5,7))-1]}</span>${cons>0?`<span>Consumo del día: <b>${finMoney(cons)}</b></span>`:""}</div>${rows}</div>`;
     }).join("");
   }
+  document.getElementById("hogarFile").addEventListener("change", e=>{ const f = e.target.files[0]; e.target.value = ""; if(f) hogarImport(f); });
+  document.getElementById("view-finanzas").addEventListener("submit", e=>{
+    if(e.target.id!=="hogarForm") return; e.preventDefault();
+    const a = parseFloat(document.getElementById("hgAmt").value); if(!(a>0)){ toast("Escribe un monto mayor a 0"); return; }
+    const kind = document.getElementById("hgKind").value, payer = document.getElementById("hgPayer").value.trim() || (fin.cfg.hogarName||"Yo");
+    const t = {id:"h"+Date.now().toString(36)+uid(), date:document.getElementById("hgDate").value || todayKey(), amount:Math.round(a*100)/100, type:kind, cat:kind==="gasto"?document.getElementById("hgCat").value:"Fondo", desc:document.getElementById("hgDesc").value.trim(), payer, space:"hogar", src:"panel", createdAt:Date.now(), pending:true};
+    fin.tx.push(t); finSaveLocal(); finPushTx(t); if(t.date.slice(0,7)!==finMonth) finMonth = t.date.slice(0,7); renderFin(); toast("Hogar: "+(kind==="gasto"?"gasto":"aporte")+" "+finMoney(t.amount)+" · "+payer);
+  });
   document.getElementById("view-finanzas").addEventListener("input", e=>{
     if(e.target.id==="finSearch"){ finSearch = e.target.value; const f = document.getElementById("finFeed"); if(f) f.innerHTML = finFeedHtml(); }
   });
@@ -5677,6 +5794,11 @@
     const b = e.target.closest("[data-act]"); if(!b) return;
     const act = b.dataset.act, id = b.dataset.id;
     if(act==="budget") finBudgetModal();
+    else if(act==="space-p" || act==="space-h"){ finSpace = act==="space-h" ? "hogar" : "personal"; try{ localStorage.setItem("panel_fin_space", finSpace); }catch(e){} renderFin(); }
+    else if(act==="toggle-inactive"){ finShowInactive = !finShowInactive; renderFin(); }
+    else if(act==="hogar-export") hogarExport();
+    else if(act==="hogar-import") document.getElementById("hogarFile").click();
+    else if(act==="hogar-name"){ e.preventDefault(); const n = (prompt("Tu nombre en los paquetes del hogar:", fin.cfg.hogarName||"")||"").trim(); if(n){ fin.cfg.hogarName = n; finCfgChanged(); renderFin(); } }
     else if(act==="mode-total"){ finChartMode = "total"; renderFin(); }
     else if(act==="mode-var"){ finChartMode = "variable"; renderFin(); }
     else if(act==="cat-pick"){ const k = b.dataset.k; finCatFilter = finCatFilter===k ? "todas" : k; renderFin(); const m = document.getElementById("finMovs"); if(m && finCatFilter!=="todas") m.scrollIntoView({behavior:"smooth", block:"start"}); }
