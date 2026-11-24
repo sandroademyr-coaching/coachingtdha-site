@@ -798,6 +798,37 @@
   .fin-two{margin-top:14px;align-items:stretch;}
   .fin-card{border:1px solid rgba(255,255,255,.08);border-radius:14px;background:linear-gradient(180deg,#171714,#131313);padding:16px;transition:transform .2s,border-color .2s,box-shadow .2s;min-width:0;}
   .fin-card:hover{transform:translateY(-4px);border-color:rgba(255,255,255,.18);box-shadow:0 18px 30px -18px rgba(0,0,0,.8);}
+  .radar{background:linear-gradient(160deg,#14161f,#0d0e13);border:1px solid rgba(234,179,8,.22);border-radius:18px;padding:18px 20px;margin-bottom:16px;box-shadow:0 18px 40px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.05);}
+  .radar .rd-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px;}
+  .radar .rd-h b{font-size:12px;letter-spacing:1.4px;text-transform:uppercase;color:#EAB308;} .radar .rd-h span{font-size:11px;color:var(--text-faint);}
+  .radar .rd-txt{font-size:14.5px;line-height:1.7;color:var(--text);} .radar .rd-txt p{margin:0 0 8px;} .radar .rd-txt b{color:#EAB308;font-weight:600;}
+  .radar .rd-verdict{margin-top:6px;padding:10px 12px;border-left:3px solid #EAB308;background:rgba(234,179,8,.07);border-radius:0 10px 10px 0;font-size:13.5px;}
+  .radar .rd-pills{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px;perspective:800px;}
+  .radar .rd-pill{background:#12141C;border:1px solid rgba(255,255,255,.08);border-radius:13px;padding:10px 12px;transition:transform .22s,box-shadow .22s;} .radar .rd-pill:hover{transform:translateY(-3px) rotateX(3deg);box-shadow:0 12px 22px rgba(0,0,0,.45);}
+  .radar .rd-pill small{display:block;font-size:10.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--text-dim);}
+  .radar .rd-pill .ft{margin-top:5px;font-size:14px;font-family:ui-monospace,Menlo,monospace;} .radar .rd-pill .ft i{font-style:normal;color:var(--text-faint);margin:0 4px;}
+  .radar .rd-pill.up{border-color:rgba(52,211,153,.35);} .radar .rd-pill.up .ft .to{color:#34d399;} .radar .rd-pill.dn{border-color:rgba(248,113,113,.35);} .radar .rd-pill.dn .ft .to{color:#f87171;}
+  .radar .rd-pill em{display:block;font-style:normal;font-size:11px;color:var(--text-faint);margin-top:3px;}
+  @media(max-width:920px){.radar .rd-pills{grid-template-columns:repeat(2,1fr);}}
+  .fin-seg{display:inline-flex;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:9px;padding:2px;gap:2px;}
+  .fin-seg button{background:transparent;border:none;color:var(--text-dim);font-size:11px;padding:4px 9px;border-radius:7px;cursor:pointer;font-family:inherit;}
+  .fin-seg button.on{background:rgba(234,179,8,.16);color:#EAB308;font-weight:600;}
+  .fin-cats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px;perspective:900px;}
+  .fin-cc{position:relative;background:#12141C;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:13px 14px;cursor:pointer;transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease;transform-style:preserve-3d;}
+  .fin-cc:hover{transform:translateY(-4px) rotateX(3deg);box-shadow:0 14px 26px rgba(0,0,0,.45),0 0 0 1px rgba(234,179,8,.25);border-color:rgba(234,179,8,.35);}
+  .fin-cc.sel{border-color:#EAB308;box-shadow:0 0 0 1px rgba(234,179,8,.5);}
+  .fin-cc.hot{border-color:rgba(239,68,68,.45);} .fin-cc.hot:hover{box-shadow:0 14px 26px rgba(0,0,0,.45),0 0 0 1px rgba(239,68,68,.4);}
+  .fin-cc .h{display:flex;align-items:center;gap:8px;font-weight:600;font-size:13px;} .fin-cc .h .ic{font-size:18px;} .fin-cc .h .ed{margin-left:auto;background:transparent;border:none;color:var(--text-faint);cursor:pointer;font-size:12px;}
+  .fin-cc .amt{margin-top:9px;font-size:14px;font-family:ui-monospace,Menlo,monospace;} .fin-cc .amt small{color:var(--text-dim);font-size:11.5px;}
+  .fin-cc .bar{height:4px;border-radius:4px;background:rgba(255,255,255,.07);margin-top:9px;overflow:hidden;} .fin-cc .bar i{display:block;height:100%;background:#EAB308;border-radius:4px;transition:width .4s;} .fin-cc.hot .bar i{background:#EF4444;}
+  .fin-cc .ft{display:flex;justify-content:space-between;margin-top:7px;font-size:11px;color:var(--text-dim);} .fin-cc .ft .up{color:#f87171;}
+  .fin-sav-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .fin-sav-grid>div{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:12px 14px;}
+  .fin-sav-grid small{display:block;font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;} .fin-sav-grid b{display:block;font-size:22px;margin:4px 0 2px;} .fin-sav-grid em{font-style:normal;font-size:11.5px;color:var(--text-faint);}
+  .fin-sav-grid .hist b{color:#EAB308;}
+  .fin-badge-ex{display:inline-block;font-size:10.5px;color:#34d399;border:1px solid rgba(52,211,153,.35);border-radius:6px;padding:1px 6px;margin-left:6px;}
+  @media(max-width:920px){.fin-cats{grid-template-columns:repeat(2,1fr);} .fin-sav-grid{grid-template-columns:1fr;}}
+  @media(max-width:520px){.fin-cats{grid-template-columns:1fr;}}
   .fin-card-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
   .fin-card-h b{font-size:13px;letter-spacing:.2px;} .fin-card-h span{font-size:11px;color:var(--text-faint);}
   .fin-chart{width:100%;height:auto;display:block;} .fin-chart .ax{font-size:10px;fill:var(--text-faint);font-family:'JetBrains Mono',monospace;}
@@ -1157,6 +1188,7 @@
 
   <!-- ============ VISTA JOURNAL ============ -->
   <section class="view" id="view-journal">
+    <div id="jRadar"></div>
     <div class="day-nav">
       <button id="journalPrevDay">‹</button>
       <div class="date-label" id="journalDateLabel">—</div>
@@ -4616,9 +4648,75 @@
   }
 
   function journalOnShow(){ if(jDirty){ renderJournalKpis(); renderJournalContext(); } else renderJournalView(); }
+  /* ---- Radar de Evolución 90D · evidencia vs. percepción ---- */
+  const RD_FRIC = ["frustr","quej","lament","saturad","cansad","trabajo","estres","agobi","harto","presion","agotad","abrum"];
+  const RD_CTRL = ["aprend","solucion","control","avanc","gratitud","agradec","logr","decid","enfoc","orden","plan"];
+  function renderRadar(){
+    const box = document.getElementById("jRadar"); if(!box) return;
+    const t0 = startOfToday(), dAdd = (d,n)=>{ const x = new Date(d); x.setDate(x.getDate()+n); return x; };
+    const cF = dAdd(t0,-29), bT = dAdd(t0,-90), bF = dAdd(t0,-119);
+    const kcF = todayKey(cF), kcT = todayKey(t0), kbF = todayKey(bF), kbT = todayKey(bT);
+    const inW = (k,a,b)=>k>=a && k<=b;
+    // Mentalidad
+    const wordCount = (a,b)=>{ let fr=0, ct=0, n=0;
+      Object.keys(state.journal||{}).forEach(k=>{ if(!inW(k,a,b)) return; const e = state.journal[k]; const txt = normName([e.dump,e.leak,e.win,e.rule].filter(Boolean).join(" ")); if(!txt.trim()) return; n++;
+        txt.split(/[^a-z0-9ñ]+/).filter(Boolean).forEach(t=>{ if(RD_FRIC.some(w=>t.indexOf(w)===0)) fr++; if(RD_CTRL.some(w=>t.indexOf(w)===0)) ct++; }); });
+      return {fr, ct, n, tot:fr+ct}; };
+    const mB = wordCount(kbF,kbT), mC = wordCount(kcF,kcT);
+    const ment = (mB.tot>=3 && mC.tot>=3) ? {bFr:Math.round(mB.fr/mB.tot*100), cFr:Math.round(mC.fr/mC.tot*100), cCt:Math.round(mC.ct/mC.tot*100)} : null;
+    // Hábitos
+    const rate = (h,a,b)=>{ let num=0, den=0; for(let d=new Date(a); d<=b; d.setDate(d.getDate()+1)){ const k = todayKey(d); if(h.createdAt && k<h.createdAt) continue; if(isOffFor(h,k)) continue; den++; if(h.logs[k]) num++; } return den>=7 ? num/den*100 : null; };
+    const avgRate = (hs,a,b)=>{ const r = hs.map(h=>rate(h,a,b)).filter(x=>x!==null); return r.length ? r.reduce((x,y)=>x+y,0)/r.length : null; };
+    const hAbs = state.habits.filter(h=>/abstin/i.test(h.name));
+    let pil = state.habits.filter(h=>h.pillar); if(!pil.length) pil = state.habits.filter(h=>/estudi|descans|ejercic/i.test(h.name));
+    const abB = avgRate(hAbs,bF,bT), abC = avgRate(hAbs,cF,t0), piB = avgRate(pil,bF,bT), piC = avgRate(pil,cF,t0);
+    // Agenda
+    const rocks = (a,b)=>{ let done=0, tot=0; Object.keys(state.bigRocks||{}).forEach(k=>{ if(!inW(k,a,b)) return; (state.bigRocks[k]||[]).filter(r=>String(r.text||"").trim()).forEach(r=>{ tot++; if(r.done) done++; }); }); return {done, tot}; };
+    const rB = rocks(kbF,kbT), rC = rocks(kcF,kcT);
+    const rkB = rB.tot>=3 ? rB.done/30 : null, rkC = rC.tot>=3 ? rC.done/30 : null;
+    // Finanzas
+    let cap = null;
+    try{
+      const capTo = k => fin.tx.filter(t=>(t.type==="ahorro"||t.type==="inversion") && t.date<=k).reduce((a,t)=>a+t.amount,0);
+      const vr = (a,b) => fin.tx.filter(t=>t.type==="gasto" && !finIsFixedTx(t) && inW(t.date,a,b)).reduce((x,t)=>x+t.amount,0);
+      const hB = capTo(kbT), hC = capTo(kcT), vB = vr(kbF,kbT), vC = vr(kcF,kcT);
+      if(hC>0 || vB>0 || vC>0) cap = {hB, hC, vB, vC};
+    }catch(e){}
+    const pct = x => Math.round(x)+"%", mon = n => "S/ "+Math.round(n).toLocaleString("es-PE");
+    const pills = [], verdicts = [], parts = [];
+    if(ment){
+      const good = ment.cCt>ment.bFr || ment.cFr<ment.bFr;
+      pills.push({l:"Mentalidad", a:"Queja "+ment.bFr+"%", b:"Control "+ment.cCt+"%", good, n:"Bitácora · palabras clave"}); verdicts.push(good);
+      parts.push(`Hace 3 meses el <b>${ment.bFr}%</b> de tus palabras en la Bitácora hablaban de fricción (queja, cansancio, trabajo). Hoy esa fricción es del <b>${ment.cFr}%</b> y el <b>${ment.cCt}%</b> de tus notas habla de control, avance y aprendizaje.`);
+    } else pills.push({l:"Mentalidad", a:"—", b:"—", good:null, n:"Escribe más en Bitácora (≥3 palabras clave por periodo)"});
+    if(abB!==null && abC!==null){
+      const dlt = abC-abB, good = dlt>=1 ? true : dlt<=-1 ? false : null; pills.push({l:"Abstinencia", a:pct(abB), b:pct(abC), good, n:good===null?"estable":(dlt>=0?"+":"")+Math.round(dlt)+" pts"}); if(good!==null) verdicts.push(good);
+      if(piB!==null && piC!==null && Math.abs(piC-piB)>=1) verdicts.push(piC>piB);
+      parts.push(`En <b>Abstinencia</b> pasaste de ${pct(abB)} a <b>${pct(abC)}</b>${piB!==null&&piC!==null?`, y tus hábitos pilar de ${pct(piB)} a <b>${pct(piC)}</b>`:""}.`);
+    } else if(piB!==null && piC!==null){
+      const good = piC>=piB; pills.push({l:"Hábitos pilar", a:pct(piB), b:pct(piC), good, n:(piC-piB>=0?"+":"")+Math.round(piC-piB)+" pts"}); verdicts.push(good);
+      parts.push(`Tus <b>hábitos pilar</b> pasaron de ${pct(piB)} a <b>${pct(piC)}</b>.`);
+    } else pills.push({l:"Abstinencia", a:"—", b:"—", good:null, n:"Faltan 7+ días en cada periodo"});
+    if(rkB!==null && rkC!==null){
+      const good = rkC>=rkB; pills.push({l:"Big Rocks", a:rkB.toFixed(1)+"/día", b:rkC.toFixed(1)+"/día", good, n:"victorias cerradas"}); verdicts.push(good);
+      parts.push(`Cerrabas <b>${rkB.toFixed(1)}</b> Big Rocks por día y hoy cierras <b>${rkC.toFixed(1)}</b>.`);
+    } else pills.push({l:"Big Rocks", a:"—", b:"—", good:null, n:"Registra tus Big Rocks en Agenda"});
+    if(cap){
+      const good = cap.hC>cap.hB || cap.vC<cap.vB; pills.push({l:"Ahorro logrado", a:mon(cap.hB), b:mon(cap.hC), good, n:(cap.hC-cap.hB>=0?"+":"")+mon(cap.hC-cap.hB).replace("S/ ","S/ ")+" en 90 días"}); verdicts.push(good);
+      parts.push(`Tu <b>ahorro histórico logrado</b> subió de ${mon(cap.hB)} a <b>${mon(cap.hC)}</b>${cap.vB>0?` y tu gasto variable pasó de ${mon(cap.vB)} a ${mon(cap.vC)} (${cap.vC<=cap.vB?"−":"+"}${Math.abs(Math.round((cap.vC-cap.vB)/cap.vB*100))}%)`:""}.`);
+    } else pills.push({l:"Ahorro logrado", a:"—", b:"—", good:null, n:"Registra ahorros en Finanzas"});
+    const up = verdicts.filter(Boolean).length, tot = verdicts.length;
+    const verdict = tot===0 ? "Aún no hay suficientes datos para comparar. Sigue registrando: el radar se activa solo cuando hay 90 días de historia."
+      : up===tot ? `Evidencia: las ${tot} dimensiones medidas mejoraron. Si sientes que no avanzas, la percepción está contradiciendo tus propios datos.`
+      : up>=Math.ceil(tot/2) ? `Evidencia: ${up} de ${tot} dimensiones mejoraron. El avance es real aunque no sea parejo; apunta tu siguiente ajuste a la que retrocedió.`
+      : `Evidencia: solo ${up} de ${tot} dimensiones mejoraron. Aquí la sensación de estancamiento tiene base: elige una sola dimensión y recupérala esta semana.`;
+    box.innerHTML = `<div class="radar"><div class="rd-h"><b>Radar de Evolución 90D · Evidencia vs. Percepción</b><span>últimos 30 días vs. hace 90 días</span></div>
+      <div class="rd-txt">${parts.length?parts.map(x=>`<p>${x}</p>`).join(""):""}<div class="rd-verdict">${verdict}</div></div>
+      <div class="rd-pills">${pills.map(x=>`<div class="rd-pill ${x.good===true?"up":x.good===false?"dn":""}"><small>${x.l}</small><div class="ft">${x.a}<i>→</i><span class="to">${x.b}</span></div><em>${x.n}</em></div>`).join("")}</div></div>`;
+  }
   function renderJournalView(){
     document.getElementById("journalDateLabel").textContent = fmtDateLabel(journalDate);
-    renderJournalKpis(); renderJournalContext(); loadJournalEntry(); renderJournalHistory(); renderRuleBanner();
+    try{ renderRadar(); }catch(e){ console.error(e); } renderJournalKpis(); renderJournalContext(); loadJournalEntry(); renderJournalHistory(); renderRuleBanner();
   }
 
   /* ================= INIT ================= */
@@ -4950,20 +5048,31 @@
     "Educación":["curso","libro","colegio","universidad","taller","clase"],
     "Ocio":["cine","salida","restaurante","bar","juego","viaje","fiesta","concierto"],
     "Compras":["ropa","zapatilla","zapato","regalo","electro","tienda"],
-    "Deudas":["prestamo","cuota","tarjeta","deuda","credito"]
+    "Deudas":["prestamo","cuota","tarjeta","deuda","credito"],
+    "Mercado":["palta","huevo","pollo","pechuga","verdura","lechuga","leche","yogur","atun","pan ","avena","platano","mani","fideo","mercado","mass","fruta","carne","queso"],
+    "Restaurante":["pizza","chifa","poyi","popeyes","starbucks","hamburguesa","almuerzo","menu","restaurante","shawarma","lasagna"],
+    "Tiendas":["gatorade","jugo","tambo","oxxo","galleta","snack","chuches","bebida","agua cielo","tienda"],
+    "Hogar":["bicarbonato","detergente","esponja","papel higienico","platos","gas","tuppers","dollar city"],
+    "Cuidado personal":["corte","shampoo","desodorante","crema dental","pasta de diente"],
+    "Suplementos":["vhm","suplemento","proteina","creatina"],
+    "Solidaridad":["rubi","limosna","ayuda","solidaridad"],
+    "Entretenimiento":["concierto","entrada","cine","teatro"],
+    "Regalos":["regalo","flores"],
+    "Ropa":["polo","boxers","media","workout","ropa"],
+    "Mascotas":["luna","mascota","veterinaria"]
   };
   const FIN_TYPES = {gasto:"Gasto", ingreso:"Ingreso", ahorro:"Ahorro", inversion:"Inversión"};
-  function finCfgDefault(){ return { budgetMonth:0, catBudgets:{}, alertPct:80, alertEmail:"", cats:FIN_CATS.slice(), fx:3.75, fixed:[], essCats:["Alimentación","Vivienda","Servicios","Salud","Transporte","Deudas"] }; }
+  function finCfgDefault(){ return { budgetMonth:0, catBudgets:{}, alertPct:80, alertEmail:"", cats:FIN_CATS.slice(), fx:3.75, fixed:[], essCats:["Alimentación","Vivienda","Servicios","Salud","Transporte","Deudas"], cycleStart:"" }; }
   const FIN_PILLS = [
-    {l:"Mercado / Comida", e:"🛒", type:"gasto", cat:"Alimentación"},
+    {l:"Mercado / Comida", e:"🛒", type:"gasto", cat:"Alimentación", alt:["Mercado","Comida"]},
     {l:"Transporte", e:"🚕", type:"gasto", cat:"Transporte"},
-    {l:"Hogar / Mascota", e:"🏠", type:"gasto", cat:"Vivienda"},
-    {l:"Salida / Ocio", e:"🎬", type:"gasto", cat:"Ocio"},
+    {l:"Hogar / Mascota", e:"🏠", type:"gasto", cat:"Vivienda", alt:["Hogar","Mascotas"]},
+    {l:"Salida / Ocio", e:"🎬", type:"gasto", cat:"Ocio", alt:["Restaurante","Entretenimiento"]},
     {l:"Aporte Inversión", e:"📈", type:"inversion", cat:"Inversión"}
   ];
   let fin = { cfg:finCfgDefault(), goals:[], invest:[], tx:[] };
   let finMonth = todayKey().slice(0,7);
-  let finFilter = "todos", finCatFilter = "todas";
+  let finFilter = "todos", finCatFilter = "todas", finChartMode = "total";
   let finUnsubs = [], finCfgTimer = null, finCatManual = false;
 
   function finLoad(){
@@ -5118,7 +5227,7 @@
     if(b.dataset.p==="fixed"){ if(!(fin.cfg.fixed||[]).length) finFixedModal(); else finPayAllFixed(); return; }
     const p = FIN_PILLS[+b.dataset.p];
     document.getElementById("fqType").value = p.type; finQuickType();
-    if(p.type==="gasto") document.getElementById("fqCat").value = fin.cfg.cats.indexOf(p.cat)>=0 ? p.cat : (fin.cfg.cats.indexOf("Otros")>=0?"Otros":fin.cfg.cats[0]);
+    if(p.type==="gasto") document.getElementById("fqCat").value = [p.cat].concat(p.alt||[]).find(k=>fin.cfg.cats.indexOf(k)>=0) || (fin.cfg.cats.indexOf("Otros")>=0?"Otros":fin.cfg.cats[0]);
     finCatManual = true;
     const d = document.getElementById("fqDesc"); if(!d.value.trim()) d.value = p.l;
     if(parseFloat(document.getElementById("fqAmount").value)>0) document.getElementById("finQuick").requestSubmit();
@@ -5151,11 +5260,14 @@
       <div style="font-size:11.5px;color:var(--text-faint);margin:-4px 0 12px;">El presupuesto semanal se calcula solo: mensual × días de la semana ÷ días del mes.</div>
       <div class="field"><label>Límite mensual por categoría (opcional)</label></div>${rows}
       <div class="field"><label>Categorías esenciales (para el ratio Esenciales vs. Variables)</label><div class="jtags" id="fbEss">${c.cats.map(k=>`<label class="jtag ${(c.essCats||[]).indexOf(k)>=0?"sel":""}" style="cursor:pointer;"><input type="checkbox" data-ess="${escAttr(k)}" ${(c.essCats||[]).indexOf(k)>=0?"checked":""} style="display:none">${escHtml(k)}</label>`).join("")}</div></div>
+      <div class="field"><label>Inicio del ciclo de ahorro activo (opcional)</label><input type="date" id="fbCycle" value="${escAttr(c.cycleStart||"")}"></div>
+      <div style="font-size:11.5px;color:var(--text-faint);margin:-4px 0 12px;">Lo ahorrado antes de esta fecha cuenta en tu «Ahorro histórico logrado» pero no en el «Ahorro activo».</div>
       <div class="field"><label>Nueva categoría</label><input type="text" id="fbNewCat" placeholder="Ej. Mascotas"></div>`,
       ov=>{
         c.budgetMonth = finNum(ov.querySelector("#fbMonth").value);
         c.alertPct = Math.min(100, Math.max(1, parseInt(ov.querySelector("#fbPct").value)||80));
         c.alertEmail = ov.querySelector("#fbMail").value.trim();
+        c.cycleStart = ov.querySelector("#fbCycle").value || "";
         ov.querySelectorAll("[data-cb]").forEach(i=>{ const v = finNum(i.value); if(v) c.catBudgets[i.dataset.cb] = v; else delete c.catBudgets[i.dataset.cb]; });
         c.essCats = Array.from(ov.querySelectorAll("[data-ess]")).filter(i=>i.checked).map(i=>i.dataset.ess);
         const nc = ov.querySelector("#fbNewCat").value.trim();
@@ -5224,9 +5336,18 @@
         const d = JSON.parse(rd.result);
         const list = Array.isArray(d) ? d : d.tx;
         if(!Array.isArray(list)) throw new Error("no es un archivo de movimientos");
+        let cfgMsg = "";
+        if(!Array.isArray(d) && d.cfg){
+          const c = fin.cfg;
+          if(Array.isArray(d.cfg.cats) && d.cfg.cats.length){ c.cats = d.cfg.cats.slice(); cfgMsg += " Categorías: "+c.cats.length+"."; }
+          if(Array.isArray(d.cfg.essCats)) c.essCats = d.cfg.essCats.slice();
+          if(typeof d.cfg.cycleStart==="string") c.cycleStart = d.cfg.cycleStart;
+          if(Array.isArray(d.cfg.fixed)){ c.fixed = d.cfg.fixed.map(f=>Object.assign({}, f)); cfgMsg += " Gastos fijos: "+c.fixed.length+"."; }
+          finCfgChanged(); try{ finFillQuick(); finPillsUi(); }catch(e){}
+        }
         const have = new Set(fin.tx.map(t=>t.id));
         const fresh = list.filter(t=>t && t.id && t.date && t.amount>0 && !have.has(t.id));
-        if(!fresh.length){ toast("Nada nuevo: esos movimientos ya estaban cargados"); return; }
+        if(!fresh.length){ renderFin(); toast("Nada nuevo en movimientos."+cfgMsg); return; }
         if(!confirm("Importar "+fresh.length+" movimientos nuevos ("+(list.length-fresh.length)+" ya existían). ¿Continuar?")) return;
         fresh.forEach(t=>{ t.createdAt = t.createdAt || Date.now(); fin.tx.push(t); });
         finSaveLocal();
@@ -5260,6 +5381,16 @@
       desc:f.name, src:"fijo", fixedId:f.id, createdAt:Date.now(), pending:true };
     if(f.goalId) t.goalId = f.goalId; if(f.investId) t.investId = f.investId;
     fin.tx.push(t); finPushTx(t); return t;
+  }
+  const FIN_ICONS = {"Mercado":"🛒","Alimentación":"🛒","Comida":"🍽️","Restaurante":"🍔","Transporte":"🚕","Tiendas":"🏪","Misceláneos":"🧩","Hogar":"🏠","Cuidado personal":"🧴","Salud":"💊","Suplementos":"💪","Ropa":"👕","Regalos":"🎁","Entretenimiento":"🎟️","Educación":"📚","Solidaridad":"🤝","Mascotas":"🐾","Vacaciones":"🏖️","Efectivo":"💵","Otros":"📦","Servicios":"💡","Vivienda":"🏢","Deudas":"💳","Ocio":"🎬","Compras":"🛍️"};
+  function finIsFixedTx(t){ return !!(t.fixedId || t.src==="fijo" || t.sub==="Facturas" || t.sub==="Deuda" || ["Vivienda","Servicios","Deudas"].indexOf(t.cat)>=0); }
+  function finSavings(){
+    const c = fin.cfg, cyc = c.cycleStart||"";
+    const capTx = fin.tx.filter(t=>t.type==="ahorro" || t.type==="inversion");
+    const isEx = t => !!(t.executed || (t.goalId && (fin.goals.find(g=>g.id===t.goalId)||{}).executed));
+    const hist = capTx.reduce((a,t)=>a+t.amount,0);
+    const act = capTx.filter(t=>!isEx(t) && (!cyc || t.date>=cyc)).reduce((a,t)=>a+t.amount,0);
+    return {hist, act, exec: hist-act, cyc};
   }
   function finChart(N, daily, budget, daysEl){
     const Wd=560, Ht=230, pl=46, pr=12, pt=14, pb=26, W=Wd-pl-pr, Hh=Ht-pt-pb;
@@ -5373,10 +5504,19 @@
       : topCat ? `<div class="value" style="font-size:19px;">${escHtml(topCat)}</div><div class="sub">Concentra ${Math.round(byCat[topCat]/exp*100)}% de tu gasto del mes</div>`
       : `<div class="value dim">—</div><div class="sub">Aún sin gastos este mes</div>`;
     // gráfico
-    const daily = {}; gastoTx.forEach(t=>{ const d = parseInt(t.date.slice(8,10)); daily[d]=(daily[d]||0)+t.amount; });
+    const vMode = finChartMode==="variable";
+    const varTx = gastoTx.filter(t=>!finIsFixedTx(t));
+    const chartTx = vMode ? varTx : gastoTx;
+    const expC = chartTx.reduce((a,t)=>a+t.amount,0);
+    const fixedSpent = exp - varTx.reduce((a,t)=>a+t.amount,0);
+    const tplFixed = fixed.filter(f=>(f.type||"gasto")==="gasto").reduce((a,f)=>a+(Number(f.amount)||0),0);
+    const budC = vMode ? (c.budgetMonth>0 ? Math.max(0, c.budgetMonth - Math.max(fixedSpent, tplFixed)) : 0) : (c.budgetMonth||0);
+    const daily = {}; chartTx.forEach(t=>{ const d = parseInt(t.date.slice(8,10)); daily[d]=(daily[d]||0)+t.amount; });
     let chartNote = "";
-    if(c.budgetMonth>0 && daysEl>0){ const idl = c.budgetMonth*daysEl/N, diff = exp-idl; chartNote = `Real <b>${finMoney(exp)}</b> · ideal a hoy <b>${finMoney(idl)}</b> · <b class="${diff<=0?"gd":"bd"}">${diff<=0?"vas "+finMoney(-diff)+" por debajo":"vas "+finMoney(diff)+" por encima"}</b>`; }
+    if(budC>0 && daysEl>0){ const idl = budC*daysEl/N, diff = expC-idl; chartNote = `${vMode?"Variable real":"Real"} <b>${finMoney(expC)}</b> · ideal a hoy <b>${finMoney(idl)}</b> · <b class="${diff<=0?"gd":"bd"}">${diff<=0?"vas "+finMoney(-diff)+" por debajo":"vas "+finMoney(diff)+" por encima"}</b>`; }
     else if(!c.budgetMonth) chartNote = `Define tu presupuesto mensual para ver la línea ideal.`;
+    else if(vMode && budC<=0) chartNote = `Tus fijos ya consumen todo el presupuesto; no queda margen variable.`;
+    if(vMode) chartNote += `<br><span style="color:var(--text-faint)">Excluye fijos, alquiler, servicios y deudas.${budC>0?" Ideal = presupuesto − fijos ("+finMoney(c.budgetMonth-budC)+").":""}</span>`;
     // dona
     const cats = Object.keys(byCat).sort((a,b)=>byCat[b]-byCat[a]);
     let entries = cats.slice(0,6).map(k=>({k, v:byCat[k]}));
@@ -5402,9 +5542,9 @@
         est = `Cumplimiento estimado: <b>${eta.toLocaleDateString("es-PE",{month:"short",year:"numeric"})}</b> al ritmo actual`;
       } else est = "Registra tu primer aporte para estimar la fecha";
       if(left>0 && g.deadline){ const ms = Math.max(1, (new Date(g.deadline)-new Date())/2629800000); est += `<br>Límite ${g.deadline} · ahorra ~${finMoney(left/ms)}/mes`; }
-      return `<div class="fin-item"><div class="nm"><span>${escHtml(g.name)}</span><span><button class="fin-mini" data-act="goal-add" data-id="${g.id}">+ Aportar</button> <button class="fin-mini" data-act="goal-edit" data-id="${g.id}">✎</button></span></div>
+      return `<div class="fin-item"><div class="nm"><span>${escHtml(g.name)}</span><span><button class="fin-mini" data-act="goal-add" data-id="${g.id}">+ Aportar</button> <button class="fin-mini" data-act="goal-exec" data-id="${g.id}">${g.executed?"↺ Reactivar":"✓ Ejecutada"}</button> <button class="fin-mini" data-act="goal-edit" data-id="${g.id}">✎</button></span></div>
         <div class="fin-bar gold"><i style="width:${Math.min(100,pct)}%"></i></div>
-        <div class="meta"><span class="mono">${finMoney(saved)} / ${finMoney(g.target)} · ${Math.round(pct)}%</span><br>${est}</div></div>`;
+        <div class="meta"><span class="mono">${finMoney(saved)} / ${finMoney(g.target)} · ${Math.round(pct)}%</span>${g.executed?` <span class="fin-badge-ex">✓ Ejecutado en Meta</span>`:""}<br>${est}</div></div>`;
     }).join("") : `<div class="fin-empty">Crea tu primera meta de ahorro (viaje, fondo de emergencia, equipo…).</div>`;
     const invHtml = fin.invest.length ? fin.invest.map(g=>{
       const put = fin.tx.filter(t=>t.type==="inversion" && t.investId===g.id).reduce((a,t)=>a+t.amount,0);
@@ -5412,6 +5552,23 @@
       return `<div class="fin-item"><div class="nm"><span>${escHtml(g.name)}</span><span><button class="fin-mini" data-act="inv-add" data-id="${g.id}">+ Aportar</button> <button class="fin-mini" data-act="inv-edit" data-id="${g.id}">✎</button></span></div>
         <div class="fin-inv"><div><small>Capital invertido</small><b class="mono">${finMoney(put)}</b></div><div><small>Valor actual</small><b class="mono">${g.value?finMoney(g.value):"—"}</b></div><div><small>ROI</small><b class="mono">${ret===null?"—":(ret>=0?"+":"")+ret.toFixed(1)+"%"}</b></div></div></div>`;
     }).join("") : `<div class="fin-empty">Registra dónde inviertes (fondo mutuo, acciones, negocio) y actualiza su valor para ver tu ROI.</div>`;
+    // cards de categoría
+    const catCards = cats.slice(0,6).map(k=>{
+      const v = byCat[k], cap = c.catBudgets[k]||0, share = exp>0 ? Math.round(v/exp*100) : 0, pv = prevBy[k]||0;
+      const gr = pv>0 ? Math.round((v-pv)/pv*100) : null;
+      const hot = (cap>0 && v>cap) || (gr!==null && gr>=100);
+      const w = cap>0 ? Math.min(100, v/cap*100) : share;
+      return `<div class="fin-cc ${hot?"hot":""} ${finCatFilter===k?"sel":""}" data-act="cat-pick" data-k="${escAttr(k)}" data-tip="${escAttr(k+"\nClic: ver solo estos movimientos"+(gr!==null?"\n"+(gr>=0?"+":"")+gr+"% vs mes anterior":""))}">
+        <div class="h"><span class="ic">${FIN_ICONS[k]||"📦"}</span><span>${escHtml(k)}</span><button class="ed" data-act="cat-cap" data-k="${escAttr(k)}" title="Editar tope">✎</button></div>
+        <div class="amt">${finMoney(v)} <small>${cap>0?"/ "+finMoney(cap):"· sin tope"}</small></div>
+        <div class="bar"><i style="width:${w}%"></i></div>
+        <div class="ft"><span>${share}% del gasto</span><span class="${gr!==null&&gr>0?"up":""}">${gr===null?"—":(gr>=0?"+":"")+gr+"% vs mes ant."}</span></div></div>`;
+    }).join("");
+    const sv = finSavings();
+    const savHtml = `<div class="fin-sav-grid">
+      <div class="hist"><small>Ahorro histórico logrado</small><b class="mono">${finMoney(sv.hist)}</b><em>Nunca baja: es tu capacidad de producir y retener capital.</em></div>
+      <div><small>Ahorro activo actual</small><b class="mono">${finMoney(sv.act)}</b><em>${sv.cyc?"Ciclo desde "+sv.cyc+" hasta hoy":"Saldo vigente (no ejecutado)"}</em></div></div>
+      <div class="fin-note">${sv.exec>0?`<span class="fin-badge-ex">✓ Ejecutado en Meta</span> <b>${finMoney(sv.exec)}</b> de ahorro de ciclos anteriores o metas ya cumplidas siguen sumando a tu histórico.`:`Marca una meta como ✓ Ejecutada, o define el inicio del ciclo en ⚙ Presupuesto, para separar lo ya usado.`}</div>`;
     // movimientos
     let list = mtx.slice().sort((a,b)=> b.date.localeCompare(a.date) || (b.createdAt||0)-(a.createdAt||0));
     if(finFilter!=="todos") list = list.filter(t=>t.type===finFilter);
@@ -5432,8 +5589,8 @@
         <div class="kpi-card" data-tip="Fuga principal\nLa categoría que más creció respecto al mes anterior\n(o dónde se concentra tu gasto)."><div class="label">Fuga principal</div>${k4}</div>
       </div>
       <div class="fin-two fin-main">
-        <div class="fin-card"><div class="fin-card-h"><b>Consumo acumulado vs. línea ideal</b><span>${N} días · ${c.budgetMonth?"presupuesto "+finMoney(c.budgetMonth):"sin presupuesto"}</span></div>
-          ${finChart(N, daily, c.budgetMonth||0, daysEl)}<div class="fin-note">${chartNote}</div>
+        <div class="fin-card"><div class="fin-card-h"><b>Consumo acumulado vs. línea ideal</b><span class="fin-seg"><button class="${vMode?"":"on"}" data-act="mode-total">Total</button><button class="${vMode?"on":""}" data-act="mode-var">Solo variable</button></span></div>
+          ${finChart(N, daily, budC, daysEl)}<div class="fin-note">${chartNote}</div>
           ${c.budgetMonth?"":`<button class="btn small" data-act="budget" style="margin-top:8px;">Definir presupuesto</button>`}</div>
         <div class="fin-card"><div class="fin-card-h"><b>Por categoría</b><span>gasto del mes</span></div>
           ${exp>0 ? `<div class="fin-donut-wrap">${finDonut(entries, exp)}<div class="fin-legs">${legend}</div></div>
@@ -5441,15 +5598,17 @@
             <div class="rb"><i style="width:${essP}%" data-tip="${escAttr("Esenciales\n"+finMoney(essV))}"></i><i class="v" style="width:${100-essP}%" data-tip="${escAttr("Variables / Deseo\n"+finMoney(varV))}"></i></div></div>`
           : `<div class="fin-empty">Aún no hay gastos este mes.</div>`}</div>
       </div>
+      ${catCards?`<div class="fin-sec" style="margin-top:14px;"><div class="fin-sec-h"><h3>Categorías de gasto</h3><span style="font-size:11px;color:var(--text-faint)">Clic en una card para filtrar los movimientos · ✎ para fijar su tope</span></div><div class="fin-cats">${catCards}</div></div>`:""}
       <div class="fin-two">
         <div class="fin-card"><div class="fin-card-h"><b>Gastos fijos del mes</b><span><button class="fin-mini" data-act="fixed-edit">✎ Plantilla</button>${pendFixed>0?` <button class="fin-mini gold" data-act="fixed-all">Pagar todos</button>`:""}</span></div>${fixedHtml}</div>
         <div class="fin-card"><div class="fin-card-h"><b>Cruce con tu bitácora</b><span>gastos variables × estado del día</span></div>${finJournalCross()}</div>
       </div>
+      <div class="fin-card" style="margin-top:14px;"><div class="fin-card-h"><b>Patrimonio · ahorro logrado vs. activo</b><span>todo tu historial</span></div>${savHtml}</div>
       <div class="fin-two">
         <div class="fin-card"><div class="fin-card-h"><b>Metas de ahorro</b><span><button class="fin-mini" data-act="goal-new">+ Nueva meta</button></span></div>${goalsHtml}</div>
         <div class="fin-card"><div class="fin-card-h"><b>Inversiones</b><span><button class="fin-mini" data-act="inv-new">+ Nueva inversión</button></span></div>${invHtml}</div>
       </div>
-      <div class="fin-sec"><div class="fin-sec-h"><h3>Movimientos</h3><span class="fin-filters">
+      <div class="fin-sec" id="finMovs"><div class="fin-sec-h"><h3>Movimientos${finCatFilter!=="todas"?` · ${escHtml(finCatFilter)}`:""}</h3><span class="fin-filters">
         <select class="fin-filter" id="finFilterSel"><option value="todos">Todos los tipos</option>${Object.keys(FIN_TYPES).map(k=>`<option value="${k}" ${finFilter===k?"selected":""}>${FIN_TYPES[k]}</option>`).join("")}</select>
         <select class="fin-filter" id="finCatSel"><option value="todas">Todas las categorías</option>${catOpts.map(k=>`<option value="${escAttr(k)}" ${finCatFilter===k?"selected":""}>${escHtml(k)}</option>`).join("")}</select></span></div>
         ${rows?`<div class="fin-tablewrap"><table class="fin-table"><thead><tr><th>Fecha</th><th>Descripción</th><th>Tipo</th><th>Categoría</th><th style="text-align:right">Monto</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`:`<div class="fin-empty">Sin movimientos en este mes para estos filtros.</div>`}</div>`;
@@ -5468,6 +5627,13 @@
     const b = e.target.closest("[data-act]"); if(!b) return;
     const act = b.dataset.act, id = b.dataset.id;
     if(act==="budget") finBudgetModal();
+    else if(act==="mode-total"){ finChartMode = "total"; renderFin(); }
+    else if(act==="mode-var"){ finChartMode = "variable"; renderFin(); }
+    else if(act==="cat-pick"){ const k = b.dataset.k; finCatFilter = finCatFilter===k ? "todas" : k; renderFin(); const m = document.getElementById("finMovs"); if(m && finCatFilter!=="todas") m.scrollIntoView({behavior:"smooth", block:"start"}); }
+    else if(act==="cat-cap"){ const k = b.dataset.k; e.stopPropagation();
+      finModal("Tope mensual · "+escHtml(k), `<div class="field"><label>Límite para ${escHtml(k)} (S/ al mes, vacío = sin tope)</label><input type="number" min="0" step="1" id="fcCap" value="${fin.cfg.catBudgets[k]||""}"></div>`,
+        ov=>{ const v = finNum(ov.querySelector("#fcCap").value); if(v) fin.cfg.catBudgets[k] = v; else delete fin.cfg.catBudgets[k]; finCfgChanged(); renderFin(); }); }
+    else if(act==="goal-exec"){ const g = fin.goals.find(x=>x.id===id); if(g){ g.executed = !g.executed; finCfgChanged(); renderFin(); toast(g.executed?"Meta marcada como ejecutada: su ahorro sigue en tu histórico":"Meta reactivada"); } }
     else if(act==="fixed-edit") finFixedModal();
     else if(act==="fixed-pay"){ const f = (fin.cfg.fixed||[]).find(x=>x.id===id); if(f && !finFixedPaid(f, finMonth)){ finConfirmFixed(f); finSaveLocal(); renderFin(); toast("Pagado: "+f.name+" "+finMoney(f.amount)); } }
     else if(act==="fixed-all") finPayAllFixed();
