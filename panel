@@ -782,7 +782,7 @@
   .jpat b{color:var(--accent);}
   .jpat.soft{background:transparent;border-style:dashed;color:var(--text-dim);}
   /* ---------- Finanzas v2 ---------- */
-  .fin-quick{grid-template-columns:150px 1fr 120px 150px 140px auto !important;}
+  .fin-quick{grid-template-columns:150px 1fr 120px 150px 150px 140px auto !important;}
   .fq-amt{display:flex;gap:4px;min-width:0;} .fq-amt input{flex:1;min-width:0;} .fq-amt select{width:58px !important;flex:none;padding:10px 4px !important;}
   .fq-pills{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap;}
   .fq-pill{background:transparent;border:1px solid var(--border);color:var(--text-dim);border-radius:999px;padding:6px 12px;font-size:12.5px;cursor:pointer;font-family:inherit;transition:.15s;}
@@ -810,6 +810,15 @@
   .radar .rd-pill.up{border-color:rgba(52,211,153,.35);} .radar .rd-pill.up .ft .to{color:#34d399;} .radar .rd-pill.dn{border-color:rgba(248,113,113,.35);} .radar .rd-pill.dn .ft .to{color:#f87171;}
   .radar .rd-pill em{display:block;font-style:normal;font-size:11px;color:var(--text-faint);margin-top:3px;}
   @media(max-width:920px){.radar .rd-pills{grid-template-columns:repeat(2,1fr);}}
+  .fin-day{margin-top:14px;} .fin-day .dh{display:flex;justify-content:space-between;font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:var(--text-faint);padding:0 4px 6px;} .fin-day .dh b{color:var(--text-dim);}
+  .fin-row{display:flex;align-items:center;gap:12px;padding:10px 12px;background:#12141C;border:1px solid rgba(255,255,255,.07);border-radius:11px;margin-bottom:6px;transition:background .18s,transform .18s,border-color .18s;}
+  .fin-row:hover{background:#171a24;transform:translateY(-1px);border-color:rgba(255,255,255,.14);}
+  .fin-row .ds{flex:1;min-width:0;} .fin-row .ds b{display:block;font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;} .fin-row .ds small{color:var(--text-faint);font-size:11.5px;}
+  .fin-row .am{font-family:ui-monospace,Menlo,monospace;font-weight:700;font-size:13.5px;white-space:nowrap;text-align:right;} .fin-row .am.inc{color:#34d399;} .fin-row .am.gold{color:#EAB308;} .fin-row .am small{color:var(--text-dim);font-weight:400;font-family:inherit;} .fin-row .am .usd{display:block;font-size:10.5px;color:var(--text-faint);font-weight:400;}
+  .fin-row.xfer{border-color:rgba(234,179,8,.35);background:linear-gradient(90deg,rgba(234,179,8,.06),#12141C 55%);}
+  .fin-row .orig{display:inline-block;font-size:9.5px;padding:1px 6px;border-radius:6px;margin-left:6px;background:rgba(255,255,255,.07);color:var(--text-dim);letter-spacing:.3px;} .fin-row .orig.sav{background:rgba(234,179,8,.15);color:#EAB308;}
+  .fin-row .acts{display:flex;gap:2px;opacity:0;transition:opacity .15s;} .fin-row:hover .acts,.fin-row:focus-within .acts{opacity:1;} .fin-row .acts .x{background:transparent;border:none;color:var(--text-dim);cursor:pointer;font-size:13px;padding:4px 6px;border-radius:6px;} .fin-row .acts .x:hover{background:rgba(255,255,255,.08);color:var(--text);}
+  @media(hover:none){.fin-row .acts{opacity:1;}}
   .fin-seg{display:inline-flex;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:9px;padding:2px;gap:2px;}
   .fin-seg button{background:transparent;border:none;color:var(--text-dim);font-size:11px;padding:4px 9px;border-radius:7px;cursor:pointer;font-family:inherit;}
   .fin-seg button.on{background:rgba(234,179,8,.16);color:#EAB308;font-weight:600;}
@@ -1177,6 +1186,7 @@
       <input id="fqDesc" type="text" placeholder="Descripción (pollo, arroz, taxi…)">
       <select id="fqType"><option value="gasto">Gasto</option><option value="ingreso">Ingreso</option><option value="ahorro">Ahorro</option><option value="inversion">Inversión</option></select>
       <select id="fqCat"></select>
+      <select id="fqFund" title="¿De dónde sale el dinero?"><option value="sueldo">💳 Sueldo base</option><option value="ahorro">🏦 Fondo de ahorro</option></select>
       <select id="fqTarget" style="display:none"></select>
       <input id="fqDate" type="date">
       <button class="btn" type="submit">Registrar</button>
@@ -4678,7 +4688,7 @@
     let cap = null;
     try{
       const capTo = k => fin.tx.filter(t=>(t.type==="ahorro"||t.type==="inversion") && t.date<=k).reduce((a,t)=>a+t.amount,0);
-      const vr = (a,b) => fin.tx.filter(t=>t.type==="gasto" && !finIsFixedTx(t) && inW(t.date,a,b)).reduce((x,t)=>x+t.amount,0);
+      const vr = (a,b) => fin.tx.filter(t=>t.type==="gasto" && finIsSalary(t) && !finIsFixedTx(t) && inW(t.date,a,b)).reduce((x,t)=>x+t.amount,0);
       const hB = capTo(kbT), hC = capTo(kcT), vB = vr(kbF,kbT), vC = vr(kcF,kcT);
       if(hC>0 || vB>0 || vC>0) cap = {hB, hC, vB, vC};
     }catch(e){}
@@ -5062,7 +5072,7 @@
     "Mascotas":["luna","mascota","veterinaria"]
   };
   const FIN_TYPES = {gasto:"Gasto", ingreso:"Ingreso", ahorro:"Ahorro", inversion:"Inversión"};
-  function finCfgDefault(){ return { budgetMonth:0, catBudgets:{}, alertPct:80, alertEmail:"", cats:FIN_CATS.slice(), fx:3.75, fixed:[], essCats:["Alimentación","Vivienda","Servicios","Salud","Transporte","Deudas"], cycleStart:"" }; }
+  function finCfgDefault(){ return { budgetMonth:0, catBudgets:{}, alertPct:80, alertEmail:"", cats:FIN_CATS.slice(), fx:3.75, fixed:[], essCats:["Alimentación","Vivienda","Servicios","Salud","Transporte","Deudas"], cycleStart:"", execAdj:0 }; }
   const FIN_PILLS = [
     {l:"Mercado / Comida", e:"🛒", type:"gasto", cat:"Alimentación", alt:["Mercado","Comida"]},
     {l:"Transporte", e:"🚕", type:"gasto", cat:"Transporte"},
@@ -5072,7 +5082,7 @@
   ];
   let fin = { cfg:finCfgDefault(), goals:[], invest:[], tx:[] };
   let finMonth = todayKey().slice(0,7);
-  let finFilter = "todos", finCatFilter = "todas", finChartMode = "total";
+  let finFilter = "todos", finCatFilter = "todas", finChartMode = "total", finSearch = "";
   let finUnsubs = [], finCfgTimer = null, finCatManual = false;
 
   function finLoad(){
@@ -5173,6 +5183,7 @@
     const type = document.getElementById("fqType").value;
     const cat = document.getElementById("fqCat"), tg = document.getElementById("fqTarget");
     cat.style.display = type==="gasto" ? "" : "none";
+    document.getElementById("fqFund").style.display = type==="gasto" ? "" : "none";
     if(type==="ahorro"){
       tg.style.display = "";
       tg.innerHTML = `<option value="">Ahorro general</option>` + fin.goals.map(g=>`<option value="${g.id}">${escHtml(g.name)}</option>`).join("");
@@ -5199,12 +5210,13 @@
       desc: document.getElementById("fqDesc").value.trim(), src:"panel", createdAt: Date.now(), pending:true };
     const tgt = document.getElementById("fqTarget").value;
     if(usd) t.orig = {cur:"USD", amt:origAmt, fx};
+    if(type==="gasto" && document.getElementById("fqFund").value==="ahorro") t.fund = "ahorro";
     if(type==="ahorro" && tgt) t.goalId = tgt;
     if(type==="inversion" && tgt) t.investId = tgt;
     fin.tx.push(t); finSaveLocal(); finPushTx(t);
     if(t.date.slice(0,7) !== finMonth) finMonth = t.date.slice(0,7);
     document.getElementById("fqAmount").value = ""; document.getElementById("fqDesc").value = "";
-    finCatManual = false; document.getElementById("fqCur").value = "PEN"; finCurUi(); renderFin();
+    finCatManual = false; document.getElementById("fqFund").value = "sueldo"; document.getElementById("fqCur").value = "PEN"; finCurUi(); renderFin();
     toast("Registrado: " + FIN_TYPES[type] + " " + finMoney(t.amount));
     document.getElementById("fqAmount").focus();
   });
@@ -5310,7 +5322,12 @@
         const name = ov.querySelector("#fgName").value.trim(), target = finNum(ov.querySelector("#fgTarget").value);
         if(!name || !target){ toast("Pon nombre y monto objetivo"); return false; }
         if(id){ g.name = name; g.target = target; g.deadline = ov.querySelector("#fgDate").value; }
-        else fin.goals.push({id:"g"+uid(), name, target, deadline: ov.querySelector("#fgDate").value});
+        else{
+          const ng = {id:"g"+uid(), name, target, deadline: ov.querySelector("#fgDate").value}; fin.goals.push(ng);
+          const nn = normName(name), linked = fin.tx.filter(t=>t.type==="ahorro" && !t.goalId && normName(t.desc||"")===nn);
+          linked.forEach(t=>{ t.goalId = ng.id; finPushTx(t); });
+          if(linked.length) toast("Meta creada y vinculada a "+linked.length+" ahorro(s) existente(s)");
+        }
         finCfgChanged(); finQuickType(); renderFin();
       });
   }
@@ -5383,14 +5400,16 @@
     fin.tx.push(t); finPushTx(t); return t;
   }
   const FIN_ICONS = {"Mercado":"🛒","Alimentación":"🛒","Comida":"🍽️","Restaurante":"🍔","Transporte":"🚕","Tiendas":"🏪","Misceláneos":"🧩","Hogar":"🏠","Cuidado personal":"🧴","Salud":"💊","Suplementos":"💪","Ropa":"👕","Regalos":"🎁","Entretenimiento":"🎟️","Educación":"📚","Solidaridad":"🤝","Mascotas":"🐾","Vacaciones":"🏖️","Efectivo":"💵","Otros":"📦","Servicios":"💡","Vivienda":"🏢","Deudas":"💳","Ocio":"🎬","Compras":"🛍️"};
+  function finIsSalary(t){ return t.fund!=="ahorro"; }
   function finIsFixedTx(t){ return !!(t.fixedId || t.src==="fijo" || t.sub==="Facturas" || t.sub==="Deuda" || ["Vivienda","Servicios","Deudas"].indexOf(t.cat)>=0); }
   function finSavings(){
     const c = fin.cfg, cyc = c.cycleStart||"";
     const capTx = fin.tx.filter(t=>t.type==="ahorro" || t.type==="inversion");
     const isEx = t => !!(t.executed || (t.goalId && (fin.goals.find(g=>g.id===t.goalId)||{}).executed));
     const hist = capTx.reduce((a,t)=>a+t.amount,0);
-    const act = capTx.filter(t=>!isEx(t) && (!cyc || t.date>=cyc)).reduce((a,t)=>a+t.amount,0);
-    return {hist, act, exec: hist-act, cyc};
+    const spent = fin.tx.filter(t=>t.type==="gasto" && t.fund==="ahorro" && (!cyc || t.date>=cyc)).reduce((a,t)=>a+t.amount,0);
+    const act = Math.max(0, capTx.filter(t=>!isEx(t) && (!cyc || t.date>=cyc)).reduce((a,t)=>a+t.amount,0) - spent - (Number(c.execAdj)||0));
+    return {hist, act, exec: Math.max(0,hist-act-spent), cyc, spent, adj:Number(c.execAdj)||0};
   }
   function finChart(N, daily, budget, daysEl){
     const Wd=560, Ht=230, pl=46, pr=12, pt=14, pb=26, W=Wd-pl-pr, Hh=Ht-pt-pb;
@@ -5446,11 +5465,11 @@
     document.getElementById("finMonthLabel").textContent = finMonthLabel(finMonth);
     const c = fin.cfg;
     const mtx = fin.tx.filter(t=>t.date && t.date.slice(0,7)===finMonth);
-    const inc = finSum(mtx,"ingreso"), exp = finSum(mtx,"gasto"), sav = finSum(mtx,"ahorro"), inv = finSum(mtx,"inversion");
+    const inc = finSum(mtx,"ingreso"), exp = finSum(mtx.filter(finIsSalary),"gasto"), sav = finSum(mtx,"ahorro"), inv = finSum(mtx,"inversion");
     const {weeks, N} = finWeeks(finMonth);
     const nowM = todayKey().slice(0,7), isCur = finMonth===nowM, todayD = parseInt(todayKey().slice(8,10));
     const daysEl = isCur ? todayD : (finMonth<nowM ? N : 0);
-    const gastoTx = mtx.filter(t=>t.type==="gasto");
+    const gastoTx = mtx.filter(t=>t.type==="gasto" && finIsSalary(t));
     weeks.forEach(w=>{
       w.spent = gastoTx.filter(t=>{ const d = parseInt(t.date.slice(8,10)); return d>=w.from && d<=w.to; }).reduce((a,t)=>a+t.amount,0);
       w.budget = c.budgetMonth ? c.budgetMonth*w.days/N : 0;
@@ -5496,7 +5515,7 @@
     const capital = sav + inv, tasa = inc>0 ? capital/inc*100 : null;
     const k3 = `<div class="value">${tasa===null?"—":tasa.toFixed(1)+"%"}</div><div class="sub">${tasa===null?"Registra ingresos para calcularla":`${finMoney(capital)} a capital · ${finMoney(exp)} a consumo`}</div>`;
     // KPI 4 · fuga principal
-    const prevBy = {}; finPrevMonthTx().filter(t=>t.type==="gasto").forEach(t=>{ prevBy[t.cat]=(prevBy[t.cat]||0)+t.amount; });
+    const prevBy = {}; finPrevMonthTx().filter(t=>t.type==="gasto" && finIsSalary(t)).forEach(t=>{ prevBy[t.cat]=(prevBy[t.cat]||0)+t.amount; });
     let fuga = null;
     Object.keys(byCat).forEach(k=>{ const g = byCat[k]-(prevBy[k]||0); if(prevBy[k]>0 && g>0 && (!fuga || g>fuga.g)) fuga = {k, g, pct:Math.round(g/prevBy[k]*100)}; });
     const topCat = Object.keys(byCat).sort((a,b)=>byCat[b]-byCat[a])[0];
@@ -5556,7 +5575,7 @@
     const catCards = cats.slice(0,6).map(k=>{
       const v = byCat[k], cap = c.catBudgets[k]||0, share = exp>0 ? Math.round(v/exp*100) : 0, pv = prevBy[k]||0;
       const gr = pv>0 ? Math.round((v-pv)/pv*100) : null;
-      const hot = (cap>0 && v>cap) || (gr!==null && gr>=100);
+      const hot = cap>0 ? v>cap : (gr!==null && gr>=100);
       const w = cap>0 ? Math.min(100, v/cap*100) : share;
       return `<div class="fin-cc ${hot?"hot":""} ${finCatFilter===k?"sel":""}" data-act="cat-pick" data-k="${escAttr(k)}" data-tip="${escAttr(k+"\nClic: ver solo estos movimientos"+(gr!==null?"\n"+(gr>=0?"+":"")+gr+"% vs mes anterior":""))}">
         <div class="h"><span class="ic">${FIN_ICONS[k]||"📦"}</span><span>${escHtml(k)}</span><button class="ed" data-act="cat-cap" data-k="${escAttr(k)}" title="Editar tope">✎</button></div>
@@ -5568,17 +5587,7 @@
     const savHtml = `<div class="fin-sav-grid">
       <div class="hist"><small>Ahorro histórico logrado</small><b class="mono">${finMoney(sv.hist)}</b><em>Nunca baja: es tu capacidad de producir y retener capital.</em></div>
       <div><small>Ahorro activo actual</small><b class="mono">${finMoney(sv.act)}</b><em>${sv.cyc?"Ciclo desde "+sv.cyc+" hasta hoy":"Saldo vigente (no ejecutado)"}</em></div></div>
-      <div class="fin-note">${sv.exec>0?`<span class="fin-badge-ex">✓ Ejecutado en Meta</span> <b>${finMoney(sv.exec)}</b> de ahorro de ciclos anteriores o metas ya cumplidas siguen sumando a tu histórico.`:`Marca una meta como ✓ Ejecutada, o define el inicio del ciclo en ⚙ Presupuesto, para separar lo ya usado.`}</div>`;
-    // movimientos
-    let list = mtx.slice().sort((a,b)=> b.date.localeCompare(a.date) || (b.createdAt||0)-(a.createdAt||0));
-    if(finFilter!=="todos") list = list.filter(t=>t.type===finFilter);
-    if(finCatFilter!=="todas") list = list.filter(t=>t.cat===finCatFilter);
-    const rows = list.map(t=>{
-      const sign = t.type==="ingreso" ? "+" : "−";
-      const goal = t.goalId ? (fin.goals.find(g=>g.id===t.goalId)||{}).name : t.investId ? (fin.invest.find(g=>g.id===t.investId)||{}).name : "";
-      const usd = t.orig && t.orig.cur==="USD" ? ` <span class="usd">US$ ${t.orig.amt}</span>` : "";
-      return `<tr><td class="mono dt">${t.date.slice(8,10)}/${t.date.slice(5,7)}</td><td>${escHtml(t.desc || t.cat || FIN_TYPES[t.type])}${goal?` <small>· ${escHtml(goal)}</small>`:""}${t.src==="form"?` <small>· 📲</small>`:t.src==="fijo"?` <small>· fijo</small>`:""}</td><td><span class="tp ${t.type}">${FIN_TYPES[t.type]}</span></td><td>${t.type==="gasto"?escHtml(t.cat||""):"—"}</td><td class="a mono ${t.type}">${sign}${finMoney(t.amount)}${usd}</td><td><button class="x" data-act="tx-del" data-id="${t.id}" title="Eliminar">✕</button></td></tr>`;
-    }).join("");
+      <div class="fin-note"><button class="fin-mini" data-act="adj-exec" style="float:right;margin-left:8px;">⚖ Ajustar saldo ejecutado</button>${sv.spent>0?`🏦 Pagado con fondo de ahorro: <b>${finMoney(sv.spent)}</b> · `:""}${sv.exec>0?`<span class="fin-badge-ex">✓ Ejecutado en Meta</span> <b>${finMoney(sv.exec)}</b> de ahorro de ciclos anteriores o metas ya cumplidas siguen sumando a tu histórico.`:`Marca una meta como ✓ Ejecutada, o define el inicio del ciclo en ⚙ Presupuesto, para separar lo ya usado.`}</div>`;
     const catOpts = Array.from(new Set(c.cats.concat(mtx.map(t=>t.cat).filter(Boolean))));
     root.innerHTML = `
       ${alerts.length?`<div class="fin-alerts">${alerts.map(a=>`<div class="fin-alert ${a[0]}">${a[0]==="bad"?"🚨":"⚠️"} <span>${a[1]}</span></div>`).join("")}</div>`:""}
@@ -5609,10 +5618,51 @@
         <div class="fin-card"><div class="fin-card-h"><b>Inversiones</b><span><button class="fin-mini" data-act="inv-new">+ Nueva inversión</button></span></div>${invHtml}</div>
       </div>
       <div class="fin-sec" id="finMovs"><div class="fin-sec-h"><h3>Movimientos${finCatFilter!=="todas"?` · ${escHtml(finCatFilter)}`:""}</h3><span class="fin-filters">
-        <select class="fin-filter" id="finFilterSel"><option value="todos">Todos los tipos</option>${Object.keys(FIN_TYPES).map(k=>`<option value="${k}" ${finFilter===k?"selected":""}>${FIN_TYPES[k]}</option>`).join("")}</select>
+        <input type="search" class="fin-filter" id="finSearch" placeholder="🔎 Buscar…" value="${escAttr(finSearch)}" style="min-width:130px;"><select class="fin-filter" id="finFilterSel"><option value="todos">Todos los tipos</option>${Object.keys(FIN_TYPES).map(k=>`<option value="${k}" ${finFilter===k?"selected":""}>${FIN_TYPES[k]}</option>`).join("")}</select>
         <select class="fin-filter" id="finCatSel"><option value="todas">Todas las categorías</option>${catOpts.map(k=>`<option value="${escAttr(k)}" ${finCatFilter===k?"selected":""}>${escHtml(k)}</option>`).join("")}</select></span></div>
-        ${rows?`<div class="fin-tablewrap"><table class="fin-table"><thead><tr><th>Fecha</th><th>Descripción</th><th>Tipo</th><th>Categoría</th><th style="text-align:right">Monto</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`:`<div class="fin-empty">Sin movimientos en este mes para estos filtros.</div>`}</div>`;
+        <div id="finFeed">${finFeedHtml()}</div></div>`;
   }
+  function finTxEdit(id){
+    const t = fin.tx.find(x=>x.id===id); if(!t) return;
+    const catSel = `<select id="feCat">${fin.cfg.cats.map(k=>`<option ${k===t.cat?"selected":""}>${escHtml(k)}</option>`).join("")}</select>`;
+    finModal("Editar movimiento", `<div class="field-row"><div class="field"><label>Monto (S/)</label><input type="number" step="0.01" min="0" id="feAmt" value="${t.amount}"></div><div class="field"><label>Fecha</label><input type="date" id="feDate" value="${t.date}"></div></div>
+      <div class="field"><label>Descripción</label><input type="text" id="feDesc" value="${escAttr(t.desc||"")}"></div>
+      ${t.type==="gasto"?`<div class="field-row"><div class="field"><label>Categoría</label>${catSel}</div><div class="field"><label>Origen</label><select id="feFund"><option value="sueldo" ${t.fund!=="ahorro"?"selected":""}>💳 Sueldo base</option><option value="ahorro" ${t.fund==="ahorro"?"selected":""}>🏦 Fondo de ahorro</option></select></div></div>`:""}`,
+      ov=>{
+        const a = finNum(ov.querySelector("#feAmt").value); if(!(a>0)){ toast("Monto inválido"); return false; }
+        t.amount = Math.round(a*100)/100; t.date = ov.querySelector("#feDate").value || t.date; t.desc = ov.querySelector("#feDesc").value.trim();
+        if(t.type==="gasto"){ t.cat = ov.querySelector("#feCat").value; if(ov.querySelector("#feFund").value==="ahorro") t.fund="ahorro"; else delete t.fund; }
+        finSaveLocal(); finPushTx(t); renderFin(); toast("Movimiento actualizado");
+      });
+  }
+  function finFeedHtml(){
+    let list = fin.tx.filter(t=>t.date && t.date.slice(0,7)===finMonth).sort((a,b)=> b.date.localeCompare(a.date) || (b.createdAt||0)-(a.createdAt||0));
+    if(finFilter!=="todos") list = list.filter(t=>t.type===finFilter);
+    if(finCatFilter!=="todas") list = list.filter(t=>t.cat===finCatFilter);
+    const q = normName(finSearch).trim();
+    if(q) list = list.filter(t=>normName([t.desc,t.cat,t.sub].join(" ")).indexOf(q)>=0);
+    if(!list.length) return `<div class="fin-empty">Sin movimientos en este mes para estos filtros.</div>`;
+    const days = {}; list.forEach(t=>{ (days[t.date] = days[t.date]||[]).push(t); });
+    const MES = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+    return Object.keys(days).sort().reverse().map(d=>{
+      const cons = days[d].filter(t=>t.type==="gasto" && finIsSalary(t)).reduce((a,t)=>a+t.amount,0);
+      const rows = days[d].map(t=>{
+        const goal = t.goalId ? (fin.goals.find(g=>g.id===t.goalId)||{}).name : t.investId ? (fin.invest.find(g=>g.id===t.investId)||{}).name : "";
+        const usd = t.orig && t.orig.cur==="USD" ? ` <span class="usd">US$ ${t.orig.amt}</span>` : "";
+        const tag = t.src==="form" ? " · 📲" : t.src==="fijo" ? " · fijo" : "";
+        const act = `<span class="acts"><button class="x" data-act="tx-edit" data-id="${t.id}" title="Editar">✎</button><button class="x" data-act="tx-del" data-id="${t.id}" title="Eliminar">✕</button></span>`;
+        if(t.type==="ahorro" || t.type==="inversion"){
+          return `<div class="fin-row xfer"><div class="ds"><b>${escHtml(t.desc||FIN_TYPES[t.type])}</b><small>${t.type==="ahorro"?"Transferencia a ahorro":"Aporte a inversión"}${goal?" · "+escHtml(goal):""}${tag}</small></div><div class="am gold">↗ ${finMoney(t.amount)} <small>→ ${t.type==="ahorro"?"Capital":"Inversión"}</small>${usd}</div>${act}</div>`;
+        }
+        const isInc = t.type==="ingreso", fromSav = t.fund==="ahorro";
+        return `<div class="fin-row"><div class="ds"><b>${escHtml(t.desc || t.cat || FIN_TYPES[t.type])}</b><small>${isInc?"Ingreso":escHtml(t.cat||"")}${isInc?"":` <span class="orig ${fromSav?"sav":""}">${fromSav?"Ahorro":"Sueldo"}</span>`}${tag}</small></div><div class="am ${isInc?"inc":""}">${isInc?"+":"−"}${finMoney(t.amount)}${usd}</div>${act}</div>`;
+      }).join("");
+      return `<div class="fin-day"><div class="dh"><span>${parseInt(d.slice(8,10))} ${MES[parseInt(d.slice(5,7))-1]}</span>${cons>0?`<span>Consumo del día: <b>${finMoney(cons)}</b></span>`:""}</div>${rows}</div>`;
+    }).join("");
+  }
+  document.getElementById("view-finanzas").addEventListener("input", e=>{
+    if(e.target.id==="finSearch"){ finSearch = e.target.value; const f = document.getElementById("finFeed"); if(f) f.innerHTML = finFeedHtml(); }
+  });
   function finPayAllFixed(){
     const pend = (fin.cfg.fixed||[]).filter(f=>!finFixedPaid(f, finMonth));
     if(!pend.length){ toast("No hay gastos fijos pendientes"); return; }
@@ -5633,6 +5683,12 @@
     else if(act==="cat-cap"){ const k = b.dataset.k; e.stopPropagation();
       finModal("Tope mensual · "+escHtml(k), `<div class="field"><label>Límite para ${escHtml(k)} (S/ al mes, vacío = sin tope)</label><input type="number" min="0" step="1" id="fcCap" value="${fin.cfg.catBudgets[k]||""}"></div>`,
         ov=>{ const v = finNum(ov.querySelector("#fcCap").value); if(v) fin.cfg.catBudgets[k] = v; else delete fin.cfg.catBudgets[k]; finCfgChanged(); renderFin(); }); }
+    else if(act==="adj-exec"){
+      finModal("Ajustar saldo ejecutado", `<div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">Monto de ahorro que ya usaste (compras grandes, metas cumplidas). Baja tu <b>Ahorro activo</b> pero tu <b>Ahorro histórico logrado</b> se mantiene intacto.</div>
+        <div class="field"><label>Total ejecutado a descontar (S/)</label><input type="number" min="0" step="0.01" id="faAdj" value="${fin.cfg.execAdj||""}"></div>`,
+        ov=>{ fin.cfg.execAdj = finNum(ov.querySelector("#faAdj").value)||0; finCfgChanged(); renderFin(); toast("Saldo ejecutado actualizado"); });
+    }
+    else if(act==="tx-edit"){ finTxEdit(id); }
     else if(act==="goal-exec"){ const g = fin.goals.find(x=>x.id===id); if(g){ g.executed = !g.executed; finCfgChanged(); renderFin(); toast(g.executed?"Meta marcada como ejecutada: su ahorro sigue en tu histórico":"Meta reactivada"); } }
     else if(act==="fixed-edit") finFixedModal();
     else if(act==="fixed-pay"){ const f = (fin.cfg.fixed||[]).find(x=>x.id===id); if(f && !finFixedPaid(f, finMonth)){ finConfirmFixed(f); finSaveLocal(); renderFin(); toast("Pagado: "+f.name+" "+finMoney(f.amount)); } }
