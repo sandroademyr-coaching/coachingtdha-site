@@ -880,6 +880,49 @@
   .fx-row .x{background:transparent;border:none;color:var(--text-faint);cursor:pointer;}
   @media(max-width:920px){.fin-quick{grid-template-columns:1fr 1fr !important;} .fin-kpis{grid-template-columns:repeat(2,1fr) !important;} .fq-pill.fx{margin-left:0;} .fx-row{grid-template-columns:1fr 1fr;}}
   @media(max-width:920px){.jpills{grid-template-columns:repeat(2,1fr);}}
+
+  /* ===== Ajuste F · alertas 3 niveles, ledger 65/35, smart slides ===== */
+  .fin-alert.info{background:rgba(234,179,8,.08);border-color:rgba(234,179,8,.32);color:#e8c766;}
+  .fin-cc.zero{border-color:rgba(234,179,8,.45);} .fin-cc.zero .bar i{background:#EAB308 !important;} .fin-cc.zero .amt.big{color:#EAB308 !important;}
+  .fin-cc.warn{border-color:rgba(245,158,11,.4);} .fin-cc.warn .bar i{background:#f59e0b;} .fin-cc.warn .amt.big{color:#f5c26b;}
+  .fin-cc.hot .bar i{background:#f87171;}
+  .fin-cc .pill-closed{margin-left:6px;font-size:9.5px;font-weight:700;letter-spacing:.3px;padding:2px 7px;border-radius:999px;background:rgba(234,179,8,.14);color:#EAB308;border:1px solid rgba(234,179,8,.35);white-space:nowrap;}
+  .fin-movgrid{display:grid;grid-template-columns:65fr 35fr;gap:14px;align-items:start;margin-top:4px;}
+  @media(max-width:920px){.fin-movgrid{grid-template-columns:minmax(0,1fr);}} .fin-movgrid>*{min-width:0;}
+  .fin-ledger{background:#12141C;border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden;min-width:0;}
+  .fin-ledger .fin-day{margin:0;} .fin-ledger .fin-day .dh{padding:8px 14px;background:rgba(255,255,255,.025);border-bottom:1px solid rgba(255,255,255,.05);}
+  .fin-ledger .fin-row,.fin-ledger .fin-row.xfer{height:42px;box-sizing:border-box;margin:0;padding:0 10px 0 11px;border:0;border-bottom:1px solid rgba(255,255,255,.05);border-left:3px solid var(--cc,#6f7684);border-radius:0;background:transparent;gap:10px;}
+  .fin-ledger .fin-row.xfer{--cc:#EAB308;background:linear-gradient(90deg,rgba(234,179,8,.06),transparent 60%);}
+  .fin-ledger .fin-row:hover{background:rgba(255,255,255,.03);transform:none;border-color:rgba(255,255,255,.05);border-left-color:var(--cc,#6f7684);}
+  .fin-ledger .fin-row .ds{display:flex;align-items:center;gap:8px;min-width:0;}
+  .fin-ledger .fin-row .ds .ic{font-size:14px;flex:none;width:18px;text-align:center;}
+  .fin-ledger .fin-row .ds b{display:inline;font-size:13px;flex:0 1 auto;min-width:0;}
+  .fin-ledger .fin-row .ds small{flex:none;white-space:nowrap;font-size:10.5px;}
+  .fin-ledger .fin-row .am{font-variant-numeric:tabular-nums;font-size:13px;}
+  .fin-ledger .fin-empty{padding:18px 14px;}
+  .fin-side{display:flex;flex-direction:column;gap:14px;min-width:0;position:sticky;top:12px;}
+  @media(max-width:920px){.fin-side{position:static;}}
+  .fin-side .fin-card{margin:0;}
+  .hm{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+  .hm .wd{font-size:9.5px;text-align:center;color:var(--text-faint);letter-spacing:.4px;}
+  .hm .c{aspect-ratio:1/1;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:600;color:rgba(255,255,255,.75);background:rgba(255,255,255,.04);}
+  .hm .c.e{background:transparent;} .hm .c.f{color:var(--text-faint);font-weight:400;}
+  .hm .c.g{background:rgba(16,185,129,.38);color:#d1fae5;} .hm .c.a1{background:rgba(245,158,11,.22);} .hm .c.a2{background:rgba(245,158,11,.5);color:#fff;} .hm .c.r{background:rgba(248,113,113,.65);color:#fff;}
+  .hm .c.t{outline:1.5px solid #EAB308;outline-offset:-1.5px;}
+  .hm-leg{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;font-size:10.5px;color:var(--text-faint);} .hm-leg i{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:4px;vertical-align:-1px;}
+  .rep-row{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:13px;} .rep-row:last-child{border-bottom:0;}
+  .rep-row b{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;} .rep-row span{color:var(--text-dim);font-size:12px;white-space:nowrap;font-variant-numeric:tabular-nums;}
+  /* Smart slides */
+  .ss{position:relative;overflow:hidden;}
+  .ss-bar{position:absolute;left:0;top:0;height:2px;width:0;background:#EAB308;opacity:.85;transition:width .12s linear;pointer-events:none;z-index:2;}
+  .ss-st{display:grid;} .ss-s{grid-area:1/1;opacity:0;visibility:hidden;transition:opacity .35s ease;min-width:0;} .ss-s.on{opacity:1;visibility:visible;}
+  .ss-dots{display:flex;justify-content:center;gap:7px;margin-top:8px;}
+  .ss-dots button{position:relative;width:6px;height:6px;border-radius:50%;border:0;padding:0;background:rgba(255,255,255,.22);cursor:pointer;transition:background .2s,transform .2s;}
+  .ss-dots button::before{content:"";position:absolute;inset:-7px;}
+  .ss-dots button.on{background:#EAB308;transform:scale(1.25);}
+  .ss.ss-plain .ss-s .intel-card{background:none;border:0;padding:0;transform:none;} .ss.intel-wide{grid-column:1/-1;background:#161824;border:1px solid rgba(255,255,255,.05);border-radius:14px;padding:16px;}
+  .rule-banner .ss{flex:1;min-width:0;background:transparent;} .rule-banner .ss-s{font-size:13px;line-height:1.45;} .rule-banner .ss-dots{margin-top:5px;}
+  .rule-banner.show{padding-top:12px;}
 </style>
 </head>
 <body>
@@ -2482,6 +2525,39 @@
     return { weekday: WEEKDAY_NAMES[worstIdx], rate: Math.round(worstRate) };
   }
 
+  /* ---------------- Smart Slides (carruseles silenciosos de 8 s) ---------------- */
+  const SS = {}, SS_MS = 8000;
+  const SS_REDUCE = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  function ssHtml(id, slides, cls, style){
+    const st = SS[id] || (SS[id] = {i:0, t:0, n:0}); st.n = slides.length; if(st.i>=st.n) st.i = 0;
+    return `<div class="${cls||""} ss" data-ssid="${id}"${style?` style="${style}"`:""}><i class="ss-bar" style="width:${Math.min(100,st.t/SS_MS*100)}%"></i>
+      <div class="ss-st">${slides.map((x,k)=>`<div class="ss-s ${k===st.i?"on":""}"${x.tip?` data-tip="${escAttr(x.tip)}"`:""}>${x.html}</div>`).join("")}</div>
+      ${st.n>1?`<div class="ss-dots">${slides.map((x,k)=>`<button type="button" data-ssgo="${k}" class="${k===st.i?"on":""}" aria-label="Ir a la tarjeta ${k+1} de ${st.n}"></button>`).join("")}</div>`:""}</div>`;
+  }
+  function ssGo(id, k){
+    const st = SS[id]; if(!st) return; st.i = k; st.t = 0;
+    document.querySelectorAll(`.ss[data-ssid="${id}"]`).forEach(el=>{
+      el.querySelectorAll(".ss-s").forEach((x,j)=>x.classList.toggle("on", j===k));
+      el.querySelectorAll(".ss-dots button").forEach((b,j)=>b.classList.toggle("on", j===k));
+      const bar = el.querySelector(".ss-bar"); if(bar) bar.style.width = "0%";
+    });
+  }
+  document.addEventListener("click", e=>{
+    const b = e.target.closest && e.target.closest("[data-ssgo]"); if(!b) return;
+    const el = b.closest(".ss"); if(el) ssGo(el.dataset.ssid, parseInt(b.dataset.ssgo));
+  });
+  setInterval(()=>{
+    if(document.hidden) return;
+    document.querySelectorAll(".ss").forEach(el=>{
+      const st = SS[el.dataset.ssid]; if(!st || st.n<2 || el.offsetParent===null) return;
+      if(el.matches(":hover") || el.contains(document.activeElement)) return;
+      if(SS_REDUCE) return;
+      st.t += 100;
+      const bar = el.querySelector(".ss-bar"); if(bar) bar.style.width = Math.min(100, st.t/SS_MS*100)+"%";
+      if(st.t>=SS_MS) ssGo(el.dataset.ssid, (st.i+1)%st.n);
+    });
+  }, 100);
+
   /* ---------------- Centro de inteligencia operativa ---------------- */
   function shortName(h){ return h.name.split("(")[0].trim(); }
 
@@ -2599,7 +2675,7 @@
       return;
     }
     section.style.display = "flex"; box.style.display = "block";
-    wrap.innerHTML = `<div class="intel-grid">${intelMomentum()}${intelQuality()}${intelSparklines()}${intelDomino()}</div>`;
+    wrap.innerHTML = `<div class="intel-grid">${ssHtml("hab",[{html:intelDomino()},{html:intelMomentum()}],"ss-plain intel-wide")}${intelQuality()}${intelSparklines()}</div>`;
   }
 
   let trendOffset = 0; // meses hacia atrás desde hoy (se mueve de a 6)
@@ -3812,6 +3888,7 @@
   }
 
   function renderAgendaKPIs(){
+    try{ renderRuleBanner(); }catch(e){}
     const key = todayKey(currentDate);
     const isToday = key===todayKey(new Date());
     const rocks = getRocks(key,false);
@@ -4658,14 +4735,23 @@
   document.addEventListener("keydown", e=>{ if(e.key==="Escape") closeJournalDrawer(); });
 
   /* ---- recordatorio: la regla de ayer, visible al abrir el panel ---- */
+  let radarSum = null;
   function renderRuleBanner(){
     const el = document.getElementById("ruleBanner"); if(!el) return;
     const today = todayKey(new Date()), y = jDay(today,-1), rule = state.journal[y] && state.journal[y].rule;
     let hidden = false; try{ hidden = localStorage.getItem("panel_rule_hidden") === today; }catch(e){}
-    if(!rule || hidden){ el.classList.remove("show"); return; }
-    el.innerHTML = `<span>🔔 <b>Tu regla de hoy · 05:30 AM:</b> ${escHtml(rule)}</span><button type="button" title="Ocultar por hoy">✕</button>`;
+    if(hidden){ el.classList.remove("show"); return; }
+    if(!radarSum){ try{ renderRadar(); }catch(e){} }
+    const rocks = (state.bigRocks && state.bigRocks[today] || []).filter(r=>String(r.text||"").trim());
+    const done = rocks.filter(r=>r.done).length;
+    const slides = [
+      {html: rule ? `<span>🔔 <b>Tu regla de hoy · 05:30 AM:</b> ${escHtml(rule)}</span>` : `<span>🔔 <b>Regla innegociable · 05:30 AM:</b> aún sin definir. Escríbela al cerrar tu Bitácora de hoy.</span>`},
+      {html: rocks.length ? `<span>🪨 <b>Big Rocks de hoy:</b> ${done} de ${rocks.length} cerrados · ${rocks.slice(0,3).map(r=>(r.done?"✓ ":"○ ")+escHtml(String(r.text).slice(0,38))).join(" · ")}</span>` : `<span>🪨 <b>Big Rocks de hoy:</b> aún no defines tus 3 victorias. Hazlo en Agenda.</span>`},
+      {html: `<span>📡 <b>Evolución 90D:</b> ${radarSum ? escHtml(radarSum.txt) : "se activa con 90 días de historia."}</span>`}
+    ];
+    el.innerHTML = ssHtml("banner", slides, "ss-banner") + `<button type="button" title="Ocultar por hoy">✕</button>`;
     el.classList.add("show");
-    el.querySelector("button").onclick = ()=>{ try{ localStorage.setItem("panel_rule_hidden", today); }catch(e){} el.classList.remove("show"); };
+    el.querySelector("button[title]").onclick = ()=>{ try{ localStorage.setItem("panel_rule_hidden", today); }catch(e){} el.classList.remove("show"); };
   }
 
   function journalOnShow(){ if(jDirty){ renderJournalKpis(); renderJournalContext(); } else renderJournalView(); }
@@ -4731,6 +4817,7 @@
       : up===tot ? `Evidencia: las ${tot} dimensiones medidas mejoraron. Si sientes que no avanzas, la percepción está contradiciendo tus propios datos.`
       : up>=Math.ceil(tot/2) ? `Evidencia: ${up} de ${tot} dimensiones mejoraron. El avance es real aunque no sea parejo; apunta tu siguiente ajuste a la que retrocedió.`
       : `Evidencia: solo ${up} de ${tot} dimensiones mejoraron. Aquí la sensación de estancamiento tiene base: elige una sola dimensión y recupérala esta semana.`;
+    radarSum = {up, tot, txt: tot===0 ? "aún sin datos suficientes para comparar." : `${up} de ${tot} dimensiones mejoraron frente a hace 90 días` + (pills.filter(x=>x.good===true).length ? ` (▲ ${pills.filter(x=>x.good===true).map(x=>x.l).join(", ")})` : ".")};
     box.innerHTML = `<div class="radar"><div class="rd-h"><b>Radar de Evolución 90D · Evidencia vs. Percepción</b><span>últimos 30 días vs. hace 90 días</span></div>
       <div class="rd-txt">${parts.length?parts.map(x=>`<p>${x}</p>`).join(""):""}<div class="rd-verdict">${verdict}</div></div>
       <div class="rd-pills">${pills.map(x=>`<div class="rd-pill ${x.good===true?"up":x.good===false?"dn":""}"><small>${x.l}</small><div class="ft">${x.a}<i>→</i><span class="to">${x.b}</span></div><em>${x.n}</em></div>`).join("")}</div></div>`;
@@ -5130,6 +5217,7 @@
   }
   function finMigrateV2(){
     if(!FIN_OWNER_PRESET) return false;
+    try{ finEnsureAnchor(); }catch(e){}
     let done = false; try{ done = localStorage.getItem("panel_fin_schema")==="finanzas_v2"; }catch(e){}
     if(fin.cfg.schemaVersion==="finanzas_v2" && done) return false;
     if(done){ finApplyCfgV2(); finCfgChanged(); return true; }        // otro dispositivo/nube sobrescribió la config
@@ -5459,15 +5547,33 @@
   const FIN_ICONS = {"Mercado":"🛒","Alimentación":"🛒","Comida":"🍽️","Restaurante":"🍔","Transporte":"🚕","Tiendas":"🏪","Misceláneos":"🧩","Hogar":"🏠","Cuidado personal":"🧴","Salud":"💊","Suplementos":"💪","Ropa":"👕","Regalos":"🎁","Entretenimiento":"🎟️","Educación":"📚","Solidaridad":"🤝","Mascotas":"🐾","Vacaciones":"🏖️","Efectivo":"💵","Otros":"📦","Servicios":"💡","Vivienda":"🏢","Deudas":"💳","Ocio":"🎬","Compras":"🛍️"};
   function finIsSalary(t){ return t.fund!=="ahorro"; }
   function finIsFixedTx(t){ return !!(t.fixedId || t.src==="fijo" || t.sub==="Facturas" || t.sub==="Deuda" || ["Vivienda","Servicios","Deudas"].indexOf(t.cat)>=0); }
+  const FIN_ANCHOR_AMT = 825.01;
+  function finEnsureAnchor(){
+    if(!FIN_OWNER_PRESET) return false;
+    let raw = null; try{ raw = JSON.parse(localStorage.getItem("panel_fin_anchor")||"null"); }catch(e){}
+    if(fin.cfg.savingsAnchor){ if(!raw){ try{ localStorage.setItem("panel_fin_anchor", JSON.stringify(fin.cfg.savingsAnchor)); }catch(e){} } return false; }
+    fin.cfg.savingsAnchor = raw || {amt:FIN_ANCHOR_AMT, ts:Date.now(), date:todayKey()};
+    try{ localStorage.setItem("panel_fin_anchor", JSON.stringify(fin.cfg.savingsAnchor)); }catch(e){}
+    finCfgChanged(); return true;
+  }
   function finSavings(){
-    const c = fin.cfg, cyc = c.cycleStart||"";
+    const c = fin.cfg, cyc = c.cycleStart||"", A = c.savingsAnchor;
     const capTx = fin.tx.filter(t=>t.type==="ahorro" || t.type==="inversion");
     const isEx = t => !!(t.executed || (t.goalId && (fin.goals.find(g=>g.id===t.goalId)||{}).executed));
     const hist = capTx.reduce((a,t)=>a+t.amount,0);
     const spent = fin.tx.filter(t=>t.type==="gasto" && t.fund==="ahorro" && (!cyc || t.date>=cyc)).reduce((a,t)=>a+t.amount,0);
+    if(A && A.amt!=null){
+      const after = t => (t.createdAt||0) > (A.ts||0) && t.src!=="import";
+      const add = capTx.filter(after).reduce((a,t)=>a+t.amount,0);
+      const out = fin.tx.filter(t=>t.type==="gasto" && t.fund==="ahorro" && after(t)).reduce((a,t)=>a+t.amount,0);
+      const act = Math.max(0, Math.round((Number(A.amt)+add-out)*100)/100);
+      return {hist, act, exec: Math.max(0,hist-act), cyc, spent, adj:0, anchor:A};
+    }
     const act = Math.max(0, capTx.filter(t=>!isEx(t) && (!cyc || t.date>=cyc)).reduce((a,t)=>a+t.amount,0) - spent - (Number(c.execAdj)||0));
     return {hist, act, exec: Math.max(0,hist-act-spent), cyc, spent, adj:Number(c.execAdj)||0};
   }
+  const FIN_CATCOL = {"Mercado":"#34d399","Misceláneos":"#a78bfa","Restaurante":"#fb923c","Entretenimiento":"#f472b6","Hogar":"#60a5fa","Transporte":"#38bdf8","Cuidado personal":"#2dd4bf","Ropa":"#c084fc","Regalos":"#f87171","Servicios":"#EAB308","Vivienda":"#94a3b8","Deudas":"#ef4444","Salud":"#4ade80","Educación":"#fbbf24","Comida":"#fb923c","Tiendas":"#a78bfa"};
+  function finCatColor(k){ if(FIN_CATCOL[k]) return FIN_CATCOL[k]; let h=0; String(k||"").split("").forEach(ch=>{ h=(h*31+ch.charCodeAt(0))%360; }); return "hsl("+h+",55%,62%)"; }
   function finChart(N, daily, budget, daysEl){
     const Wd=560, Ht=230, pl=46, pr=12, pt=14, pb=26, W=Wd-pl-pr, Hh=Ht-pt-pb;
     let cum=[], s=0; for(let d=1; d<=N; d++){ s+=daily[d]||0; cum[d]=s; }
@@ -5680,33 +5786,38 @@
     const c = fin.cfg;
     const mtx = fin.tx.filter(t=>t.space!=="hogar" && t.date && t.date.slice(0,7)===finMonth);
     const inc = finSum(mtx,"ingreso"), exp = finSum(mtx.filter(finIsSalary),"gasto"), sav = finSum(mtx,"ahorro"), inv = finSum(mtx,"inversion"), hog = finSum(mtx,"hogar");
+    const bud = c.budgetMonth>0 ? Math.max(0, Math.round((c.budgetMonth-hog)*100)/100) : 0;   // techo personal neto (sin aporte a Hogar)
+    const sv = finSavings();
     const {weeks, N} = finWeeks(finMonth);
     const nowM = todayKey().slice(0,7), isCur = finMonth===nowM, todayD = parseInt(todayKey().slice(8,10));
     const daysEl = isCur ? todayD : (finMonth<nowM ? N : 0);
     const gastoTx = mtx.filter(t=>t.type==="gasto" && finIsSalary(t));
     weeks.forEach(w=>{
       w.spent = gastoTx.filter(t=>{ const d = parseInt(t.date.slice(8,10)); return d>=w.from && d<=w.to; }).reduce((a,t)=>a+t.amount,0);
-      w.budget = c.budgetMonth ? c.budgetMonth*w.days/N : 0;
+      w.budget = bud ? bud*w.days/N : 0;
       w.cur = isCur && todayD>=w.from && todayD<=w.to;
     });
     // alertas
-    const alerts = [];
-    if(c.budgetMonth>0){
-      const p = exp/c.budgetMonth*100;
-      if(p>=100) alerts.push(["bad", `Superaste tu presupuesto del mes: ${finMoney(exp)} de ${finMoney(c.budgetMonth)} (${Math.round(p)}%).`]);
-      else if(p>=c.alertPct) alerts.push(["warn", `Vas en ${Math.round(p)}% del presupuesto mensual (${finMoney(exp)} de ${finMoney(c.budgetMonth)}).`]);
+    const alerts = [], EPS = 0.005, A_LO = 85;
+    if(bud>0){
+      const p = exp/bud*100;
+      if(exp>bud+EPS) alerts.push(["bad", `Superaste tu techo neto del mes: ${finMoney(exp)} de ${finMoney(bud)} (excedido por ${finMoney(exp-bud)}).`]);
+      else if(Math.abs(exp-bud)<EPS) alerts.push(["info", `Techo del mes cerrado: ${finMoney(exp)} de ${finMoney(bud)}.`]);
+      else if(p>=A_LO) alerts.push(["warn", `Vas en ${Math.floor(p)}% de tu techo neto del mes (quedan ${finMoney(bud-exp)}).`]);
       const cw = weeks.find(w=>w.cur);
       if(cw && cw.budget>0){
         const pw = cw.spent/cw.budget*100;
-        if(pw>=100) alerts.push(["bad", `Esta semana ya pasaste tu límite semanal: ${finMoney(cw.spent)} de ${finMoney(cw.budget)}.`]);
-        else if(pw>=c.alertPct) alerts.push(["warn", `Esta semana llevas ${Math.round(pw)}% de tu límite semanal.`]);
+        if(cw.spent>cw.budget+EPS) alerts.push(["bad", `Esta semana pasaste tu límite semanal: ${finMoney(cw.spent)} de ${finMoney(cw.budget)}.`]);
+        else if(Math.abs(cw.spent-cw.budget)<EPS && cw.spent>0) alerts.push(["info", `Esta semana cerraste tu límite semanal (${finMoney(cw.spent)} de ${finMoney(cw.budget)}).`]);
+        else if(pw>=A_LO) alerts.push(["warn", `Esta semana llevas ${Math.floor(pw)}% de tu límite semanal.`]);
       }
     }
     const byCat = {}; gastoTx.forEach(t=>{ byCat[t.cat] = (byCat[t.cat]||0) + t.amount; });
     Object.keys(c.catBudgets).forEach(k=>{
-      const b = c.catBudgets[k], s = byCat[k]||0;
-      if(b>0 && s>=b) alerts.push(["bad", `${escHtml(k)}: superaste tu límite (${finMoney(s)} de ${finMoney(b)}).`]);
-      else if(b>0 && s/b*100>=c.alertPct) alerts.push(["warn", `${escHtml(k)}: ${Math.round(s/b*100)}% de su límite.`]);
+      const b = c.catBudgets[k], v = byCat[k]||0; if(!(b>0)) return;
+      if(v>b+EPS) alerts.push(["bad", `${escHtml(k)}: ${finMoney(v)} de ${finMoney(b)} · excedido por ${finMoney(v-b)}`]);
+      else if(Math.abs(v-b)<EPS && v>0) alerts.push(["info", `${escHtml(k)}: presupuesto cerrado (${finMoney(v)} de ${finMoney(b)})`]);
+      else if(v/b*100>=A_LO) alerts.push(["warn", `${escHtml(k)}: ${Math.floor(v/b*100)}% de su límite (quedan ${finMoney(b-v)})`]);
     });
     // fijos del mes
     const fixed = c.fixed||[];
@@ -5720,14 +5831,30 @@
       ? `<div class="value">${finMoney(dispReal)}</div><div class="sub">${inc>0?"Sobre tus ingresos":"Sobre tu presupuesto"} · ${pendFixed>0?"descuenta "+finMoney(pendFixed)+" de fijos pendientes":"sin fijos pendientes"}</div>`
       : `<div class="value dim">—</div><div class="sub">Registra ingresos o define tu presupuesto</div>`;
     // KPI 2 · burn rate
-    const burn = daysEl>0 ? exp/daysEl : 0, cap = c.budgetMonth>0 ? c.budgetMonth/N : 0;
+    const burn = daysEl>0 ? exp/daysEl : 0, cap = bud>0 ? bud/N : 0;
     const proj = exp + burn*Math.max(0,N-daysEl) + pendFixedGasto*(isCur?1:0);
-    let k2sub = cap>0 ? `Tope sano ${finMoney(cap)}/día` : "Define tu presupuesto para ver el tope";
-    if(cap>0 && isCur) k2sub += ` · <b class="${proj<=c.budgetMonth?"gd":"bd"}">${proj<=c.budgetMonth?"Cierras en verde":"Cierras sobregirado"}</b> (~${finMoney(proj)})`;
+    let k2sub = cap>0 ? `Tope sano neto ${finMoney(cap)}/día` : "Define tu presupuesto para ver el tope";
+    if(cap>0 && isCur) k2sub += ` · <b class="${proj<=bud+0.004?"gd":"bd"}">${proj<=bud+0.004?"Cierras en verde":"Cierras sobregirado"}</b> (~${finMoney(proj)})`;
     const k2 = `<div class="value">${daysEl>0?finMoney(burn):"—"}<small> / día</small></div><div class="sub">${k2sub}</div>`;
     // KPI 3 · tasa de patrimonio
     const capital = sav + inv, tasa = inc>0 ? capital/inc*100 : null;
     const k3 = `<div class="value">${tasa===null?"—":tasa.toFixed(1)+"%"}</div><div class="sub">${tasa===null?"Registra ingresos para calcularla":`${finMoney(capital)} a capital · ${finMoney(exp)} a consumo`}</div>`;
+    // días sin gasto (variable) · base de KPI y mapa de calor
+    const vdaily = {}; mtx.filter(t=>t.type==="gasto" && !finIsFixedTx(t)).forEach(t=>{ const d = parseInt(t.date.slice(8,10)); vdaily[d] = (vdaily[d]||0) + t.amount; });
+    let noSp = 0, streak = 0; for(let d=1; d<=daysEl; d++){ if(!(vdaily[d]>0)) noSp++; } for(let d=daysEl; d>=1 && !(vdaily[d]>0); d--) streak++;
+    const projOk = bud>0 ? proj<=bud+0.004 : null;
+    const kProj = daysEl>0 ? `<div class="value">${finMoney(proj)}</div><div class="sub">${bud>0?`Techo neto ${finMoney(bud)} · <b class="${projOk?"gd":"bd"}">${projOk?"sobrarían "+finMoney(bud-proj):"te pasarías por "+finMoney(proj-bud)}</b>`:"Define tu presupuesto para comparar"}</div>` : `<div class="value dim">—</div><div class="sub">Sin datos aún este mes</div>`;
+    const kNs = daysEl>0 ? `<div class="value">${noSp}<small> de ${daysEl} días</small></div><div class="sub">Sin gasto variable (hormiga) · ${streak>0?`racha actual <b class="gd">${streak} día${streak>1?"s":""}</b>`:"hoy ya hubo gasto"}</div>` : `<div class="value dim">—</div><div class="sub">Sin datos aún este mes</div>`;
+    const k3b = `<div class="value">${finMoney(sv.act)}</div><div class="sub">${sv.anchor?"Saldo líquido real de tu cuenta de ahorro":"Ahorro vigente no ejecutado"}</div>`;
+    const k3c = `<div class="value">${finMoney(sv.hist)}</div><div class="sub">Acumulado de todos los meses · nunca baja</div>`;
+    const k2s = [
+      {tip:"Burn rate diario\nGasto promedio por día comparado con tu tope sano\n(techo neto ÷ días del mes).", html:`<div class="label">Burn rate diario</div>${k2}`},
+      {tip:"Proyección de cierre\nGasto actual + ritmo diario × días restantes + fijos pendientes.", html:`<div class="label">Proyección de cierre</div>${kProj}`},
+      {tip:"Días sin gasto hormiga\nDías del mes sin ninguna compra variable (sin contar recibos fijos).", html:`<div class="label">Días sin gasto hormiga</div>${kNs}`}];
+    const k3s = [
+      {tip:"Tasa de patrimonio\n(Ahorro + inversión) ÷ ingresos del mes.", html:`<div class="label">Tasa de patrimonio</div>${k3}`},
+      {tip:"Ahorro activo\nSaldo líquido real de tu cuenta de ahorro hoy.", html:`<div class="label">Ahorro activo</div>${k3b}`},
+      {tip:"Ahorro histórico logrado\nSuma de todo lo que has ahorrado, incluidos ciclos ya ejecutados.", html:`<div class="label">Ahorro histórico</div>${k3c}`}];
     // KPI 4 · fuga principal
     const prevBy = {}; finPrevMonthTx().filter(t=>t.type==="gasto" && finIsSalary(t)).forEach(t=>{ prevBy[t.cat]=(prevBy[t.cat]||0)+t.amount; });
     let fuga = null;
@@ -5743,13 +5870,16 @@
     const expC = chartTx.reduce((a,t)=>a+t.amount,0);
     const fixedSpent = exp - varTx.reduce((a,t)=>a+t.amount,0);
     const tplFixed = fixed.filter(f=>(f.type||"gasto")==="gasto").reduce((a,f)=>a+(Number(f.amount)||0),0);
-    const budC = vMode ? (c.budgetMonth>0 ? Math.max(0, c.budgetMonth - Math.max(fixedSpent, tplFixed)) : 0) : (c.budgetMonth||0);
+    const varCeil = (Array.isArray(c.cardCats) && c.cardCats.length) ? c.cardCats.reduce((a,k)=>a+(Number(c.catBudgets[k])||0),0) : 0;
+    const budC = vMode ? (varCeil>0 ? varCeil : (bud>0 ? Math.max(0, bud - Math.max(fixedSpent, tplFixed)) : 0)) : bud;
     const daily = {}; chartTx.forEach(t=>{ const d = parseInt(t.date.slice(8,10)); daily[d]=(daily[d]||0)+t.amount; });
     let chartNote = "";
     if(budC>0 && daysEl>0){ const idl = budC*daysEl/N, diff = expC-idl; chartNote = `${vMode?"Variable real":"Real"} <b>${finMoney(expC)}</b> · ideal a hoy <b>${finMoney(idl)}</b> · <b class="${diff<=0?"gd":"bd"}">${diff<=0?"vas "+finMoney(-diff)+" por debajo":"vas "+finMoney(diff)+" por encima"}</b>`; }
-    else if(!c.budgetMonth) chartNote = `Define tu presupuesto mensual para ver la línea ideal.`;
-    else if(vMode && budC<=0) chartNote = `Tus fijos ya consumen todo el presupuesto; no queda margen variable.`;
-    if(vMode) chartNote += `<br><span style="color:var(--text-faint)">Excluye fijos, alquiler, servicios y deudas.${budC>0?" Ideal = presupuesto − fijos ("+finMoney(c.budgetMonth-budC)+").":""}</span>`;
+    else if(budC>0) chartNote = `Techo ideal ${finMoney(budC)} (${finMoney(budC/N)}/día).`;
+    else if(!vMode && !c.budgetMonth) chartNote = `Define tu presupuesto mensual para ver la línea ideal.`;
+    else if(vMode) chartNote = `Tus fijos ya consumen todo el presupuesto; no queda margen variable.`;
+    if(vMode) chartNote += `<br><span style="color:var(--text-faint)">${varCeil>0?`Ideal = suma de tus ${c.cardCats.length} topes variables: ${finMoney(budC)} · ${finMoney(budC/N)}/día.`:"Ideal = techo neto − fijos."} Excluye recibos fijos, servicios y deudas.</span>`;
+    else if(budC>0) chartNote += `<br><span style="color:var(--text-faint)">Techo neto ${finMoney(budC)} = presupuesto ${finMoney(c.budgetMonth)}${hog>0?` − aporte a Hogar ${finMoney(hog)}`:""} · ${finMoney(budC/N)}/día. Incluye fijos propios y variables.</span>`;
     // dona
     const cats = Object.keys(byCat).sort((a,b)=>byCat[b]-byCat[a]);
     let entries = cats.slice(0,5).map(k=>({k, v:byCat[k]}));
@@ -5757,7 +5887,7 @@
     const ess = c.essCats||[]; const essV = gastoTx.filter(t=>ess.indexOf(t.cat)>=0).reduce((a,t)=>a+t.amount,0), varV = exp-essV;
     const essP = exp>0 ? Math.round(essV/exp*100) : 0;
     const legend = entries.map((e,i)=>{ const lim = c.catBudgets[e.k], pct = lim>0 ? e.v/lim*100 : 0;
-      return `<div class="fin-leg"><i style="background:${FIN_PAL[i%FIN_PAL.length]}"></i><span class="n">${escHtml(e.k)}</span><span class="v mono">${finMoney(e.v)}</span><span class="p mono">${Math.round(e.v/exp*100)}%</span>${lim>0?`<div class="lim" data-tip="${escAttr("Límite "+finMoney(lim)+"\n"+Math.round(pct)+"% usado")}"><i style="width:${Math.min(100,pct)}%;${pct>=100?"background:#f87171":""}"></i></div>`:""}</div>`; }).join("");
+      return `<div class="fin-leg"><i style="background:${FIN_PAL[i%FIN_PAL.length]}"></i><span class="n">${escHtml(e.k)}</span><span class="v mono">${finMoney(e.v)}</span><span class="p mono">${Math.round(e.v/exp*100)}%</span>${lim>0?`<div class="lim" data-tip="${escAttr("Límite "+finMoney(lim)+"\n"+Math.round(pct)+"% usado")}"><i style="width:${Math.min(100,pct)}%;${pct>100.4?"background:#f87171":""}"></i></div>`:""}</div>`; }).join("");
     // fijos card
     const fixedHtml = fixed.length ? fixedRows.map(({f,paid})=>`<div class="fin-fx ${paid?"paid":""}"><div class="n">${escHtml(f.name)}<small>${(f.type||"gasto")==="gasto"?escHtml(f.cat||"Otros"):FIN_TYPES[f.type]} · día ${f.day||1}</small></div><div class="a mono">${finMoney(f.amount)}</div>${paid?`<span class="ok">✓ Pagado</span>`:`<button class="fin-mini gold" data-act="fixed-pay" data-id="${f.id}">✓ Pagar</button>`}</div>`).join("")
       : `<div class="fin-empty" style="padding:4px 0;">Crea tu plantilla de gastos fijos (alquiler, servicios, internet, suscripciones, aportes) y cada mes solo los confirmas con un clic.</div>`;
@@ -5792,32 +5922,31 @@
     const mkCard = k => {
       const v = byCat[k]||0, cap = c.catBudgets[k]||0, pv = prevBy[k]||0;
       const gr = pv>0 ? Math.round((v-pv)/pv*100) : null;
-      const over = cap>0 && v>cap+0.004, zero = cap>0 && !over && Math.abs(cap-v)<0.005;
+      const over = cap>0 && v>cap+0.004, zero = cap>0 && !over && Math.abs(cap-v)<0.005 && v>0, warnC = cap>0 && !over && !zero && v/cap*100>=85;
       const hot = cap>0 ? over : (gr!==null && gr>=100);
       const avail = cap>0 ? Math.max(0, cap-v) : v;
       const w = cap>0 ? Math.min(100, v/cap*100) : (exp>0 ? v/exp*100 : 0);
       const big = cap>0 ? (over ? "−"+finMoney(v-cap) : finMoney(avail)) : finMoney(v);
       const lab = cap>0 ? (over ? "excedido" : zero ? "cerrado" : "libres") : "gastado";
-      return `<div class="fin-cc ${hot?"hot":""} ${zero?"zero":""} ${finCatFilter===k?"sel":""}" data-act="cat-pick" data-k="${escAttr(k)}" data-tip="${escAttr(k+"\nClic: ver solo estos movimientos"+(gr!==null?"\n"+(gr>=0?"+":"")+gr+"% vs mes anterior":""))}">
-        <div class="h"><span class="ic">${FIN_ICONS[k]||"📦"}</span><span>${escHtml(k)}</span><button class="ed" data-act="cat-cap" data-k="${escAttr(k)}" title="Editar tope">✎</button></div>
+      return `<div class="fin-cc ${hot?"hot":""} ${zero?"zero":""} ${warnC?"warn":""} ${finCatFilter===k?"sel":""}" data-act="cat-pick" data-k="${escAttr(k)}" data-tip="${escAttr(k+"\nClic: ver solo estos movimientos"+(gr!==null?"\n"+(gr>=0?"+":"")+gr+"% vs mes anterior":""))}">
+        <div class="h"><span class="ic">${FIN_ICONS[k]||"📦"}</span><span>${escHtml(k)}</span>${zero?`<span class="pill-closed">Cerrado · 100%</span>`:""}<button class="ed" data-act="cat-cap" data-k="${escAttr(k)}" title="Editar tope">✎</button></div>
         <div class="amt big">${big} <small>${lab}</small></div>
         <div class="sub">${cap>0?finMoney(v)+" de "+finMoney(cap):"sin presupuesto"}</div>
         <div class="bar"><i style="width:${w}%"></i></div></div>`;
     };
     const catCards = cardKeys.map(mkCard).join("");
     const inactiveHtml = inactiveKeys.length ? `<div style="margin-top:10px;"><button class="fin-mini" data-act="toggle-inactive">${finShowInactive?"− Ocultar":"+ Ver"} categorías sin presupuesto (${inactiveKeys.length})</button></div>${finShowInactive?`<div class="fin-cats">${inactiveKeys.map(mkCard).join("")}</div>`:""}` : "";
-    const sv = finSavings();
     const savHtml = `<div class="fin-sav-grid">
       <div class="hist"><small>Ahorro histórico logrado</small><b class="mono">${finMoney(sv.hist)}</b><em>Nunca baja: es tu capacidad de producir y retener capital.</em></div>
-      <div><small>Ahorro activo actual</small><b class="mono">${finMoney(sv.act)}</b><em>${sv.cyc?"Ciclo desde "+sv.cyc+" hasta hoy":"Saldo vigente (no ejecutado)"}</em></div></div>
-      <div class="fin-note"><button class="fin-mini" data-act="adj-exec" style="float:right;margin-left:8px;">⚖ Ajustar saldo ejecutado</button>${sv.spent>0?`🏦 Pagado con fondo de ahorro: <b>${finMoney(sv.spent)}</b> · `:""}${sv.exec>0?`<span class="fin-badge-ex">✓ Ejecutado en Meta</span> <b>${finMoney(sv.exec)}</b> de ahorro de ciclos anteriores o metas ya cumplidas siguen sumando a tu histórico.`:`Marca una meta como ✓ Ejecutada, o define el inicio del ciclo en ⚙ Presupuesto, para separar lo ya usado.`}</div>`;
+      <div><small>Ahorro activo actual</small><b class="mono">${finMoney(sv.act)}</b><em>${sv.anchor?"Saldo líquido real · fijado el "+(sv.anchor.date||"").split("-").reverse().join("/")+"; desde ahí suma y resta solo":(sv.cyc?"Ciclo desde "+sv.cyc+" hasta hoy":"Saldo vigente (no ejecutado)")}</em></div></div>
+      <div class="fin-note"><button class="fin-mini" data-act="adj-exec" style="float:right;margin-left:8px;">⚖ Fijar ahorro activo</button>${sv.spent>0?`🏦 Pagado con fondo de ahorro: <b>${finMoney(sv.spent)}</b> · `:""}${sv.exec>0?`<span class="fin-badge-ex">✓ Ejecutado en Meta</span> <b>${finMoney(sv.exec)}</b> de ahorro de ciclos anteriores o metas ya cumplidas siguen sumando a tu histórico.`:`Marca una meta como ✓ Ejecutada, o define el inicio del ciclo en ⚙ Presupuesto, para separar lo ya usado.`}</div>`;
     const catOpts = Array.from(new Set(c.cats.concat(mtx.map(t=>t.cat).filter(Boolean))));
     root.innerHTML = `
-      ${alerts.length?`<div class="fin-alerts">${alerts.map(a=>`<div class="fin-alert ${a[0]}">${a[0]==="bad"?"🚨":"⚠️"} <span>${a[1]}</span></div>`).join("")}</div>`:""}
+      ${alerts.length?`<div class="fin-alerts">${alerts.map(a=>`<div class="fin-alert ${a[0]}">${a[0]==="bad"?"🚨":a[0]==="info"?"🎯":"⚠️"} <span>${a[1]}</span></div>`).join("")}</div>`:""}
       <div class="fin-kpis">
         <div class="kpi-card" data-tip="Disponible real\nLo que te queda libre hoy tras descontar lo ya gastado,\nahorrado/invertido y los gastos fijos que aún no pagas."><div class="label">Disponible real</div>${k1}</div>
-        <div class="kpi-card" data-tip="Burn rate diario\nGasto promedio por día del mes comparado con tu tope sano\n(presupuesto ÷ días del mes)."><div class="label">Burn rate diario</div>${k2}</div>
-        <div class="kpi-card" data-tip="Tasa de patrimonio\n(Ahorro + inversión) ÷ ingresos del mes."><div class="label">Tasa de patrimonio</div>${k3}</div>
+        ${ssHtml("fk2",k2s,"kpi-card")}
+        ${ssHtml("fk3",k3s,"kpi-card")}
         <div class="kpi-card" data-tip="Fuga principal\nLa categoría que más creció respecto al mes anterior\n(o dónde se concentra tu gasto)."><div class="label">Fuga principal</div>${k4}</div>
       </div>
       <div class="fin-two fin-main">
@@ -5843,7 +5972,7 @@
       <div class="fin-sec" id="finMovs"><div class="fin-sec-h"><h3>Movimientos${finCatFilter!=="todas"?` · ${escHtml(finCatFilter)}`:""}</h3><span class="fin-filters">
         <input type="search" class="fin-filter" id="finSearch" placeholder="🔎 Buscar…" value="${escAttr(finSearch)}" style="min-width:130px;"><select class="fin-filter" id="finFilterSel"><option value="todos">Todos los tipos</option>${Object.keys(FIN_TYPES).map(k=>`<option value="${k}" ${finFilter===k?"selected":""}>${FIN_TYPES[k]}</option>`).join("")}</select>
         <select class="fin-filter" id="finCatSel"><option value="todas">Todas las categorías</option>${catOpts.map(k=>`<option value="${escAttr(k)}" ${finCatFilter===k?"selected":""}>${escHtml(k)}</option>`).join("")}</select></span></div>
-        <div id="finFeed">${finFeedHtml()}</div></div>`;
+        <div class="fin-movgrid"><div id="finFeed">${finFeedHtml()}</div><aside class="fin-side">${finSideHtml(mtx, N, daysEl, varCeil, isCur)}</aside></div></div>`;
   }
   function finTxEdit(id){
     const t = fin.tx.find(x=>x.id===id); if(!t) return;
@@ -5860,16 +5989,41 @@
         finSaveLocal(); finPushTx(t); hcPush(t); renderFin(); toast("Movimiento actualizado");
       });
   }
+  function finSideHtml(mtx, N, daysEl, varCeil, isCur){
+    const [y,mo] = finMonth.split("-").map(Number);
+    const vt = mtx.filter(t=>t.type==="gasto" && !finIsFixedTx(t));
+    const vd = {}; vt.forEach(t=>{ const d = parseInt(t.date.slice(8,10)); vd[d] = (vd[d]||0)+t.amount; });
+    const spendDays = Object.keys(vd).filter(d=>vd[d]>0).length, tot = Object.keys(vd).reduce((a,d)=>a+vd[d],0);
+    const cap = varCeil>0 ? varCeil/N : (spendDays ? tot/spendDays : 0);
+    const first = (new Date(y,mo-1,1).getDay()+6)%7, todayD = isCur ? parseInt(todayKey().slice(8,10)) : 0;
+    let cells = ["L","M","M","J","V","S","D"].map(x=>`<div class="wd">${x}</div>`).join("");
+    for(let i=0;i<first;i++) cells += `<div class="c e"></div>`;
+    let noSp = 0;
+    for(let d=1; d<=N; d++){
+      const v = vd[d]||0;
+      if(d>daysEl){ cells += `<div class="c f">${d}</div>`; continue; }
+      let cl;
+      if(!(v>0)){ cl="g"; noSp++; } else if(v<=cap) cl="a1"; else if(v<=cap*2) cl="a2"; else cl="r";
+      cells += `<div class="c ${cl} ${d===todayD?"t":""}" data-tip="${escAttr(d+" "+finMonthLabel(finMonth).split(" ")[0]+"\n"+(v>0?"Gasto variable: "+finMoney(v):"Sin gasto"))}">${d}</div>`;
+    }
+    const grp = {}; vt.forEach(t=>{ const k = normName(t.desc||t.cat||"").trim(); if(!k) return; const g = grp[k] || (grp[k] = {n:t.desc||t.cat, c:0, v:0}); g.c++; g.v += t.amount; });
+    const rep = Object.values(grp).filter(g=>g.c>=2).sort((a,b)=>b.c-a.c || b.v-a.v).slice(0,6);
+    return `<div class="fin-card"><div class="fin-card-h"><b>Días sin gasto</b><span>${daysEl>0?`<b style="color:#34d399">${noSp}</b> de ${daysEl}`:"—"}</span></div>
+        <div class="hm">${cells}</div>
+        <div class="hm-leg"><span><i style="background:rgba(16,185,129,.5)"></i>S/ 0</span><span><i style="background:rgba(245,158,11,.3)"></i>≤ ${finMoney(cap)}</span><span><i style="background:rgba(245,158,11,.6)"></i>hasta el doble</span><span><i style="background:rgba(248,113,113,.7)"></i>más</span></div></div>
+      <div class="fin-card"><div class="fin-card-h"><b>Conceptos más repetidos</b><span>gasto hormiga</span></div>
+        ${rep.length ? rep.map(g=>`<div class="rep-row"><b>${escHtml(g.n)}</b><span>${g.c} veces · ${finMoney(g.v)}</span></div>`).join("") : `<div class="fin-empty" style="padding:2px 0;">Aún no hay compras que se repitan este mes.</div>`}</div>`;
+  }
   function finFeedHtml(){
     let list = fin.tx.filter(t=>t.space!=="hogar" && t.date && t.date.slice(0,7)===finMonth).sort((a,b)=> b.date.localeCompare(a.date) || (b.createdAt||0)-(a.createdAt||0));
     if(finFilter!=="todos") list = list.filter(t=>t.type===finFilter);
     if(finCatFilter!=="todas") list = list.filter(t=>t.cat===finCatFilter);
     const q = normName(finSearch).trim();
     if(q) list = list.filter(t=>normName([t.desc,t.cat,t.sub].join(" ")).indexOf(q)>=0);
-    if(!list.length) return `<div class="fin-empty">Sin movimientos en este mes para estos filtros.</div>`;
+    if(!list.length) return `<div class="fin-ledger"><div class="fin-empty">Sin movimientos en este mes para estos filtros.</div></div>`;
     const days = {}; list.forEach(t=>{ (days[t.date] = days[t.date]||[]).push(t); });
     const MES = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
-    return Object.keys(days).sort().reverse().map(d=>{
+    return `<div class="fin-ledger">` + Object.keys(days).sort().reverse().map(d=>{
       const cons = days[d].filter(t=>t.type==="gasto" && finIsSalary(t)).reduce((a,t)=>a+t.amount,0);
       const rows = days[d].map(t=>{
         const goal = t.goalId ? (fin.goals.find(g=>g.id===t.goalId)||{}).name : t.investId ? (fin.invest.find(g=>g.id===t.investId)||{}).name : "";
@@ -5877,16 +6031,16 @@
         const tag = t.src==="form" ? " · 📲" : t.src==="fijo" ? " · fijo" : "";
         const act = `<span class="acts"><button class="x" data-act="tx-edit" data-id="${t.id}" title="Editar">✎</button><button class="x" data-act="tx-del" data-id="${t.id}" title="Eliminar">✕</button></span>`;
         if(t.type==="hogar"){
-          return `<div class="fin-row xfer"><div class="ds"><b>${escHtml(t.desc||"Aporte casa")}</b><small>Transferencia a Fondo Hogar${tag}</small></div><div class="am gold">↗ ${finMoney(t.amount)} <small>→ Hogar</small></div>${act}</div>`;
+          return `<div class="fin-row xfer"><div class="ds"><span class="ic">🏠</span><b>${escHtml(t.desc||"Aporte casa")}</b><small>Transferencia a Fondo Hogar${tag}</small></div><div class="am gold">↗ ${finMoney(t.amount)} <small>→ Hogar</small></div>${act}</div>`;
         }
         if(t.type==="ahorro" || t.type==="inversion"){
-          return `<div class="fin-row xfer"><div class="ds"><b>${escHtml(t.desc||FIN_TYPES[t.type])}</b><small>${t.type==="ahorro"?"Transferencia a ahorro":"Aporte a inversión"}${goal?" · "+escHtml(goal):""}${tag}</small></div><div class="am gold">↗ ${finMoney(t.amount)} <small>→ ${t.type==="ahorro"?"Capital":"Inversión"}</small>${usd}</div>${act}</div>`;
+          return `<div class="fin-row xfer"><div class="ds"><span class="ic">${t.type==="ahorro"?"🏦":"📈"}</span><b>${escHtml(t.desc||FIN_TYPES[t.type])}</b><small>${t.type==="ahorro"?"Transferencia a ahorro":"Aporte a inversión"}${goal?" · "+escHtml(goal):""}${tag}</small></div><div class="am gold">↗ ${finMoney(t.amount)} <small>→ ${t.type==="ahorro"?"Capital":"Inversión"}</small>${usd}</div>${act}</div>`;
         }
         const isInc = t.type==="ingreso", fromSav = t.fund==="ahorro";
-        return `<div class="fin-row"><div class="ds"><b>${escHtml(t.desc || t.cat || FIN_TYPES[t.type])}</b><small>${isInc?"Ingreso":escHtml(t.cat||"")}${isInc?"":` <span class="orig ${fromSav?"sav":""}">${fromSav?"Ahorro":"Sueldo"}</span>`}${tag}</small></div><div class="am ${isInc?"inc":""}">${isInc?"+":"−"}${finMoney(t.amount)}${usd}</div>${act}</div>`;
+        return `<div class="fin-row" style="--cc:${isInc?"#34d399":finCatColor(t.cat)}"><div class="ds"><span class="ic">${isInc?"💰":(FIN_ICONS[t.cat]||"📦")}</span><b>${escHtml(t.desc || t.cat || FIN_TYPES[t.type])}</b><small>${isInc?"Ingreso":escHtml(t.cat||"")}${isInc?"":` <span class="orig ${fromSav?"sav":""}">${fromSav?"Ahorro":"Sueldo"}</span>`}${tag}</small></div><div class="am ${isInc?"inc":""}">${isInc?"+":"−"}${finMoney(t.amount)}${usd}</div>${act}</div>`;
       }).join("");
       return `<div class="fin-day"><div class="dh"><span>${parseInt(d.slice(8,10))} ${MES[parseInt(d.slice(5,7))-1]}</span>${cons>0?`<span>Consumo del día: <b>${finMoney(cons)}</b></span>`:""}</div>${rows}</div>`;
-    }).join("");
+    }).join("") + `</div>`;
   }
   document.getElementById("hogarFile").addEventListener("change", e=>{ const f = e.target.files[0]; e.target.value = ""; if(f) hogarImport(f); });
   document.getElementById("view-finanzas").addEventListener("submit", e=>{
@@ -5926,9 +6080,13 @@
       finModal("Tope mensual · "+escHtml(k), `<div class="field"><label>Límite para ${escHtml(k)} (S/ al mes, vacío = sin tope)</label><input type="number" min="0" step="1" id="fcCap" value="${fin.cfg.catBudgets[k]||""}"></div>`,
         ov=>{ const v = finNum(ov.querySelector("#fcCap").value); if(v) fin.cfg.catBudgets[k] = v; else delete fin.cfg.catBudgets[k]; finCfgChanged(); renderFin(); }); }
     else if(act==="adj-exec"){
-      finModal("Ajustar saldo ejecutado", `<div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">Monto de ahorro que ya usaste (compras grandes, metas cumplidas). Baja tu <b>Ahorro activo</b> pero tu <b>Ahorro histórico logrado</b> se mantiene intacto.</div>
-        <div class="field"><label>Total ejecutado a descontar (S/)</label><input type="number" min="0" step="0.01" id="faAdj" value="${fin.cfg.execAdj||""}"></div>`,
-        ov=>{ fin.cfg.execAdj = finNum(ov.querySelector("#faAdj").value)||0; finCfgChanged(); renderFin(); toast("Saldo ejecutado actualizado"); });
+      const svNow = finSavings();
+      finModal("Fijar ahorro activo", `<div style="font-size:12px;color:var(--text-dim);margin-bottom:10px;">Escribe el <b>saldo líquido real</b> de tu cuenta de ahorro hoy. Desde ese momento cada movimiento de Ahorro suma y cada gasto pagado con Fondo de ahorro resta. Tu <b>Ahorro histórico logrado</b> no cambia.</div>
+        <div class="field"><label>Saldo líquido de ahorro hoy (S/)</label><input type="number" min="0" step="0.01" id="faAdj" value="${(Math.round(svNow.act*100)/100)||""}"></div>`,
+        ov=>{ const v = finNum(ov.querySelector("#faAdj").value); if(!(v>=0)){ toast("Monto inválido"); return false; }
+          fin.cfg.savingsAnchor = {amt:Math.round(v*100)/100, ts:Date.now(), date:todayKey()};
+          try{ localStorage.setItem("panel_fin_anchor", JSON.stringify(fin.cfg.savingsAnchor)); }catch(e){}
+          finCfgChanged(); renderFin(); toast("Ahorro activo fijado en "+finMoney(v)); });
     }
     else if(act==="tx-edit"){ finTxEdit(id); }
     else if(act==="goal-exec"){ const g = fin.goals.find(x=>x.id===id); if(g){ g.executed = !g.executed; finCfgChanged(); renderFin(); toast(g.executed?"Meta marcada como ejecutada: su ahorro sigue en tu histórico":"Meta reactivada"); } }
