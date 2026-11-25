@@ -1186,6 +1186,7 @@
       <div class="month"><button id="finPrev" title="Mes anterior">‹</button><b id="finMonthLabel">—</b><button id="finNext" title="Mes siguiente">›</button></div>
       <div class="fin-seg" id="finSpaceSeg"><button data-act="space-p">👤 Personal</button><button data-act="space-h">🏠 Hogar compartido</button></div>
       <div class="sp"></div>
+      <button class="btn secondary small" id="finCloudBtn" title="Sincronizar el Hogar compartido en tiempo real">⚙️ Configurar Nube</button>
       <input type="file" id="hogarFile" accept=".json,application/json" style="display:none">
       <button class="btn secondary small" id="finImportBtn" title="Cargar un archivo de movimientos (.json)">📥 Importar</button>
       <input type="file" id="finImportFile" accept=".json,application/json" style="display:none">
@@ -5022,7 +5023,7 @@
       await loadScript(base+"firebase-app-compat.js");
       await loadScript(base+"firebase-auth-compat.js");
       await loadScript(base+"firebase-firestore-compat.js");
-      firebase.initializeApp(FIREBASE_CONFIG);
+      if(!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
       cloud.auth = firebase.auth(); cloud.db = firebase.firestore();
       // Redes, antivirus o proveedores que cortan el streaming de Firestore: usar long-polling (más compatible)
       try{ cloud.db.settings({ experimentalForceLongPolling: true, useFetchStreams: false, merge: true }); }catch(e){ console.warn("settings", e); }
@@ -5095,6 +5096,46 @@
   let finFilter = "todos", finCatFilter = "todas", finChartMode = "total", finSearch = "", finShowInactive = false, finSpace = (function(){ try{ return localStorage.getItem("panel_fin_space")==="hogar" ? "hogar" : "personal"; }catch(e){ return "personal"; } })();
   let finUnsubs = [], finCfgTimer = null, finCatManual = false;
 
+  /* ---- Migración finanzas_v2 (categorías, topes, Aporte casa → Hogar) ---- */
+  const FIN_OWNER_PRESET = true; // poner en false en copias para terceros (sin categorías/topes personales)
+  const FIN_V2 = {
+    cats:["Mercado","Misceláneos","Restaurante","Entretenimiento","Hogar","Transporte","Cuidado personal","Ropa","Regalos","Comida","Tiendas","Salud","Suplementos","Educación","Solidaridad","Mascotas","Vacaciones","Efectivo","Otros","Servicios","Vivienda","Deudas"],
+    card:["Mercado","Misceláneos","Restaurante","Entretenimiento","Hogar","Transporte","Cuidado personal","Ropa","Regalos"],
+    budgets:{"Mercado":100,"Misceláneos":100,"Restaurante":275,"Entretenimiento":74,"Hogar":60,"Transporte":60,"Cuidado personal":50,"Ropa":131,"Regalos":150},
+    ess:["Mercado","Comida","Transporte","Salud","Cuidado personal","Hogar","Educación","Servicios","Vivienda","Deudas"],
+    map:{"Alimentación":"Mercado","Ocio":"Restaurante","Compras":"Misceláneos","Otros":"Cuidado personal"}
+  };
+  function finRemapTx(withOtros){
+    let mt = 0; try{ mt = Number(localStorage.getItem("panel_fin_migt"))||0; }catch(e){}
+    const touched = [];
+    fin.tx.forEach(t=>{
+      if(t.type!=="gasto" || t.space==="hogar") return;
+      if(/aporte\s+casa/i.test(t.desc||"")){ t.type = "hogar"; t.cat = "Fondo Hogar"; touched.push(t); return; }
+      const to = FIN_V2.map[t.cat]; if(!to) return;
+      if(t.cat==="Otros" && !(withOtros && (t.createdAt||0)<=mt)) return;
+      t.cat = to; touched.push(t);
+    });
+    if(touched.length){ touched.forEach(t=>{ if(!cloud.user) t.pending = true; finPushTx(t); }); finSaveLocal(); }
+    return touched.length;
+  }
+  function finApplyCfgV2(){
+    const c = fin.cfg, old = Array.isArray(c.cats) ? c.cats : [];
+    c.cats = FIN_V2.cats.concat(old.filter(k=>FIN_V2.cats.indexOf(k)<0 && !FIN_V2.map[k]));
+    const b = Object.assign({}, c.catBudgets||{}); Object.keys(FIN_V2.map).forEach(k=>{ if(k!=="Otros") delete b[k]; });
+    c.catBudgets = Object.assign(b, FIN_V2.budgets);
+    c.cardCats = FIN_V2.card.slice(); c.essCats = FIN_V2.ess.slice();
+    (c.fixed||[]).forEach(f=>{ if(f.cat && FIN_V2.map[f.cat] && f.cat!=="Otros") f.cat = FIN_V2.map[f.cat]; });
+    c.schemaVersion = "finanzas_v2";
+    try{ localStorage.setItem("panel_fin_schema","finanzas_v2"); }catch(e){}
+  }
+  function finMigrateV2(){
+    if(!FIN_OWNER_PRESET) return false;
+    let done = false; try{ done = localStorage.getItem("panel_fin_schema")==="finanzas_v2"; }catch(e){}
+    if(fin.cfg.schemaVersion==="finanzas_v2" && done) return false;
+    if(done){ finApplyCfgV2(); finCfgChanged(); return true; }        // otro dispositivo/nube sobrescribió la config
+    try{ localStorage.setItem("panel_fin_migt", String(Date.now())); }catch(e){}
+    finRemapTx(true); finApplyCfgV2(); finCfgChanged(); return true;
+  }
   function finLoad(){
     try{
       const r = JSON.parse(localStorage.getItem(FIN_KEY)||"null");
@@ -5102,6 +5143,7 @@
     }catch(e){}
     fin.cfg = Object.assign(finCfgDefault(), fin.cfg);
     if(!Array.isArray(fin.cfg.cats) || !fin.cfg.cats.length) fin.cfg.cats = FIN_CATS.slice();
+    finMigrateV2();
   }
   function finSaveLocal(){ try{ localStorage.setItem(FIN_KEY, JSON.stringify(fin)); }catch(e){} }
   function finPushCfg(){
@@ -5134,6 +5176,7 @@
         const j = JSON.parse(d.json);
         fin.cfg = Object.assign(finCfgDefault(), j.cfg||{});
         fin.goals = j.goals||[]; fin.invest = j.invest||[];
+        finMigrateV2();
         finSaveLocal(); renderFin();
       }catch(e){ console.error(e); }
     }, err=>console.error(err)));
@@ -5145,6 +5188,7 @@
         snap.docs.forEach(dc=>m.set(dc.id, Object.assign({id:dc.id}, dc.data())));
         fin.tx.filter(t=>t.pending && !m.has(t.id)).forEach(t=>{ m.set(t.id, t); finPushTx(t); });
         fin.tx = Array.from(m.values());
+        try{ if(localStorage.getItem("panel_fin_schema")==="finanzas_v2") finRemapTx(true); }catch(e){}
       }else{
         const m = new Map(fin.tx.map(t=>[t.id,t]));
         snap.docChanges().forEach(ch=>{
@@ -5473,6 +5517,79 @@
       : `Tus gastos variables no cambian con tu estado del día: <b>${finMoney(b)}</b> los días Disperso / En Fuga y <b>${finMoney(g)}</b> los días Flujo / Operativo.`;
     return `<div style="font-size:13.5px;line-height:1.55;">${msg}</div><div class="so-note" style="margin-top:6px;">Últimos 90 días · ${bad.length} días Disperso/En Fuga vs ${good.length} Flujo/Operativo.</div>`;
   }
+  /* ---- Hogar compartido en la nube (Firebase Realtime Database + Código de Sala) ---- */
+  const HC_KEY = "panel_hogar_cloud";
+  let hc = (function(){ try{ return Object.assign({room:"", url:"", on:false}, JSON.parse(localStorage.getItem(HC_KEY)||"{}")); }catch(e){ return {room:"", url:"", on:false}; } })();
+  let hcRef = null, hcState = hc.on ? "conectando…" : "sin nube", hcSig = "", hcBusy = false;
+  function hcSave(){ try{ localStorage.setItem(HC_KEY, JSON.stringify(hc)); }catch(e){} }
+  function hcDefaultUrl(){ return "https://"+FIREBASE_CONFIG.projectId+"-default-rtdb.firebaseio.com"; }
+  function hcClean(t){ const o = Object.assign({}, t); delete o.id; delete o.pending; delete o.rt; delete o.space; return o; }
+  async function hcConnect(){
+    if(hcBusy) return; hcBusy = true;
+    try{
+      if(hcRef){ try{ hcRef.off(); }catch(e){} hcRef = null; }
+      if(!hc.on || !hc.room){ hcState = "sin nube"; return; }
+      hcState = "conectando…"; try{ if(finSpace==="hogar") renderFin(); }catch(e){}
+      const base = "https://www.gstatic.com/firebasejs/10.12.2/";
+      if(!window.firebase) await loadScript(base+"firebase-app-compat.js");
+      for(let i=0; i<30 && !(firebase.apps && firebase.apps.length) && cloud.on===false && FIREBASE_CONFIG.apiKey && i<12; i++) await new Promise(r=>setTimeout(r,250));
+      if(!(firebase.apps && firebase.apps.length)) firebase.initializeApp(FIREBASE_CONFIG);
+      if(!firebase.database) await loadScript(base+"firebase-database-compat.js");
+      const db = firebase.app().database(hc.url || hcDefaultUrl());
+      hcRef = db.ref("rooms/"+hc.room+"/tx");
+      hcRef.on("value", snap=>{ hcState = "conectada"; hcRemote(snap.val()||{}); }, err=>{ console.error(err); hcState = "error: "+(err && err.code ? err.code : "sin acceso (revisa reglas)"); try{ if(finSpace==="hogar") renderFin(); }catch(e){} });
+    }catch(e){ console.error(e); hcState = "error: "+e.message; hcRef = null; try{ if(finSpace==="hogar") renderFin(); }catch(_){} }
+    finally{ hcBusy = false; }
+  }
+  function hcRemote(remote){
+    const mineIds = new Set(fin.tx.filter(t=>t.type==="hogar" && t.space!=="hogar").map(t=>t.id));
+    const byId = new Map(fin.tx.map(t=>[t.id,t]));
+    Object.keys(remote).forEach(id=>{
+      const r = remote[id]; if(!r || !(r.amount>0)) return;
+      if(id.indexOf("ap-")===0 && mineIds.has(id.slice(3))) return;
+      const cur = byId.get(id);
+      if(cur && cur.space!=="hogar") return;
+      byId.set(id, Object.assign({}, cur||{}, r, {id, space:"hogar", rt:true}));
+    });
+    let arr = Array.from(byId.values()).filter(t=>!(t.space==="hogar" && t.rt && !remote[t.id]));
+    // subir lo que existe solo localmente
+    arr.forEach(t=>{ if(t.space==="hogar" && !t.rt){ t.rt = true; hcRef && hcRef.child(t.id).set(hcClean(t)); } });
+    fin.tx = arr; finSaveLocal(); hcSyncAportes(remote);
+    try{ if(finSpace==="hogar") renderFin(); }catch(e){}
+  }
+  function hcSyncAportes(remote){
+    if(!hcRef) return;
+    const nm = fin.cfg.hogarName || "Yo";
+    const mine = fin.tx.filter(t=>t.type==="hogar" && t.space!=="hogar");
+    const sig = nm+"|"+mine.map(t=>t.id+":"+t.amount+":"+t.date).join(",");
+    if(!remote && sig===hcSig) return; hcSig = sig;
+    mine.forEach(t=>{ const id = "ap-"+t.id; hcRef.child(id).set({date:t.date, amount:t.amount, type:"ingreso", cat:"Fondo", desc:t.desc||"Aporte casa", payer:nm, src:"hogar", createdAt:t.createdAt||Date.now()}); });
+    if(remote){ const ids = new Set(mine.map(t=>t.id)); Object.keys(remote).forEach(id=>{ if(id.indexOf("ap-")===0 && remote[id] && remote[id].payer===nm && !ids.has(id.slice(3))) hcRef.child(id).remove(); }); }
+  }
+  function hcPush(t){ if(!hcRef || t.space!=="hogar") return; t.rt = true; hcRef.child(t.id).set(hcClean(t)).catch(e=>console.error(e)); }
+  function hcRemove(id){ if(hcRef) hcRef.child(id).remove().catch(e=>console.error(e)); }
+  function hcGenCode(){ const a = "abcdefghjkmnpqrstuvwxyz23456789"; let r = ""; for(let i=0;i<12;i++) r += a[Math.floor(Math.random()*a.length)]; return r.replace(/(.{4})(?=.)/g,"$1-"); }
+  function hcModal(){
+    finModal("⚙️ Configurar Nube · Hogar compartido", `
+      <div style="font-size:12.5px;color:var(--text-dim);line-height:1.55;margin-bottom:10px;">Sincroniza <b>solo el Hogar compartido</b> en tiempo real con quien tenga tu Código de Sala. Tus hábitos, bitácora y finanzas personales no se envían.</div>
+      <div class="field"><label>Código de sala</label><div style="display:flex;gap:6px;"><input type="text" id="hcRoom" value="${escAttr(hc.room)}" placeholder="ej. k7m2-9xqa-4tnr" autocomplete="off"><button type="button" class="btn secondary small" data-hc="gen">🎲 Generar</button></div></div>
+      <div class="field"><label>URL de Realtime Database (opcional)</label><input type="text" id="hcUrl" value="${escAttr(hc.url)}" placeholder="${escAttr(hcDefaultUrl())}"></div>
+      <label style="display:flex;gap:8px;align-items:center;font-size:13px;margin:6px 0 10px;"><input type="checkbox" id="hcOn" ${hc.on?"checked":""} style="width:auto;"> Sincronización activa</label>
+      <details style="font-size:12px;color:var(--text-dim);"><summary style="cursor:pointer;color:#EAB308;">Cómo activarlo (1 vez)</summary>
+        <ol style="margin:8px 0 0 16px;padding:0;line-height:1.6;"><li>Firebase Console → proyecto <b>${escHtml(FIREBASE_CONFIG.projectId)}</b> → <b>Realtime Database</b> → Crear base de datos.</li><li>Pestaña <b>Reglas</b>, pega esto y publica:<pre style="background:#0d0e13;border:1px solid var(--border);border-radius:8px;padding:8px;white-space:pre-wrap;user-select:all;">{"rules":{"rooms":{"$room":{".read":true,".write":true}}}}</pre></li><li>Comparte el código de sala con la otra persona; ella lo pone en su panel (mismo proyecto o el suyo) y listo.</li></ol>
+        <div style="margin-top:6px;">Usa un código largo: quien lo conozca puede ver y escribir en esa sala.</div></details>
+      <div id="hcStatus" style="margin-top:10px;font-size:12px;color:var(--text-faint);">Estado: ${escHtml(hcState)}</div>`,
+      ov=>{
+        const room = ov.querySelector("#hcRoom").value.trim().toLowerCase(), on = ov.querySelector("#hcOn").checked;
+        if(on && room.length<8){ toast("Usa un código de sala de al menos 8 caracteres"); return false; }
+        hc.room = room; hc.url = ov.querySelector("#hcUrl").value.trim(); hc.on = on && !!room; hcSave();
+        hcConnect().then(()=>{ if(finSpace==="hogar") renderFin(); });
+        toast(hc.on ? "Nube del Hogar activada" : "Nube del Hogar desactivada");
+      });
+  }
+  document.addEventListener("click", e=>{ const g = e.target.closest("[data-hc=gen]"); if(g){ const i = document.getElementById("hcRoom"); if(i) i.value = hcGenCode(); } });
+  document.getElementById("finCloudBtn").addEventListener("click", hcModal);
+  if(hc.on) setTimeout(()=>{ hcConnect(); }, 2500);
   /* ---- Espacio Hogar compartido ---- */
   const HOGAR_CATS = ["Alquiler","Servicios","Compras casa","Mantenimiento","Otros"];
   function finSpaceUi(){
@@ -5514,6 +5631,7 @@
         <input type="date" id="hgDate" value="${todayKey()}">
         <button class="btn" type="submit">Registrar</button>
       </form>
+      <div style="margin-top:10px;font-size:12px;color:var(--text-faint);">${hc.on ? `☁️ Sala <b>${escHtml(hc.room)}</b> · ${escHtml(hcState)}` : `☁️ Sin nube · <a href="#" data-act="hc-open" style="color:#EAB308">Configurar Nube</a> para sincronizar en tiempo real`}</div>
       <div class="fin-kpis hg3" style="margin-top:14px;">
         <div class="kpi-card"><div class="label">Fondo ingresado · mes</div><div class="value">${finMoney(fundM)}</div><div class="sub">Tu aporte + aportes de otros</div></div>
         <div class="kpi-card"><div class="label">Gastado en la casa · mes</div><div class="value">${finMoney(spentM)}</div><div class="sub">Gastos compartidos registrados</div></div>
@@ -5548,7 +5666,7 @@
         (d.aportes||[]).forEach(a=>{ if(a && a.id && a.amount>0 && !have.has(a.id) && !mineIds.has(a.id.slice(3)) && !add.some(x=>x.id===a.id)) add.push({id:a.id, date:a.date, amount:a.amount, type:"ingreso", cat:"Fondo", desc:a.desc, payer:a.payer||d.owner, space:"hogar", src:"hogar", createdAt:Date.now()}); });
         if(!add.length){ toast("Nada nuevo en ese paquete"); return; }
         if(!confirm("Importar "+add.length+" movimientos del hogar de "+(d.owner||"otra persona")+"?")) return;
-        add.forEach(t=>{ fin.tx.push(t); finPushTx(t); }); finSaveLocal(); renderFin(); toast("Importados "+add.length+" movimientos del hogar");
+        add.forEach(t=>{ fin.tx.push(t); finPushTx(t); hcPush(t); }); finSaveLocal(); renderFin(); toast("Importados "+add.length+" movimientos del hogar");
       }catch(err){ toast("Paquete no válido: "+err.message); }
     };
     rd.readAsText(file);
@@ -5557,6 +5675,7 @@
     const root = document.getElementById("finBody"); if(!root) return;
     document.getElementById("finMonthLabel").textContent = finMonthLabel(finMonth);
     finSpaceUi();
+    try{ hcSyncAportes(); }catch(e){}
     if(finSpace==="hogar"){ renderHogar(); return; }
     const c = fin.cfg;
     const mtx = fin.tx.filter(t=>t.space!=="hogar" && t.date && t.date.slice(0,7)===finMonth);
@@ -5682,7 +5801,7 @@
       return `<div class="fin-cc ${hot?"hot":""} ${zero?"zero":""} ${finCatFilter===k?"sel":""}" data-act="cat-pick" data-k="${escAttr(k)}" data-tip="${escAttr(k+"\nClic: ver solo estos movimientos"+(gr!==null?"\n"+(gr>=0?"+":"")+gr+"% vs mes anterior":""))}">
         <div class="h"><span class="ic">${FIN_ICONS[k]||"📦"}</span><span>${escHtml(k)}</span><button class="ed" data-act="cat-cap" data-k="${escAttr(k)}" title="Editar tope">✎</button></div>
         <div class="amt big">${big} <small>${lab}</small></div>
-        <div class="sub">${cap>0?finMoney(v)+" de "+finMoney(cap):"sin tope definido"}</div>
+        <div class="sub">${cap>0?finMoney(v)+" de "+finMoney(cap):"sin presupuesto"}</div>
         <div class="bar"><i style="width:${w}%"></i></div></div>`;
     };
     const catCards = cardKeys.map(mkCard).join("");
@@ -5738,7 +5857,7 @@
         t.amount = Math.round(a*100)/100; t.date = ov.querySelector("#feDate").value || t.date; t.desc = ov.querySelector("#feDesc").value.trim();
         if(t.space==="hogar"){ t.payer = ov.querySelector("#fePayer").value.trim() || t.payer; }
         if(t.type==="gasto" && t.space!=="hogar"){ t.cat = ov.querySelector("#feCat").value; if(ov.querySelector("#feFund").value==="ahorro") t.fund="ahorro"; else delete t.fund; }
-        finSaveLocal(); finPushTx(t); renderFin(); toast("Movimiento actualizado");
+        finSaveLocal(); finPushTx(t); hcPush(t); renderFin(); toast("Movimiento actualizado");
       });
   }
   function finFeedHtml(){
@@ -5775,7 +5894,7 @@
     const a = parseFloat(document.getElementById("hgAmt").value); if(!(a>0)){ toast("Escribe un monto mayor a 0"); return; }
     const kind = document.getElementById("hgKind").value, payer = document.getElementById("hgPayer").value.trim() || (fin.cfg.hogarName||"Yo");
     const t = {id:"h"+Date.now().toString(36)+uid(), date:document.getElementById("hgDate").value || todayKey(), amount:Math.round(a*100)/100, type:kind, cat:kind==="gasto"?document.getElementById("hgCat").value:"Fondo", desc:document.getElementById("hgDesc").value.trim(), payer, space:"hogar", src:"panel", createdAt:Date.now(), pending:true};
-    fin.tx.push(t); finSaveLocal(); finPushTx(t); if(t.date.slice(0,7)!==finMonth) finMonth = t.date.slice(0,7); renderFin(); toast("Hogar: "+(kind==="gasto"?"gasto":"aporte")+" "+finMoney(t.amount)+" · "+payer);
+    fin.tx.push(t); finSaveLocal(); finPushTx(t); hcPush(t); if(t.date.slice(0,7)!==finMonth) finMonth = t.date.slice(0,7); renderFin(); toast("Hogar: "+(kind==="gasto"?"gasto":"aporte")+" "+finMoney(t.amount)+" · "+payer);
   });
   document.getElementById("view-finanzas").addEventListener("input", e=>{
     if(e.target.id==="finSearch"){ finSearch = e.target.value; const f = document.getElementById("finFeed"); if(f) f.innerHTML = finFeedHtml(); }
@@ -5796,6 +5915,7 @@
     if(act==="budget") finBudgetModal();
     else if(act==="space-p" || act==="space-h"){ finSpace = act==="space-h" ? "hogar" : "personal"; try{ localStorage.setItem("panel_fin_space", finSpace); }catch(e){} renderFin(); }
     else if(act==="toggle-inactive"){ finShowInactive = !finShowInactive; renderFin(); }
+    else if(act==="hc-open"){ e.preventDefault(); hcModal(); }
     else if(act==="hogar-export") hogarExport();
     else if(act==="hogar-import") document.getElementById("hogarFile").click();
     else if(act==="hogar-name"){ e.preventDefault(); const n = (prompt("Tu nombre en los paquetes del hogar:", fin.cfg.hogarName||"")||"").trim(); if(n){ fin.cfg.hogarName = n; finCfgChanged(); renderFin(); } }
@@ -5839,6 +5959,7 @@
     }
     else if(act==="tx-del"){
       if(!confirm("¿Eliminar este movimiento?")) return;
+      const gone = fin.tx.find(t=>t.id===id); if(gone && gone.space==="hogar") hcRemove(id);
       fin.tx = fin.tx.filter(t=>t.id!==id); finSaveLocal();
       if(cloud.user && cloud.db) cloud.db.doc(`users/${cloud.user.uid}/fin_tx/${id}`).delete().catch(e=>console.error(e));
       renderFin();
