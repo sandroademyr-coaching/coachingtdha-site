@@ -947,6 +947,38 @@
   .deck .hm{max-width:400px;} .deck .fin-donut{width:190px;height:190px;flex:none;}
   .deck-sum{display:flex;gap:26px;flex-wrap:wrap;margin-bottom:8px;} .deck-sum small{display:block;font-size:11px;color:var(--text-faint);text-transform:uppercase;letter-spacing:.5px;} .deck-sum b{font-size:20px;font-family:ui-monospace,Menlo,monospace;}
   @media(prefers-reduced-motion:reduce){.deck-c{transition:none;}}
+
+  /* ===== Ajuste H · Rueda 3D Coverflow ===== */
+  .cf{position:relative;margin-top:14px;}
+  .cf .ss-bar{top:0;z-index:6;}
+  .cf-stage{position:relative;height:var(--cf-h,300px);perspective:1600px;overflow:hidden;}
+  .cf-card{position:absolute;top:0;bottom:0;left:50%;width:70%;transform-style:preserve-3d;transition:transform .65s cubic-bezier(.4,0,.2,1),opacity .65s,filter .65s;}
+  .cf-card.c{transform:translateX(-50%) scale(1);z-index:3;}
+  .cf-card.l{transform:translateX(-50%) translateX(-60%) scale(.88) rotateY(16deg);opacity:.45;filter:saturate(.25) brightness(.85);z-index:2;cursor:pointer;}
+  .cf-card.r{transform:translateX(-50%) translateX(60%) scale(.88) rotateY(-16deg);opacity:.45;filter:saturate(.25) brightness(.85);z-index:2;cursor:pointer;}
+  .cf-card.x{transform:translateX(-50%) scale(.8);opacity:0;z-index:1;pointer-events:none;}
+  .cf-card.l>.cf-flip,.cf-card.r>.cf-flip{pointer-events:none;}
+  .cf-flip{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .75s cubic-bezier(.4,0,.2,1);}
+  .cf-card.flip>.cf-flip{transform:rotateY(180deg);}
+  .cf-front,.cf-back{position:absolute;inset:0;background:#12141C;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px 16px;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:flex;flex-direction:column;min-width:0;overflow:hidden;}
+  .cf-card.c .cf-front{box-shadow:0 14px 36px rgba(0,0,0,.45);}
+  .cf-back{transform:rotateY(180deg);}
+  .cf-h{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;} .cf-h b{font-size:14px;} .cf-extra{margin-left:auto;}
+  .cf-why{background:transparent;border:1px solid rgba(255,255,255,.14);color:var(--text-dim);border-radius:999px;padding:3px 10px;font-size:11px;cursor:pointer;font-family:inherit;white-space:nowrap;transition:all .2s;}
+  .cf-why:hover{color:#EAB308;border-color:rgba(234,179,8,.5);} .cf-h .cf-extra+.cf-why{margin-left:0;} .cf-h>.cf-why:last-child{margin-left:auto;} .cf-extra:empty{display:none;}
+  .cf-extra:not(:empty)+.cf-why{margin-left:0;}
+  .cf-why-t{font-size:15px;line-height:1.6;color:var(--text);margin:14px 4px 0;max-width:56ch;}
+  .cf-body{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;}
+  .cf-body .intel-card{background:none;border:0;padding:0;transform:none;box-shadow:none;} .cf-body .intel-card:hover{transform:none;} .cf-body .intel-h{display:none;}
+  .cf-body .fin-chart{width:100%;height:auto;max-height:none;}
+  .cf-body .hm{max-width:380px;} .cf-body .fin-donut{width:170px;height:170px;flex:none;}
+  .cf-dots{display:flex;justify-content:center;align-items:center;gap:7px;margin-top:10px;}
+  .cf-dots button{position:relative;width:7px;height:7px;border-radius:999px;border:0;padding:0;background:rgba(255,255,255,.22);cursor:pointer;transition:all .3s;}
+  .cf-dots button::before{content:"";position:absolute;inset:-8px -3px;} .cf-dots button.on{width:24px;background:#EAB308;}
+  @media(max-width:720px){.cf-card{width:86%;} .cf-card.l{transform:translateX(-50%) translateX(-64%) scale(.88) rotateY(16deg);} .cf-card.r{transform:translateX(-50%) translateX(64%) scale(.88) rotateY(-16deg);}}
+  @media(prefers-reduced-motion:reduce){.cf-card,.cf-flip{transition:none;}}
+  .auto-read .ar-row{display:grid;grid-template-columns:30px 1fr;gap:10px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.06);align-items:start;} .auto-read .ar-row:last-child{border-bottom:0;padding-bottom:0;} .auto-read .ar-row:first-child{padding-top:0;}
+  .auto-read .ar-i{font-size:18px;line-height:1.3;} .auto-read .ar-k{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-faint);} .auto-read .ar-v{font-size:14px;margin-top:2px;} .auto-read .ar-v b{font-weight:600;}
 </style>
 </head>
 <body>
@@ -1034,7 +1066,6 @@
 </div>
 
 <main>
-  <div class="rule-banner" id="ruleBanner"></div>
 
   <!-- ============ VISTA HÁBITOS ============ -->
   <section class="view active" id="view-habitos">
@@ -1133,29 +1164,10 @@
     </div>
 
     <div class="section-title" id="diagSection" style="display:none;">
-      <h2>🧭 Diagnóstico y oportunidad de mejora</h2>
+      <h2>🧭 Lectura Automática del Sistema</h2>
       <span class="hint" id="diagWeekLabel"></span>
     </div>
-    <div class="panel-box" id="diagBox" style="display:none;">
-      <div class="diag-q">
-        <div class="diag-q-title">1 · ¿Dónde estuvo el cuello de botella esta semana?</div>
-        <div class="diag-suggest"><span id="diagSuggest1"></span><button class="btn secondary small" id="diagUse1" style="flex-shrink:0;">Usar</button></div>
-        <textarea class="journal-textarea" id="diagBottleneck" rows="2" placeholder="Ej. La falta de descanso nocturno desplomó la sesión de estudio mañanera."></textarea>
-      </div>
-      <div class="diag-q">
-        <div class="diag-q-title">2 · ¿Qué acción correctora se aplicará?</div>
-        <div class="diag-suggest"><span id="diagSuggest2"></span></div>
-        <textarea class="journal-textarea" id="diagAction" rows="2" placeholder="Ej. Reajuste de horario: mover el bloque de estudio de la noche a la ventana del desayuno."></textarea>
-      </div>
-      <div class="diag-q">
-        <div class="diag-q-title">3 · Proyección a 7 días: meta de conversión para revertir la tendencia</div>
-        <div class="diag-suggest"><span id="diagSuggest3"></span><button class="btn secondary small" id="diagUse3" style="flex-shrink:0;">Usar meta</button></div>
-        <div class="diag-target-row">
-          <input type="number" id="diagTarget" min="0" max="100" placeholder="%">
-          <span id="diagGap" style="font-size:12px;color:var(--text-dim);"></span>
-        </div>
-      </div>
-    </div>
+    <div class="panel-box" id="diagBox" style="display:none;"><div class="auto-read" id="autoRead"></div></div>
   </section>
 
   <!-- ============ VISTA AGENDA + EISENHOWER ============ -->
@@ -1311,7 +1323,7 @@
       <input type="text" id="jRule" placeholder="Ej. Pies al piso al primer timbre, sin celular hasta terminar el estudio.">
 
       <details class="jdump" id="jDump">
-        <summary><span>Contexto o descarga libre del día</span><i>Opcional · solo si pasó algo fuera de lo común</i></summary>
+        <summary><span>Contexto libre</span><i>Opcional · 3 líneas · detecto Relación, Carga Laboral, Físico y Entorno y lo cruzo con tus hábitos</i></summary>
         <div class="jd-in">
           <textarea class="journal-textarea" id="jDumpText" rows="3" placeholder="Una pelea, una mala noticia, un pico de estrés, un gran logro… suéltalo sin filtro."></textarea>
           <div class="jauto" id="jDumpTags"></div>
@@ -1321,7 +1333,7 @@
 
       <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:16px;flex-wrap:wrap;">
         <span class="hint" id="jSavedHint"></span>
-        <button class="btn" id="saveJournalBtn">Guardar cierre</button>
+        <span style="display:flex;gap:8px;flex-wrap:wrap;"><button class="btn secondary" id="jAutoCloseBtn" type="button" title="Registra el resumen objetivo del día a partir de tus datos, sin escribir">⚡ Cierre automático en 1 clic</button><button class="btn" id="saveJournalBtn">Guardar cierre</button></span>
       </div>
     </div>
 
@@ -2571,25 +2583,42 @@
     const b = e.target.closest && e.target.closest("[data-ssgo]"); if(!b) return;
     const el = b.closest(".ss"); if(el) ssGo(el.dataset.ssid, parseInt(b.dataset.ssgo));
   });
-  const DECK = {i:0, t:0}, DECK_MS = 10000;
-  function deckGo(k){
-    const dk = document.querySelector(".deck"); if(!dk) return;
-    const n = parseInt(dk.dataset.n)||1; k = (k%n+n)%n; DECK.i = k; DECK.t = 0;
-    dk.querySelectorAll(".deck-c").forEach((c,j)=>{ c.className = "deck-c p"+((j-k+n)%n); });
-    dk.querySelectorAll(".deck-tabs button").forEach((b,j)=>b.classList.toggle("on", j===k));
-    const bar = dk.querySelector(".ss-bar"); if(bar) bar.style.width = "0%";
+  /* ---------------- Rueda 3D Coverflow (reutilizable) ---------------- */
+  const CF = {}, CF_MS = 10000;
+  function cfPos(d, n){ return d===0 ? "c" : d===1 ? "r" : d===n-1 ? "l" : "x"; }
+  function cfHtml(id, slides, h){
+    const n = slides.length, st = CF[id] || (CF[id] = {i:0, t:0, flip:null, n:0}); st.n = n; if(st.i>=n){ st.i = 0; st.flip = null; }
+    return `<div class="cf" data-cfid="${id}" style="--cf-h:${h||300}px"><i class="ss-bar" style="width:${Math.min(100,st.t/CF_MS*100)}%"></i>
+      <div class="cf-stage">${slides.map((x,k)=>`<div class="cf-card ${cfPos(((k-st.i)%n+n)%n,n)} ${st.flip===k?"flip":""}" data-k="${k}"><div class="cf-flip">
+        <div class="cf-front"><div class="cf-h"><b>${x.title}</b><span class="cf-extra">${x.extra||""}</span><button type="button" class="cf-why" data-cfwhy="${k}">¿Qué significa?</button></div><div class="cf-body">${x.html}</div></div>
+        <div class="cf-back"><div class="cf-h"><b>¿Qué significa? · ${x.title}</b><button type="button" class="cf-why" data-cfwhy="${k}">↩ Volver</button></div><p class="cf-why-t">${x.why||""}</p></div>
+      </div></div>`).join("")}</div>
+      <div class="cf-dots">${slides.map((x,k)=>`<button type="button" data-cfgo="${k}" class="${k===st.i?"on":""}" aria-label="${escAttr(String(x.title).replace(/<[^>]*>/g,""))}"></button>`).join("")}</div></div>`;
+  }
+  function cfGo(id, k){
+    const st = CF[id], el = document.querySelector(`.cf[data-cfid="${id}"]`); if(!st || !el) return;
+    const n = st.n; k = ((k%n)+n)%n; st.i = k; st.t = 0; st.flip = null;
+    el.querySelectorAll(".cf-card").forEach((c,j)=>{ c.className = "cf-card "+cfPos(((j-k)%n+n)%n, n); });
+    el.querySelectorAll(".cf-dots button").forEach((b,j)=>b.classList.toggle("on", j===k));
+    const bar = el.querySelector(".ss-bar"); if(bar) bar.style.width = "0%";
   }
   document.addEventListener("click", e=>{
-    const g = e.target.closest && e.target.closest("[data-deckgo]"); if(g){ deckGo(parseInt(g.dataset.deckgo)); return; }
-    const nv = e.target.closest && e.target.closest("[data-decknav]"); if(nv) deckGo(DECK.i + parseInt(nv.dataset.decknav));
+    const t = e.target; if(!t.closest) return;
+    const g = t.closest("[data-cfgo]"); if(g){ cfGo(g.closest(".cf").dataset.cfid, parseInt(g.dataset.cfgo)); return; }
+    const w = t.closest("[data-cfwhy]");
+    if(w){ const el = w.closest(".cf"), st = CF[el.dataset.cfid], k = parseInt(w.dataset.cfwhy);
+      st.flip = st.flip===k ? null : k; st.t = 0; el.querySelectorAll(".cf-card").forEach((c,j)=>c.classList.toggle("flip", st.flip===j)); return; }
+    const side = t.closest(".cf-card.l, .cf-card.r");
+    if(side){ const el = side.closest(".cf"); cfGo(el.dataset.cfid, parseInt(side.dataset.k)); }
   });
   setInterval(()=>{
     if(document.hidden) return;
-    const dk = document.querySelector(".deck");
-    if(dk && dk.offsetParent!==null && !SS_REDUCE && !dk.matches(":hover") && !dk.contains(document.activeElement)){
-      DECK.t += 100; const bar = dk.querySelector(".ss-bar"); if(bar) bar.style.width = Math.min(100, DECK.t/DECK_MS*100)+"%";
-      if(DECK.t>=DECK_MS) deckGo(DECK.i+1);
-    }
+    document.querySelectorAll(".cf").forEach(el=>{
+      const st = CF[el.dataset.cfid]; if(!st || st.n<2 || el.offsetParent===null || SS_REDUCE) return;
+      if(st.flip!==null || el.matches(":hover") || el.contains(document.activeElement)) return;
+      st.t += 100; const bar = el.querySelector(".ss-bar"); if(bar) bar.style.width = Math.min(100, st.t/CF_MS*100)+"%";
+      if(st.t>=CF_MS) cfGo(el.dataset.cfid, st.i+1);
+    });
     document.querySelectorAll(".ss").forEach(el=>{
       const st = SS[el.dataset.ssid]; if(!st || st.n<2 || el.offsetParent===null) return;
       if(el.matches(":hover") || el.contains(document.activeElement)) return;
@@ -2717,7 +2746,12 @@
       return;
     }
     section.style.display = "flex"; box.style.display = "block";
-    wrap.innerHTML = `<div class="intel-grid">${ssHtml("hab",[{html:intelDomino()},{html:intelMomentum()}],"ss-plain intel-wide")}${intelQuality()}${intelSparklines()}</div>`;
+    wrap.innerHTML = cfHtml("hab", [
+      {title:"🔗 Efecto dominó", html:intelDomino(), why:"Cuando cumples un hábito pilar, otros hábitos suelen salir mejor ese mismo día. Mira cuáles se arrastran juntos y empieza siempre por el que jala a los demás."},
+      {title:"🎯 Calidad de jornada", html:intelQuality(), why:"Aquí se cuentan tus días: élite es cumplir casi todo, fuga es cumplir menos de la mitad. Lo que buscas es que crezca el tramo verde mes a mes."},
+      {title:"📈 Volatilidad", html:intelSparklines(), why:"Cada curva muestra qué tan parejo eres con un hábito en las últimas semanas. Si sube y baja mucho, el hábito todavía no es automático."},
+      {title:"🚀 Momentum", html:intelMomentum(), why:"Compara tu última semana con tu promedio del mes. Si va hacia arriba estás acelerando; si va hacia abajo, te estás frenando y toca ajustar."}
+    ], 330);
   }
 
   let trendOffset = 0; // meses hacia atrás desde hoy (se mueve de a 6)
@@ -3071,51 +3105,23 @@
     const sec = document.getElementById("diagSection"), box = document.getElementById("diagBox");
     if(state.habits.length===0){ sec.style.display="none"; box.style.display="none"; return; }
     sec.style.display = "flex"; box.style.display = "block";
-    document.getElementById("diagWeekLabel").textContent = periodLabel("week", new Date());
-    const d = getDiag();
-    const sg = diagSuggestions();
-    const bt = document.getElementById("diagBottleneck"), ac = document.getElementById("diagAction"), tg = document.getElementById("diagTarget");
-    if(document.activeElement!==bt) bt.value = d.bottleneck;
-    if(document.activeElement!==ac) ac.value = d.action;
-    if(document.activeElement!==tg) tg.value = d.target;
-
-    const s1 = document.getElementById("diagSuggest1");
-    s1.textContent = sg.worst
-      ? `Sugerencia automática: «${sg.worst.h.icon} ${sg.worst.h.name.split("(")[0].trim()}» fue tu punto más bajo (${sg.worst.r}% en los últimos 7 días).`
-      : "Aún no hay suficientes datos de los últimos 7 días.";
-    document.getElementById("diagUse1").style.display = sg.worst ? "" : "none";
-
-    const s2 = document.getElementById("diagSuggest2");
-    if(sg.info && sg.info.leak.length){
-      s2.textContent = `Patrón detectado: fuga los ${sg.info.leak.map(i=>DAY_NAMES[i]).join(", ")}. Considera mover el hábito a otra ventana horaria o prepararlo la noche anterior.`;
-    } else {
-      s2.textContent = "Define un ajuste concreto: horario, entorno o disparador del hábito que falló.";
-    }
-
-    const s3 = document.getElementById("diagSuggest3");
-    document.getElementById("diagUse3").style.display = sg.target!==null ? "" : "none";
-    s3.textContent = sg.target!==null
-      ? `Meta sugerida: ${sg.target}% (${sg.why}). Últimos 7 días: ${sg.r7===null?"—":sg.r7+"%"}.`
-      : "Aún no hay suficientes datos para sugerir una meta.";
-    const tv = parseInt(d.target);
-    document.getElementById("diagGap").textContent = (!isNaN(tv) && sg.r7!==null)
-      ? (tv>sg.r7 ? `Brecha: +${tv-sg.r7} puntos sobre tu ritmo actual` : "Meta alcanzada con tu ritmo actual")
-      : "";
+    document.getElementById("diagWeekLabel").textContent = periodLabel("week", new Date()) + " · en tiempo real";
+    const row = (ic,k,v)=>`<div class="ar-row"><span class="ar-i">${ic}</span><div><div class="ar-k">${k}</div><div class="ar-v">${v}</div></div></div>`;
+    const nm = h => `${h.icon||""} ${escHtml(shortName(h))}`;
+    const rows7 = state.habits.map(h=>({h, r:rateLastDays(h,7)})).filter(x=>x.r!==null).sort((a,b)=>a.r-b.r);
+    const a = rows7[0];
+    const hw = computeHardestWeekdayProductivity();
+    const now = new Date(), key = todayKey(now);
+    let anchor = null; state.habits.forEach(h=>{ if(isOffFor(h,key) && false) return; const st = computeStreak(h); if(st>0 && (!anchor || st>anchor.st)) anchor = {h, st}; });
+    const act = isDayDisabled(key) ? [] : state.habits.filter(h=>getHabitStart(h)<=now && !isRest(h,key));
+    const done = act.filter(h=>h.logs[key]).length, need = Math.max(0, Math.ceil(act.length*0.8 - 1e-9) - done);
+    const pend = act.filter(h=>!h.logs[key]).slice(0,need).map(h=>nm(h)).join(" · ");
+    document.getElementById("autoRead").innerHTML =
+      row("🧱","Cuello de botella de la semana", a ? `<b>${nm(a.h)}</b> · solo ${a.r}% en los últimos 7 días` : "Aún no hay datos suficientes de los últimos 7 días.") +
+      row("📉","Día de mayor fuga histórica", hw ? `<b style="text-transform:capitalize">${hw.weekday}</b> · tu cumplimiento promedio cae a ${hw.rate}% (últimas 8 semanas)` : "Necesito al menos 2 semanas de datos para detectarlo.") +
+      row("⚓","Hábito ancla para apalancarte", anchor ? `<b>${nm(anchor.h)}</b> · racha de ${anchor.st} día${anchor.st>1?"s":""}. Úsalo como primer paso del día.` : "Aún no tienes una racha activa. Marca un hábito hoy para crear tu ancla.") +
+      row("🏆","Día Élite de hoy (≥ 80%)", !act.length ? "Hoy no tienes hábitos que contar (día libre)." : need===0 ? `<b style="color:#10b981">Día Élite alcanzado</b> · ${done} de ${act.length} hábitos (${Math.round(done/act.length*100)}%).` : `Te ${need>1?"faltan":"falta"} <b>${need}</b> hábito${need>1?"s":""} para el Día Élite (${done} de ${act.length} hoy). ${pend?"Pendientes: "+pend:""}`);
   }
-  [["diagBottleneck","bottleneck"],["diagAction","action"],["diagTarget","target"]].forEach(([id,field])=>{
-    document.getElementById(id).addEventListener("input", (e)=>{
-      const d = getDiag(); d[field] = e.target.value; save();
-      if(field==="target") renderDiagnosis();
-    });
-  });
-  document.getElementById("diagUse1").addEventListener("click", ()=>{
-    const sg = diagSuggestions(); if(!sg.worst) return;
-    const d = getDiag(); d.bottleneck = `${sg.worst.h.name.split("(")[0].trim()} cayó a ${sg.worst.r}% esta semana.`; save(); renderDiagnosis();
-  });
-  document.getElementById("diagUse3").addEventListener("click", ()=>{
-    const sg = diagSuggestions(); if(sg.target===null) return;
-    const d = getDiag(); d.target = String(sg.target); save(); renderDiagnosis();
-  });
 
   function renderHabits(){
     renderKPIs();
@@ -4713,6 +4719,19 @@
     state.journal[key] = Object.assign({}, old, { status:jStatus, manual: !!(jAuto && jStatus!==jAuto.status), autoStatus: jAuto?jAuto.status:null, leakTags:jTags.slice(), leak, win, rule, dump, ctx:jDetect(dump+" "+leak), updatedAt:new Date().toISOString() });
     save(); toast("Cierre guardado"); renderJournalView();
   });
+  document.getElementById("jAutoCloseBtn").addEventListener("click", ()=>{
+    const key = journalKey();
+    if(!jAuto){ toast("Aún no hay hábitos marcados para cerrar este día"); return; }
+    const old = state.journal[key] || {}, p = computeDayProductivity(key), pct = p.habitsTotal ? Math.round(p.habitsDone/p.habitsTotal*100) : 0;
+    const kd = new Date(key+"T00:00:00");
+    const missed = state.habits.filter(h=>!isOffFor(h,key) && getHabitStart(h)<=kd && !h.logs[key]);
+    const noLeak = jAuto.tags.indexOf(J_NOLEAK)>=0;
+    const leak = old.leak || (noLeak ? "Cierre automático: sin fugas según tus datos del día." : `Cierre automático: ${jAuto.tags.length} señal${jAuto.tags.length>1?"es":""} de fuga según tus datos (${p.habitsDone} de ${p.habitsTotal} hábitos).`);
+    const win = old.win || (jAuto.wins.length ? jAuto.wins.map(w=>"• "+w).join("\n") : `${p.habitsDone} de ${p.habitsTotal} hábitos cumplidos (${pct}%).`);
+    const rule = old.rule || (missed.length ? `Antes de cualquier otra cosa: ${shortName(missed[0])}.` : "Repetir la misma secuencia de hoy.");
+    state.journal[key] = Object.assign({}, old, {status:jAuto.status, manual:false, autoStatus:jAuto.status, leakTags:jAuto.tags.slice(), leak, win, rule, auto:true, ctx:jDetect((old.dump||"")+" "+leak), updatedAt:new Date().toISOString()});
+    save(); toast("Cierre automático registrado: "+J_STATUS[jAuto.status].label); renderJournalView();
+  });
   document.getElementById("journalPrevDay").addEventListener("click", ()=>{ journalDate.setDate(journalDate.getDate()-1); renderJournalView(); });
   document.getElementById("journalNextDay").addEventListener("click", ()=>{ journalDate.setDate(journalDate.getDate()+1); renderJournalView(); });
   document.getElementById("journalGotoToday").addEventListener("click", ()=>{ journalDate = new Date(); renderJournalView(); });
@@ -4778,23 +4797,7 @@
 
   /* ---- recordatorio: la regla de ayer, visible al abrir el panel ---- */
   let radarSum = null;
-  function renderRuleBanner(){
-    const el = document.getElementById("ruleBanner"); if(!el) return;
-    const today = todayKey(new Date()), y = jDay(today,-1), rule = state.journal[y] && state.journal[y].rule;
-    let hidden = false; try{ hidden = localStorage.getItem("panel_rule_hidden") === today; }catch(e){}
-    if(hidden){ el.classList.remove("show"); return; }
-    if(!radarSum){ try{ renderRadar(); }catch(e){} }
-    const rocks = (state.bigRocks && state.bigRocks[today] || []).filter(r=>String(r.text||"").trim());
-    const done = rocks.filter(r=>r.done).length;
-    const slides = [
-      {html: rule ? `<span>🔔 <b>Tu regla de hoy · 05:30 AM:</b> ${escHtml(rule)}</span>` : `<span>🔔 <b>Regla innegociable · 05:30 AM:</b> aún sin definir. Escríbela al cerrar tu Bitácora de hoy.</span>`},
-      {html: rocks.length ? `<span>🪨 <b>Big Rocks de hoy:</b> ${done} de ${rocks.length} cerrados · ${rocks.slice(0,3).map(r=>(r.done?"✓ ":"○ ")+escHtml(String(r.text).slice(0,38))).join(" · ")}</span>` : `<span>🪨 <b>Big Rocks de hoy:</b> aún no defines tus 3 victorias. Hazlo en Agenda.</span>`},
-      {html: `<span>📡 <b>Evolución 90D:</b> ${radarSum ? escHtml(radarSum.txt) : "se activa con 90 días de historia."}</span>`}
-    ];
-    el.innerHTML = ssHtml("banner", slides, "ss-banner") + `<button type="button" title="Ocultar por hoy">✕</button>`;
-    el.classList.add("show");
-    el.querySelector("button[title]").onclick = ()=>{ try{ localStorage.setItem("panel_rule_hidden", today); }catch(e){} el.classList.remove("show"); };
-  }
+  function renderRuleBanner(){ /* banner eliminado */ }
 
   function journalOnShow(){ if(jDirty){ renderJournalKpis(); renderJournalContext(); } else renderJournalView(); }
   /* ---- Radar de Evolución 90D · evidencia vs. percepción ---- */
@@ -6008,16 +6011,21 @@
         <div class="kpi-card"><div class="label">Ahorro activo</div>${k3b}</div>
         <div class="kpi-card"><div class="label">Fuga principal</div>${k4}</div>
       </div>
-      ${finDeckHtml([
-        {tab:"📈 Consumo vs. ideal", html:`<div class="fin-card-h" style="margin-bottom:8px;"><b>Consumo acumulado vs. línea ideal</b><span class="fin-seg"><button class="${vMode?"":"on"}" data-act="mode-total">Total${bud>0?" "+finMoney(bud):""}</button><button class="${vMode?"on":""}" data-act="mode-var">Solo variable${varCeil>0?" "+finMoney(varCeil):""}</button></span></div>
-          ${finChart(N, daily, budC, daysEl, 880, 300)}<div class="fin-note">${chartNote}</div>${c.budgetMonth?"":`<button class="btn small" data-act="budget" style="margin-top:8px;">Definir presupuesto</button>`}`},
-        {tab:"🍩 Por categoría", html:`<div class="fin-card-h" style="margin-bottom:10px;"><b>Distribución por categoría</b><span>gasto del mes · ${cats.length} categorías</span></div>`+(exp>0 ? `<div class="deck-2col"><div class="fin-donut-wrap" style="justify-content:center;">${finDonut(cats.map(k=>({k, v:byCat[k], col:finCatColor(k)})), exp)}</div>
+      ${cfHtml("fin",[
+        {title:"📈 Consumo acumulado vs. línea ideal", extra:`<span class="fin-seg"><button class="${vMode?"":"on"}" data-act="mode-total">Total${bud>0?" "+finMoney(bud):""}</button><button class="${vMode?"on":""}" data-act="mode-var">Solo variable${varCeil>0?" "+finMoney(varCeil):""}</button></span>`,
+          html:`${finChart(N, daily, budC, daysEl, 880, 300)}<div class="fin-note">${chartNote}</div>${c.budgetMonth?"":`<button class="btn small" data-act="budget" style="margin-top:8px;">Definir presupuesto</button>`}`,
+          why:"Si la línea verde va por debajo de la punteada dorada, estás gastando menos de lo que te toca hoy. Si la cruza hacia arriba, vas más rápido que tu presupuesto."},
+        {title:"🍩 Por categoría", extra:`<span style="font-size:11px;color:var(--text-faint)">${cats.length} categorías</span>`,
+          html:(exp>0 ? `<div class="deck-2col"><div class="fin-donut-wrap" style="justify-content:center;">${finDonut(cats.map(k=>({k, v:byCat[k], col:finCatColor(k)})), exp)}</div>
           <div class="fin-legs" style="min-width:0;">${cats.map(k=>`<div class="fin-leg"><i style="background:${finCatColor(k)}"></i><span class="n">${escHtml(k)}</span><span class="v mono">${finMoney(byCat[k])}</span><span class="p mono">${Math.round(byCat[k]/exp*100)}%</span><div class="lim"><i style="width:${byCat[k]/byCat[cats[0]]*100}%;background:${finCatColor(k)}"></i></div></div>`).join("")}</div></div>
           <div class="fin-ratio"><div class="rt"><span>Esenciales <b>${essP}%</b></span><span>Variables / Deseo <b>${100-essP}%</b></span></div>
-            <div class="rb"><i style="width:${essP}%" data-tip="${escAttr("Esenciales\n"+finMoney(essV))}"></i><i class="v" style="width:${100-essP}%" data-tip="${escAttr("Variables / Deseo\n"+finMoney(varV))}"></i></div></div>` : `<div class="fin-empty">Aún no hay gastos este mes.</div>`)},
-        {tab:"🗓️ Días sin gasto", html:(function(){ const r = finRadarParts(mtx, N, daysEl, varCeil, isCur); return `<div class="fin-card-h" style="margin-bottom:10px;"><b>Mapa de días sin gasto &amp; conceptos repetidos</b><span>${daysEl>0?`<b style="color:#34d399">${r.noSp}</b> de ${daysEl} días sin gasto variable`:"—"}</span></div><div class="deck-2col"><div><div class="hm">${r.cells}</div>${r.leg}</div><div><div class="so-note" style="margin:0 0 6px;">Lo que más se repite</div>${r.repHtml}</div></div>`; })()},
-        {tab:"🏦 Ahorro 6 meses", html:`<div class="fin-card-h" style="margin-bottom:8px;"><b>Evolución de ahorro · histórico vs. activo</b><span>últimos 6 meses</span></div><div class="deck-sum"><div><small>Ahorro histórico logrado</small><b>${finMoney(sv.hist)}</b></div><div><small>Ahorro activo</small><b style="color:#34d399">${finMoney(sv.act)}</b></div></div>${finSavChart()}`}
-      ])}
+            <div class="rb"><i style="width:${essP}%" data-tip="${escAttr("Esenciales\n"+finMoney(essV))}"></i><i class="v" style="width:${100-essP}%" data-tip="${escAttr("Variables / Deseo\n"+finMoney(varV))}"></i></div></div>` : `<div class="fin-empty">Aún no hay gastos este mes.</div>`),
+          why:"Cada trozo es una categoría: cuanto más grande, más plata se te va ahí. La barra de abajo te dice cuánto va a lo necesario y cuánto a gustos."},
+        {title:"🗓️ Días sin gasto y conceptos repetidos", html:(function(){ const r = finRadarParts(mtx, N, daysEl, varCeil, isCur); return `<div class="deck-2col"><div><div class="hm">${r.cells}</div>${r.leg}</div><div><div class="so-note" style="margin:0 0 6px;"><b style="color:#34d399">${daysEl>0?r.noSp:"—"}</b> de ${daysEl} días sin gasto variable · lo que más se repite</div>${r.repHtml}</div></div>`; })(),
+          why:"Los cuadros verdes son días en que no compraste nada extra; los rojos, días pesados. Al lado ves en qué compras pequeñas se te va la plata una y otra vez."},
+        {title:"🏦 Ahorro histórico vs. activo", html:`<div class="deck-sum"><div><small>Histórico logrado</small><b>${finMoney(sv.hist)}</b></div><div><small>Activo hoy</small><b style="color:#34d399">${finMoney(sv.act)}</b></div></div>${finSavChart()}`,
+          why:"Las barras doradas muestran todo lo que has ahorrado a lo largo de los meses y nunca baja. La línea verde es lo que realmente tienes disponible hoy en tu ahorro."}
+      ], 410)}
       ${catCards?`<div class="fin-sec" style="margin-top:14px;"><div class="fin-sec-h"><h3>Categorías de gasto</h3><span style="font-size:11px;color:var(--text-faint)">Clic en una card para filtrar los movimientos · ✎ para fijar su tope</span></div><div class="fin-cats">${catCards}</div>${inactiveHtml}</div>`:""}
       <div class="fin-two">
         <div class="fin-card"><div class="fin-card-h"><b>Gastos fijos del mes</b><span><button class="fin-mini" data-act="fixed-edit">✎ Plantilla</button>${pendFixed>0?` <button class="fin-mini gold" data-act="fixed-all">Pagar todos</button>`:""}</span></div>${fixedHtml}</div>
@@ -6095,13 +6103,6 @@
     });
     svg += `<line x1="${pl}" x2="${W-pr}" y1="${Y(act)}" y2="${Y(act)}" stroke="#34d399" stroke-width="1.6" stroke-dasharray="6 5"/><text x="${pl+4}" y="${Y(act)-6}" text-anchor="start" class="ax" fill="#34d399">Ahorro activo ${finMoney(act)}</text>`;
     return svg+`</svg><div class="hm-leg"><span><i style="background:#EAB308"></i>Histórico acumulado</span><span><i style="background:#8f7a52"></i>Ahorrado en el mes</span><span><i style="background:#34d399"></i>Ahorro activo hoy</span></div>`;
-  }
-  function finDeckHtml(slides){
-    const n = slides.length; if(DECK.i>=n) DECK.i = 0;
-    return `<div class="deck ss" data-n="${n}" style="overflow:visible;"><i class="ss-bar" style="width:${Math.min(100,DECK.t/DECK_MS*100)}%"></i>
-      <div class="deck-tabs">${slides.map((x,k)=>`<button type="button" data-deckgo="${k}" class="${k===DECK.i?"on":""}">${x.tab}</button>`).join("")}</div>
-      <div class="deck-stage"><button type="button" class="deck-nav l" data-decknav="-1" aria-label="Gráfico anterior">‹</button><button type="button" class="deck-nav r" data-decknav="1" aria-label="Gráfico siguiente">›</button>
-      ${slides.map((x,k)=>`<div class="deck-c p${(k-DECK.i+n)%n}">${x.html}</div>`).join("")}</div></div>`;
   }
   function finFeedHtml(){
     let list = fin.tx.filter(t=>t.space!=="hogar" && t.date && t.date.slice(0,7)===finMonth).sort((a,b)=> b.date.localeCompare(a.date) || (b.createdAt||0)-(a.createdAt||0));
